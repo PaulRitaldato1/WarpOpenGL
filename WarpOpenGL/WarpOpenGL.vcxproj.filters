@@ -1,0 +1,176 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="External\glad.c">
+      <Filter>External</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\Imgui\imgui.cpp">
+      <Filter>Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\Imgui\imgui_demo.cpp">
+      <Filter>Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\Imgui\imgui_draw.cpp">
+      <Filter>Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\Imgui\imgui_impl_glfw.cpp">
+      <Filter>Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\Imgui\imgui_impl_opengl3.cpp">
+      <Filter>Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\Imgui\imgui_tables.cpp">
+      <Filter>Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Includes\Imgui\imgui_widgets.cpp">
+      <Filter>Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh\Model.cpp" />
+    <ClCompile Include="Buffers\GLBuffers\GLVertexBuffer.cpp" />
+    <ClCompile Include="Buffers\GLBuffers\GLIndexBuffer.cpp" />
+    <ClCompile Include="Buffers\GLBuffers\GLVertexArray.cpp" />
+    <ClCompile Include="Renderer\GLRenderer\GLRenderer.cpp" />
+    <ClCompile Include="Buffers\GLBuffers\UniformBufferObject.cpp" />
+    <ClCompile Include="Mesh\GeoGen.cpp" />
+    <ClCompile Include="Buffers\GLBuffers\GLSSBO.cpp" />
+    <ClCompile Include="Mesh\ModelLoader.cpp" />
+    <ClCompile Include="SceneManagement\RenderPass\RenderPassDefs\RenderPassCollection.cpp" />
+    <ClCompile Include="Buffers\GLBuffers\GLFramebuffer.cpp" />
+    <ClCompile Include="Buffers\GLBuffers\GLRenderBuffer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="External">
+      <UniqueIdentifier>{73c2bcd1-78b7-4f87-b4b7-5623ead55401}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Imgui">
+      <UniqueIdentifier>{d84c8c3a-72c9-41cf-b1c1-8841915270cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{6845dbb4-4af3-4650-bbf5-14727614f902}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cameras">
+      <UniqueIdentifier>{dc2bb32c-7b2b-4df5-9f5e-dd5df3ebf93b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Texture">
+      <UniqueIdentifier>{c647cf45-5100-4736-8051-05807fde168b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Texture\GLTexture">
+      <UniqueIdentifier>{e6ff2035-882f-4858-a1ab-e6035d024bd3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mesh">
+      <UniqueIdentifier>{ea656944-a658-4c52-a260-be554046f14d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{a871b2b7-32c2-4dfc-bb7e-f2323aee1166}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{88095970-c255-4032-8b83-49bfa0b4dcb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Shaders">
+      <UniqueIdentifier>{556b9d06-a70d-432d-acb6-583365ecb563}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\backpack">
+      <UniqueIdentifier>{dea13ff4-24ee-4b30-9402-cfc184e06ac0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Common\CommonTypes.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Cameras\FPCamera.h">
+      <Filter>Cameras</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture\GLTexture\GLTexture.h">
+      <Filter>Texture\GLTexture</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture\ITexture.h">
+      <Filter>Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh\Mesh.h">
+      <Filter>Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh\Model.h">
+      <Filter>Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\Shader.h">
+      <Filter>Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture\stb_image.h">
+      <Filter>Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\Imgui\imconfig.h">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\Imgui\imgui.h">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\Imgui\imgui_impl_glfw.h">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\Imgui\imgui_impl_opengl3.h">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\Imgui\imgui_internal.h">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\Imgui\ImGuiWrapper.h">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\Imgui\imstb_rectpack.h">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\Imgui\imstb_textedit.h">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\Imgui\imstb_truetype.h">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Parallelization\Threading\ThreadPool.h" />
+    <ClInclude Include="Buffers\GLBuffers\GLVertexBuffer.h" />
+    <ClInclude Include="Buffers\GenericBuffer.h" />
+    <ClInclude Include="Buffers\GLBuffers\GLIndexBuffer.h" />
+    <ClInclude Include="Buffers\GLBuffers\GLVertexBufferLayout.h" />
+    <ClInclude Include="Common\Assert.h" />
+    <ClInclude Include="Mesh\Vertex.h" />
+    <ClInclude Include="Buffers\GLBuffers\GLVertexArray.h" />
+    <ClInclude Include="Renderer\IRenderer.h" />
+    <ClInclude Include="Renderer\GLRenderer\GLRenderer.h" />
+    <ClInclude Include="Buffers\GLBuffers\UniformBufferObject.h" />
+    <ClInclude Include="Mesh\GeoGen.h" />
+    <ClInclude Include="Common\GPUMarker.h" />
+    <ClInclude Include="Common\Profiler.h" />
+    <ClInclude Include="Buffers\GLBuffers\GLSSBO.h" />
+    <ClInclude Include="Mesh\ModelLoader.h" />
+    <ClInclude Include="Shader\ShaderManager.h" />
+    <ClInclude Include="SceneManagement\RenderPass\RenderPass.h" />
+    <ClInclude Include="SceneManagement\RenderPass\RenderPassManager.h" />
+    <ClInclude Include="SceneManagement\RenderPass\RenderPassDefs\RenderPassCollection.h" />
+    <ClInclude Include="Buffers\GLBuffers\GLFramebuffer.h" />
+    <ClInclude Include="Buffers\GLBuffers\GLRenderBuffer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Shaders\model.vs" />
+    <None Include="Resources\Shaders\model.fs" />
+    <None Include="Resources\Backpack\backpack.mtl" />
+    <None Include="Resources\Shaders\instancedModel.vs" />
+    <None Include="Resources\Shaders\ZOnly.vs" />
+    <None Include="Resources\Shaders\ZOnly.fs" />
+    <None Include="Resources\Shaders\ZOnlyInstanced.vs" />
+    <None Include="Resources\Shaders\simpleDepthDebug.vs" />
+    <None Include="Resources\Shaders\simpleDepthDebug.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\Backpack\ao.jpg" />
+    <Image Include="Resources\Backpack\diffuse.jpg" />
+    <Image Include="Resources\Backpack\normal.png" />
+    <Image Include="Resources\Backpack\roughness.jpg" />
+    <Image Include="Resources\Backpack\specular.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="Resources\Backpack\backpack.obj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Resources\Backpack\source_attribution.txt" />
+  </ItemGroup>
+</Project>
