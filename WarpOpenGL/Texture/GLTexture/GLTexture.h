@@ -131,11 +131,11 @@ struct GLTexture : ITexture
 	{
 		PROFILE_FUNCTION();
 
-		if (TextureTracker::getInstance().RegisterTexture(Id, slot))
-		{
+		//if (TextureTracker::getInstance().RegisterTexture(Id, slot))
+		//{
 			glActiveTexture(GL_TEXTURE0 + slot);
 			glBindTexture(GL_TEXTURE_2D, Id);
-		}
+		//}
 	}
 
 	void Unbind() const
