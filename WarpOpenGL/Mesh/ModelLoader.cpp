@@ -155,10 +155,10 @@ Ref<Mesh> ModelLoader::loadMesh(aiMesh* mesh, string& directory, const aiScene* 
 	Vector<Ref<GLTexParams>> specularMaps = loadTextures(material, aiTextureType_SPECULAR, "texture_specular", directory);
 	textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 	//3 normal maps
-	Vector<Ref<GLTexParams>> normalMaps = loadTextures(material, aiTextureType_NORMALS, "texture_normal", directory);
+	Vector<Ref<GLTexParams>> normalMaps = loadTextures(material, aiTextureType_HEIGHT, "texture_normal", directory);
 	textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
 	//4 height maps
-	Vector<Ref<GLTexParams>> heightMaps = loadTextures(material, aiTextureType_HEIGHT, "texture_height", directory);
+	Vector<Ref<GLTexParams>> heightMaps = loadTextures(material, aiTextureType_AMBIENT, "texture_height", directory);
 	textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
 	return std::make_shared<Mesh>(vertices, indices, textures);

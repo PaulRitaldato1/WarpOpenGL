@@ -31,6 +31,7 @@ struct ModelDesc
 {
 	string path;
 	bool gamma;
+	bool hasShadow;
 	bool isInstanced;
 	Vector<glm::mat4> instances;
 };
@@ -43,6 +44,7 @@ public:
 		m_meshes(std::move(meshList))
 		, m_isInstanced(desc.isInstanced)
 		, m_gammaCorrection(desc.gamma)
+		, m_hasShadow(desc.hasShadow)
 		, m_path(desc.path)
 	{
 		m_name = m_path.substr(m_path.find_last_of('/') + 1, m_path.size()-1);
@@ -113,6 +115,8 @@ public:
 	}
 
 	bool getIsInstanced() const { return m_isInstanced; }
+
+	bool getHasShadow() const { return m_hasShadow; }
 private:
 
 	Vector<Ref<Mesh>> m_meshes;
@@ -123,7 +127,7 @@ private:
 	glm::mat4 m_modelTransform;
 
 	bool m_gammaCorrection;
-	
+	bool m_hasShadow;
 	bool m_isInstanced;
 	URef<GLSSBO> m_ssbo; //ssbo for instanced models
 	Vector<glm::mat4> m_instances;

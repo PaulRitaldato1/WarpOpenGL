@@ -69,12 +69,15 @@ void AddZOnlyPass(uint width, uint height, Vector<Ref<Model>>& models)
 
 			for (auto& model : models)
 			{
-				if (!model->getIsInstanced())
+				if (model->getHasShadow())
 				{
-					model->Draw(*data->shaders[0]);
+					if (!model->getIsInstanced())
+					{
+						model->Draw(*data->shaders[0]);
+					}
+					else
+						model->Draw(*data->shaders[1]);
 				}
-				else
-					model->Draw(*data->shaders[1]);
 			}
 
 			data->frameBuffer->Unbind();

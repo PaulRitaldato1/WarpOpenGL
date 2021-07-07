@@ -163,8 +163,8 @@ int main()
 	//load model
 	Vector<ModelDesc> modelDescs;
 	//modelDescs.push_back({"Resources/Backpack/backpack.obj", false, false});
-	modelDescs.push_back({ "Resources/rock/rock.obj", false, true, modelMatrices});
-	modelDescs.push_back({ "Resources/planet/planet.obj", false, false });
+	modelDescs.push_back({ "Resources/rock/rock.obj", false, false, true, modelMatrices});
+	modelDescs.push_back({ "Resources/planet/planet.obj", false, true, false });
 	Vector<Ref<Model>> models = loader.loadModelsAsync(modelDescs);
 	
 	UniformBufferObject viewProjUBO(2*sizeof(glm::mat4), 0);
