@@ -49,7 +49,7 @@ float lastFrame = 0.0f;
 void loadRenderDoc()
 {
 	RENDERDOC_API_1_1_2* rdoc_api = NULL;
-	HINSTANCE hLib = LoadLibraryA("C:\\Program Files\\RenderDoc\\renderdoc.dll");
+	HINSTANCE hLib = LoadLibraryA("Lib\\renderdoc.dll");
 	if (HMODULE mod = GetModuleHandleA("renderdoc.dll"))
 	{
 		pRENDERDOC_GetAPI RENDERDOC_GetAPI =
