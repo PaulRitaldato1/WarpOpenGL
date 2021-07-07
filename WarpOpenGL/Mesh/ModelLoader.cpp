@@ -2,7 +2,10 @@
 
 Vector<Ref<Model>> ModelLoader::loadModelsAsync(Vector<ModelDesc>& modelArgs)
 {
-	PROFILE_FUNCTION();
+	PROFILE_SCOPE("ModelLoader::LoadModelAsync");
+	
+	stbi_set_flip_vertically_on_load(true);
+
 	Vector<std::future<Ref<Model>>> futures;
 	auto loadFunc = [this](ModelDesc& args) { return loadModel(args); };
 	for (auto& args : modelArgs)

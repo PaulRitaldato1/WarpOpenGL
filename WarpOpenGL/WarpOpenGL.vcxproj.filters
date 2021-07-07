@@ -148,6 +148,7 @@
     <ClInclude Include="SceneManagement\RenderPass\RenderPassDefs\RenderPassCollection.h" />
     <ClInclude Include="Buffers\GLBuffers\GLFramebuffer.h" />
     <ClInclude Include="Buffers\GLBuffers\GLRenderBuffer.h" />
+    <ClInclude Include="Texture\GLTexture\TextureTracker.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\model.vs" />

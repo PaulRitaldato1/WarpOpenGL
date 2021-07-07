@@ -228,7 +228,6 @@ public:
 private:
 
 	HashMap<string, int> m_locationCache;
-	HashMap<string, int> m_UBOLocationCache;
 	string m_vertPath;
 	string m_fragPath;
 	string m_geoPath;
@@ -244,8 +243,9 @@ private:
 		else
 		{
 			int location = glGetUniformLocation(m_id, name.c_str());
-			if (location == -1)
-				std::cout << "Warning: uniform " << name << " doesnt exist\n";
+
+			DYNAMIC_ASSERT(location != -1, "WARNING: uniform " + name + " does not exist\n");
+
 			m_locationCache[name] = location;
 			return location;
 		}

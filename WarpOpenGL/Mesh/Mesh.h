@@ -98,11 +98,9 @@ public:
 
 	void Draw(Shader& shader)
 	{
-		PROFILE_FUNCTION();
+		PROFILE_SCOPE("MeshDraw");
 
 		FATAL_ASSERT(m_textures.size() > 0, "No textures attached to mesh");
-
-		shader.Bind();
 
 		uint totalTexCount = 0;
 		for (auto texture : m_textures)
@@ -124,8 +122,8 @@ public:
 			g_renderer.DrawIndexed(m_indexedDraw);
 		}
 
-		for (Ref<GLTexture>& tex : m_textures)
-			tex->Unbind();
+		//for (Ref<GLTexture>& tex : m_textures)
+		//	tex->Unbind();
 	}
 
 	void setVertices(Vector<Vertex>& vertices)

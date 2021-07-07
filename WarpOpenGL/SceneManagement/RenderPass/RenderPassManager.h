@@ -1,5 +1,6 @@
 #pragma once
 #include <SceneManagement/RenderPass/RenderPass.h>
+#include <Common/Profiler.h>
 
 class RenderPassManager 
 {
@@ -42,6 +43,7 @@ public:
 
 	void ExecutePasses()
 	{
+		PROFILE_SCOPE("Frame Start");
 		for (Ref<RenderPass>& pass : m_passOrder)
 		{
 			if (m_dependencies.find(pass->getDependency()) == m_dependencies.end())

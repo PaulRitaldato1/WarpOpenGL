@@ -1,8 +1,10 @@
 #pragma once
 
-#ifndef NDEBUG
 #include <glad/glad.h>
 #include <Common/CommonTypes.h>
+
+#define GPUMarkers
+#ifdef GPUMarkers
 class Marker
 {
 public:
@@ -16,11 +18,8 @@ public:
 		glPopDebugGroup();
 	}
 };
+
+#define GPUMarker(name) Marker marker(name)
 #else
-class Marker
-{
-public:
-	Marker(const string& message)
-	{}
-};
+#define GPUMarker(name) do{}while(0)
 #endif

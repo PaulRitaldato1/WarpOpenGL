@@ -13,21 +13,15 @@
 #include <windows.h>
 #include <RenderDoc/renderdoc_app.h>
 
-#include <chrono>
 #include <Renderer/GLRenderer/GLRenderer.h>
 #include <Buffers/GLBuffers/UniformBufferObject.h>
 #include <Mesh/GeoGen.h>
 #include <Mesh/ModelLoader.h>
-#include <SceneManagement/RenderPass/RenderPassManager.h>
 #include <SceneManagement/RenderPass/RenderPassDefs/RenderPassCollection.h>
 
 /*TO DO spitballing goes here*/
 
 //TODO REGISTER SYSTEM FOR IMGUI. SORT OF LIKE VISITOR PATTERN BUT FOR ANY REGISTERED VAR
-//TODO RENDERPASS SYSTEM
-//	1. SETUP PHASE, EXECUTE PHASE
-//	2. WAY TO PASS DATA BETWEEN PHASES
-//	3. NO VALIDATION BECAUSE FUCK THAT
 //TODO LIST OF RENDER ITEMS THAT CAN BE SORTED BY DISTANCE TO CAMERA
 //TODO SHOULD ALL BUFFER ALLOC GO THROUGH RENDERER? 
 //	1. COULD MAKE DRAW CALLS EASIER?
@@ -134,44 +128,6 @@ Vector<glm::mat4> generateAsteroidPositions(uint amount)
 
 	return modelMatrices;
 }
-unsigned int quadVAO = 0;
-unsigned int quadVBO;
-void renderQuad()
-{
-	if (quadVAO == 0)
-	{
-		float quadVertices[] = {
-			// positions        // texture Coords
-			-1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-			 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-			 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-		};
-		// setup plane VAO
-		glGenVertexArrays(1, &quadVAO);
-		glGenBuffers(1, &quadVBO);
-		glBindVertexArray(quadVAO);
-		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-	}
-	glBindVertexArray(quadVAO);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
-}
-
-void debugDrawDepth(Ref<GLTexture> depth, Shader& shader)
-{
-	g_renderer.setViewport(SCR_WIDTH, SCR_HEIGHT);
-	shader.setUniform("texture_buffer0", 0);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, depth->Id);
-	renderQuad();
-	g_renderer.setViewport(1920, 1080);
-}
 
 int main()
 {
@@ -205,16 +161,11 @@ int main()
 	Vector<glm::mat4> modelMatrices = generateAsteroidPositions(amount);
 	
 	//load model
-	stbi_set_flip_vertically_on_load(true);
-	auto start = std::chrono::high_resolution_clock::now();
 	Vector<ModelDesc> modelDescs;
 	//modelDescs.push_back({"Resources/Backpack/backpack.obj", false, false});
 	modelDescs.push_back({ "Resources/rock/rock.obj", false, true, modelMatrices});
 	modelDescs.push_back({ "Resources/planet/planet.obj", false, false });
 	Vector<Ref<Model>> models = loader.loadModelsAsync(modelDescs);
-	auto stop = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
-	std::cout << "Model Loading time: " << duration.count() << std::endl;
 	
 	UniformBufferObject viewProjUBO(2*sizeof(glm::mat4), 0);
 	
@@ -225,6 +176,7 @@ int main()
 
 	AddZOnlyPass(1024, 1024, models);
 	AddOpaquePass(models);
+
 	// render loop
 	// -----------
 	while (!glfwWindowShouldClose(window))
@@ -252,20 +204,17 @@ int main()
 
 		// render
 		// ------
-		g_renderer.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		g_renderer.ClearBoundBufferBits();
-
-		Ref<ZOnlyPassData> data = std::dynamic_pointer_cast<ZOnlyPassData>(g_renderPassManager.getPassOutput("ZOnlyPass"));
-		//debugDrawDepth(data->depthTexture, debugShader);
-
 
 		g_renderPassManager.ExecutePasses();
 
 		imgui.render();
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
-		glfwSwapBuffers(window);
-		glfwPollEvents();
+		{
+			PROFILE_SCOPE("Swap Buffers");
+			glfwSwapBuffers(window);
+			glfwPollEvents();
+		}
 	}
 
 	// glfw: terminate, clearing all previously allocated GLFW resources.

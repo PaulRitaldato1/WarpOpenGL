@@ -6,6 +6,7 @@ GLSSBO::GLSSBO(uint size, uint bindingPoint) : m_size(size), m_bindingPoint(bind
 	Bind();
 	glBufferData(GL_SHADER_STORAGE_BUFFER, size, NULL, GL_STATIC_DRAW);
 	BindRange(0, size);
+	m_isDirty = true;
 }
 
 void GLSSBO::Bind() const
@@ -21,5 +22,6 @@ void GLSSBO::Unbind() const
 void GLSSBO::BindRange(uint begin, uint end)
 {
 	glBindBufferRange(GL_SHADER_STORAGE_BUFFER, m_bindingPoint, m_id, 0, m_size);
+	m_isDirty = true;
 }
 

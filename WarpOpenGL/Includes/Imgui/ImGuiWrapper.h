@@ -3,6 +3,7 @@
 #include <Imgui/imgui_impl_glfw.h>
 #include <Imgui/imgui_impl_opengl3.h>
 #include <Common/GPUMarker.h>
+#include <Common/Profiler.h>
 
 class ImGuiWrapper
 {
@@ -26,7 +27,9 @@ public:
 
 	void render()
 	{
-		Marker marker("Imgui");
+		//Marker marker("Imgui");
+		GPUMarker("Imgui");
+		PROFILE_SCOPE("Imgui Render");
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}

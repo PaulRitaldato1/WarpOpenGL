@@ -276,6 +276,7 @@
     <ClInclude Include="Shader\Shader.h" />
     <ClInclude Include="Shader\ShaderManager.h" />
     <ClInclude Include="Texture\GLTexture\GLTexture.h" />
+    <ClInclude Include="Texture\GLTexture\TextureTracker.h" />
     <ClInclude Include="Texture\ITexture.h" />
     <ClInclude Include="Texture\stb_image.h" />
   </ItemGroup>

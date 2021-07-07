@@ -11,12 +11,22 @@ RenderPassManager g_renderPassManager;
 
 void AddZOnlyPass(uint width, uint height, Vector<Ref<Model>>& models)
 {
+	struct ZOnlyPassData : public IPassData
+	{
+		ZOnlyPassData()
+		{
+			isValid = true;
+		}
 
+		Ref<GLTexture> depthTexture;
+		Ref<GLFramebuffer> frameBuffer;
+		Array<Ref<Shader>, 2> shaders;
+	};
 
 	g_renderPassManager.AddPass("ZOnlyPass",
 		[&](Ref<IPassData> passData) 
 		{
-			
+			PROFILE_SCOPE("ZOnlyPass Setup");
 			Ref<ZOnlyPassData> zPassData = std::make_shared<ZOnlyPassData>();
 			zPassData->frameBuffer = std::make_shared<GLFramebuffer>();
 
@@ -28,8 +38,14 @@ void AddZOnlyPass(uint width, uint height, Vector<Ref<Model>>& models)
 			float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 			zPassData->depthTexture->setParameterfv(GL_TEXTURE_BORDER_COLOR, borderColor);
 
-			zPassData->frameBuffer->AttachTexture(GL_DEPTH_ATTACHMENT, zPassData->depthTexture);
+			zPassData->frameBuffer->Bind();
+			zPassData->frameBuffer->AttachTexture(AttachmentType::DEPTH, zPassData->depthTexture);
+			g_renderer.setReadBuffer(GL_NONE);
+			g_renderer.setDrawBuffer(GL_NONE);
+			
+			DYNAMIC_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Frambuffer machine broke");
 
+			zPassData->frameBuffer->Unbind();
 			zPassData->shaders[0] = std::make_shared<Shader>("Resources/Shaders/ZOnly.vs", "Resources/Shaders/ZOnly.fs");
 			zPassData->shaders[1] = std::make_shared<Shader>("Resources/Shaders/ZOnlyInstanced.vs", "Resources/Shaders/ZOnly.fs");
 
@@ -37,6 +53,7 @@ void AddZOnlyPass(uint width, uint height, Vector<Ref<Model>>& models)
 		},
 		[=](Ref<IPassData> passData, Ref<IPassData> setupData)
 		{
+			PROFILE_SCOPE("ZOnlyPass Execute");
 
 			Ref<ZOnlyPassData> data = std::dynamic_pointer_cast<ZOnlyPassData>(setupData);
 
@@ -47,9 +64,6 @@ void AddZOnlyPass(uint width, uint height, Vector<Ref<Model>>& models)
 			g_renderer.setViewport(data->depthTexture->Width, data->depthTexture->Height);
 			
 			g_renderer.setCullMode(GL_FRONT);
-			
-			g_renderer.setReadBuffer(GL_NONE);
-			g_renderer.setDrawBuffer(GL_NONE);
 
 			g_renderer.ClearBufferBits(GL_DEPTH_BUFFER_BIT);
 
@@ -87,53 +101,25 @@ void AddOpaquePass(Vector<Ref<Model>>& modelList)
 	g_renderPassManager.AddPass("OpaquePass",
 		[&](Ref<IPassData> passData) 
 		{
+			PROFILE_SCOPE("OpaquePass Setup");
+
 			Ref<OpaquePassData> data = std::make_shared<OpaquePassData>();
 
 			data->shaders[0] = std::make_shared<Shader>("Resources/Shaders/model.vs", "Resources/Shaders/model.fs");
 			data->shaders[1] = std::make_shared<Shader>("Resources/Shaders/instancedModel.vs", "Resources/Shaders/model.fs");
 
-			//uint amount = 100000;
-			//Vector<glm::mat4> modelMatrices;
-
-			//srand(time(NULL)); // initialize random seed	
-			//float radius = 150.0;
-			//float offset = 25.0f;
-			//for (unsigned int i = 0; i < amount; i++)
-			//{
-			//	glm::mat4 model = glm::mat4(1.0f);
-			//	// 1. translation: displace along circle with 'radius' in range [-offset, offset]
-			//	float angle = (float)i / (float)amount * 360.0f;
-			//	float displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-			//	float x = sin(angle) * radius + displacement;
-			//	displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-			//	float y = displacement * 0.4f; // keep height of asteroid field smaller compared to width of x and z
-			//	displacement = (rand() % (int)(2 * offset * 100)) / 100.0f - offset;
-			//	float z = cos(angle) * radius + displacement;
-			//	model = glm::translate(model, glm::vec3(x, y, z));
-
-			//	// 2. scale: Scale between 0.05 and 0.25f
-			//	float scale = (rand() % 20) / 100.0f + 0.05;
-			//	model = glm::scale(model, glm::vec3(scale));
-
-			//	// 3. rotation: add random rotation around a (semi)randomly picked rotation axis vector
-			//	float rotAngle = (rand() % 360);
-			//	model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
-
-			//	// 4. now add to list of matrices
-			//	data->instancedModelMatrices.push_back(model);
-
-			//}
-
 			data->models = modelList;
-			//data->modelMatrix = glm::mat4(1.0f);
-			//data->modelMatrix = glm::translate(data->modelMatrix, glm::vec3(0.0f, -3.0f, 0.0f));
-			//data->modelMatrix = glm::scale(data->modelMatrix, glm::vec3(10.0f, 10.0f, 10.0f));
 
 			return data;
 		},
 		[&](Ref<IPassData> passData, Ref<IPassData> setupData)
 		{
+			PROFILE_SCOPE("OpaquePass Execute");
+
 			Ref<OpaquePassData> data = std::dynamic_pointer_cast<OpaquePassData>(setupData);
+
+			g_renderer.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+			g_renderer.ClearBoundBufferBits();
 
 			for (auto& model : data->models)
 			{

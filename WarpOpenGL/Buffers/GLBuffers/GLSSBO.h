@@ -32,11 +32,17 @@ public:
 		glBufferSubData(GL_SHADER_STORAGE_BUFFER, m_currentOffset, data.size() * sizeof(glm::mat4), data.data());
 		updateOffset(data.size() * sizeof(glm::mat4));
 		Unbind();
+		m_isDirty = false;
+	}
+	void BindRange(uint begin, uint end);
+
+	bool isDirty()
+	{
+		return m_isDirty;
 	}
 
 private:
 
-	void BindRange(uint begin, uint end);
 	void updateOffset(uint size)
 	{
 		FATAL_ASSERT(m_currentOffset + size <= m_size, "Attemping to bind more memory than buffer contains!");
@@ -50,4 +56,5 @@ private:
 	uint m_currentOffset;
 	uint m_size;
 	uint m_bindingPoint;
+	bool m_isDirty;
 };

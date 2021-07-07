@@ -53,15 +53,16 @@ public:
 
 	void ExecutePass(Ref<IPassData> data)
 	{
-		Marker marker(m_name + " Execute");
-
+		//Marker marker(m_name + " Execute");
+		GPUMarker(m_name + " Execute");
 		m_output = m_execute(data, m_setupOutput);
 		m_currentState = PassState::PassState_ExecuteComplete;
 	}
 
 	void ExecuteSetup(Ref<IPassData> data)
 	{
-		Marker marker(m_name + " Setup");
+		//Marker marker(m_name + " Setup");
+		GPUMarker(m_name + " Setup");
 
 		m_setupOutput = m_setup(data);
 		m_currentState = PassState::PassState_SetupComplete;

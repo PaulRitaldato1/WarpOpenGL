@@ -8,21 +8,9 @@
 
 #include <SceneManagement/RenderPass/RenderPassManager.h>
 
-struct ZOnlyPassData : public IPassData
-{
-	ZOnlyPassData()
-	{
-		isValid = true;
-	}
-
-	Ref<GLTexture> depthTexture;
-	Ref<GLFramebuffer> frameBuffer;
-	Array<Ref<Shader>, 2> shaders;
-};
-
 void AddZOnlyPass(uint width, uint height, Vector<Ref<Model>>& models);
 
-void AddDebugDepthPass();
+void AddDebugDepthPass(uint width, uint height);
 
 void AddOpaquePass(Vector<Ref<Model>>& modelList);
 

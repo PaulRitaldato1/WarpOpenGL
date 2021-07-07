@@ -23,16 +23,16 @@ void GLFramebuffer::Unbind() const
 
 void GLFramebuffer::AttachTexture(GLenum attachmentType, Ref<GLTexture> texture)
 {
-	Bind();
+
 	uint attachmentNum = (attachmentType == AttachmentType::COLOR) ? m_numColorAttachments : 0;
 
 	if (texture->TexType == GL_TEXTURE_1D)
 	{
-		glFramebufferTexture1D(GL_FRAMEBUFFER, attachmentType + attachmentNum, texture->Format, texture->Id, 0);
+		glFramebufferTexture1D(GL_FRAMEBUFFER, attachmentType + attachmentNum, texture->TexType, texture->Id, 0);
 	}
 	else if (texture->TexType == GL_TEXTURE_2D)
 	{
-		glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, texture->Format, texture->Id, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType + attachmentNum, texture->TexType, texture->Id, 0);
 	}
 	//else if (texture->Format == GL_TEXTURE_3D)
 	//{
@@ -41,7 +41,6 @@ void GLFramebuffer::AttachTexture(GLenum attachmentType, Ref<GLTexture> texture)
 
 	if (attachmentType == AttachmentType::COLOR)
 		m_numColorAttachments++;
-	Unbind();
 }
 
 void GLFramebuffer::AttachRenderBuffer(Ref<GLRenderBuffer> rbo)

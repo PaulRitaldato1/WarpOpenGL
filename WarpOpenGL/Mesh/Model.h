@@ -71,16 +71,22 @@ public:
 
 	void Draw(Shader& shader)
 	{
-		PROFILE_FUNCTION();
-		Marker marker(m_name);
+		string s = m_name + " draw";
+		PROFILE_SCOPE(s.c_str());
+		GPUMarker(s);
+		//Marker marker(m_name);
 
-		if (m_isInstanced)
+		shader.Bind();
+		
+		if (m_isInstanced && m_ssbo->isDirty())
 		{
 			m_ssbo->BindSubdata<Vector<glm::mat4>> (m_instances);
 		}
+		else
+		{
+			shader.setUniform("model", m_modelTransform);
+		}
 
-		shader.Bind();
-		shader.setUniform("model", m_modelTransform);
 		for (auto& mesh : m_meshes)
 			mesh->Draw(shader);
 	}

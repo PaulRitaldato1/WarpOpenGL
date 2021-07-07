@@ -5,6 +5,8 @@
 #include <stdexcept>
 #include <Texture/ITexture.h>
 #include <Common/Profiler.h>
+#include <Texture/GLTexture/TextureTracker.h>
+#include <iostream>
 
 struct GLTexParams
 {
@@ -99,8 +101,6 @@ struct GLTexture : ITexture
 		glGenTextures(1, &Id);
 		glBindTexture(texType, Id);
 		glTexImage2D(texType, 0, internalFormat, width, height, 0, format, dataType, NULL);
-		glTexParameteri(texType, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(texType, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	}
 
 	GLTexture(const GLTexture& source)
@@ -131,8 +131,11 @@ struct GLTexture : ITexture
 	{
 		PROFILE_FUNCTION();
 
-		glActiveTexture(GL_TEXTURE0 + slot);
-		glBindTexture(GL_TEXTURE_2D, Id);
+		if (TextureTracker::getInstance().RegisterTexture(Id, slot))
+		{
+			glActiveTexture(GL_TEXTURE0 + slot);
+			glBindTexture(GL_TEXTURE_2D, Id);
+		}
 	}
 
 	void Unbind() const
