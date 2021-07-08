@@ -38,6 +38,7 @@
     <ClCompile Include="SceneManagement\RenderPass\RenderPassDefs\RenderPassCollection.cpp" />
     <ClCompile Include="Buffers\GLBuffers\GLFramebuffer.cpp" />
     <ClCompile Include="Buffers\GLBuffers\GLRenderBuffer.cpp" />
+    <ClCompile Include="SceneManagement\Scene\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="External">
@@ -149,6 +150,9 @@
     <ClInclude Include="Buffers\GLBuffers\GLFramebuffer.h" />
     <ClInclude Include="Buffers\GLBuffers\GLRenderBuffer.h" />
     <ClInclude Include="Texture\GLTexture\TextureTracker.h" />
+    <ClInclude Include="Lights\Pointlight.h" />
+    <ClInclude Include="Lights\Spotlight.h" />
+    <ClInclude Include="SceneManagement\Scene\Scene.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\model.vs" />

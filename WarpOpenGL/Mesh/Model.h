@@ -117,6 +117,7 @@ public:
 	bool getIsInstanced() const { return m_isInstanced; }
 
 	bool getHasShadow() const { return m_hasShadow; }
+	bool setHasShadow(bool value) { m_hasShadow = value; }
 private:
 
 	Vector<Ref<Mesh>> m_meshes;

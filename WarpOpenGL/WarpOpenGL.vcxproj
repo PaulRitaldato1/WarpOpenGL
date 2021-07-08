@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -237,6 +237,7 @@
     <ClCompile Include="Mesh\Model.cpp" />
     <ClCompile Include="Renderer\GLRenderer\GLRenderer.cpp" />
     <ClCompile Include="SceneManagement\RenderPass\RenderPassDefs\RenderPassCollection.cpp" />
+    <ClCompile Include="SceneManagement\Scene\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Buffers\GLBuffers\GLFramebuffer.h" />
@@ -262,6 +263,8 @@
     <ClInclude Include="Includes\Imgui\imstb_rectpack.h" />
     <ClInclude Include="Includes\Imgui\imstb_textedit.h" />
     <ClInclude Include="Includes\Imgui\imstb_truetype.h" />
+    <ClInclude Include="Lights\Pointlight.h" />
+    <ClInclude Include="Lights\Spotlight.h" />
     <ClInclude Include="Mesh\GeoGen.h" />
     <ClInclude Include="Mesh\Mesh.h" />
     <ClInclude Include="Mesh\ModelLoader.h" />
@@ -273,6 +276,7 @@
     <ClInclude Include="SceneManagement\RenderPass\RenderPass.h" />
     <ClInclude Include="SceneManagement\RenderPass\RenderPassDefs\RenderPassCollection.h" />
     <ClInclude Include="SceneManagement\RenderPass\RenderPassManager.h" />
+    <ClInclude Include="SceneManagement\Scene\Scene.h" />
     <ClInclude Include="Shader\Shader.h" />
     <ClInclude Include="Shader\ShaderManager.h" />
     <ClInclude Include="Texture\GLTexture\GLTexture.h" />
