@@ -263,6 +263,7 @@
     <ClInclude Include="Includes\Imgui\imstb_rectpack.h" />
     <ClInclude Include="Includes\Imgui\imstb_textedit.h" />
     <ClInclude Include="Includes\Imgui\imstb_truetype.h" />
+    <ClInclude Include="Lights\DirectionalLight.h" />
     <ClInclude Include="Lights\Pointlight.h" />
     <ClInclude Include="Lights\Spotlight.h" />
     <ClInclude Include="Mesh\GeoGen.h" />

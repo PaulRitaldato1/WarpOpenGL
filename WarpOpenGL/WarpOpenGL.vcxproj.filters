@@ -153,6 +153,7 @@
     <ClInclude Include="Lights\Pointlight.h" />
     <ClInclude Include="Lights\Spotlight.h" />
     <ClInclude Include="SceneManagement\Scene\Scene.h" />
+    <ClInclude Include="Lights\DirectionalLight.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\model.vs" />

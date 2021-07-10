@@ -5,7 +5,7 @@
 #include <Common/Profiler.h>
 #include <Mesh/Model.h>
 #include <Buffers/GLBuffers/GLFramebuffer.h>
-
+#include <SceneManagement/Scene/Scene.h>
 #include <SceneManagement/RenderPass/RenderPassManager.h>
 
 void AddZOnlyPass(uint width, uint height, Vector<Ref<Model>>& models);
@@ -17,3 +17,5 @@ void AddOpaquePass(Vector<Ref<Model>>& modelList);
 void AddShadowPass();
 
 void AddPostProcessingPass();
+
+void AddGBufferPass(Scene& scene);
