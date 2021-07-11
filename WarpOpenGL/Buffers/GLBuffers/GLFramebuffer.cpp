@@ -24,7 +24,13 @@ void GLFramebuffer::Unbind() const
 void GLFramebuffer::AttachTexture(GLenum attachmentType, Ref<GLTexture> texture)
 {
 
-	uint attachmentNum = (attachmentType == AttachmentType::COLOR) ? m_numColorAttachments : 0;
+	//update color attachment enum vector
+	if (attachmentType == AttachmentType::COLOR)
+	{
+		m_colorAttachments.push_back(attachmentType + m_colorAttachments.size());
+	}
+
+	uint attachmentNum = (attachmentType == AttachmentType::COLOR) ? m_colorAttachments.size() : 0;
 
 	if (texture->TexType == GL_TEXTURE_1D)
 	{
@@ -40,7 +46,9 @@ void GLFramebuffer::AttachTexture(GLenum attachmentType, Ref<GLTexture> texture)
 	//}
 
 	if (attachmentType == AttachmentType::COLOR)
-		m_numColorAttachments++;
+	{
+		glDrawBuffers(m_colorAttachments.size(), m_colorAttachments.data());
+	}
 }
 
 void GLFramebuffer::AttachRenderBuffer(Ref<GLRenderBuffer> rbo)

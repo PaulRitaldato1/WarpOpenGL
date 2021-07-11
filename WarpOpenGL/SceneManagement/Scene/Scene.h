@@ -10,7 +10,7 @@ class Scene
 public:
 
 	//expensive constructor, but this should only be run during setup, or loading, not per frame
-	Scene(string name, Vector<Spotlight> spotlights, Vector<Pointlight> pointlights, Vector<Model> models, Vector<FPCamera> cameras)
+	Scene(string name, Vector<Spotlight> spotlights, Vector<Pointlight> pointlights, Vector<Ref<Model>> models, Vector<FPCamera> cameras)
 		: m_name(name)
 		, m_spotlights(spotlights)
 		, m_pointlights(pointlights)

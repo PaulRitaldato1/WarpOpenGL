@@ -29,4 +29,5 @@ public:
 
 private:
 	uint m_numColorAttachments;
+	Vector<uint> m_colorAttachments;
 };

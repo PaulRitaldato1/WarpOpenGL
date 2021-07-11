@@ -4,7 +4,6 @@
 #include <Common/GPUMarker.h>
 #include <Common/CommonTypes.h>
 
-#include <any>
 #include <functional>
 
 //Empty struct all pass data should inherit from. Generic data blah blah
@@ -55,6 +54,8 @@ public:
 	{
 		//Marker marker(m_name + " Execute");
 		GPUMarker(m_name + " Execute");
+		PROFILE_SCOPE(string(m_name + " Execute").c_str());
+
 		m_output = m_execute(data, m_setupOutput);
 		m_currentState = PassState::PassState_ExecuteComplete;
 	}
@@ -63,6 +64,7 @@ public:
 	{
 		//Marker marker(m_name + " Setup");
 		GPUMarker(m_name + " Setup");
+		PROFILE_SCOPE(string(m_name + " Setup").c_str());
 
 		m_setupOutput = m_setup(data);
 		m_currentState = PassState::PassState_SetupComplete;

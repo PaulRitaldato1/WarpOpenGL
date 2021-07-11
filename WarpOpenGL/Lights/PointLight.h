@@ -1,6 +1,7 @@
 #pragma once
 #include <Includes/glm/glm.hpp>
 #include <Common/CommonTypes.h>
+#include <Mesh/Mesh.h>
 
 class Pointlight
 {

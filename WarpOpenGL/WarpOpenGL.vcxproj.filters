@@ -165,6 +165,9 @@
     <None Include="Resources\Shaders\ZOnlyInstanced.vs" />
     <None Include="Resources\Shaders\simpleDepthDebug.vs" />
     <None Include="Resources\Shaders\simpleDepthDebug.fs" />
+    <None Include="Resources\Shaders\gBufferGeometry.vs" />
+    <None Include="Resources\Shaders\gBufferGeometry.fs" />
+    <None Include="Resources\Shaders\instancedGBufferGeometry.vs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Backpack\ao.jpg" />

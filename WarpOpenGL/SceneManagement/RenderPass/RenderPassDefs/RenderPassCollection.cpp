@@ -26,7 +26,6 @@ void AddZOnlyPass(uint width, uint height, Vector<Ref<Model>>& models)
 	g_renderPassManager.AddPass("ZOnlyPass",
 		[&](Ref<IPassData> passData) 
 		{
-			PROFILE_SCOPE("ZOnlyPass Setup");
 			Ref<ZOnlyPassData> zPassData = std::make_shared<ZOnlyPassData>();
 			zPassData->frameBuffer = std::make_shared<GLFramebuffer>();
 
@@ -53,8 +52,6 @@ void AddZOnlyPass(uint width, uint height, Vector<Ref<Model>>& models)
 		},
 		[=](Ref<IPassData> passData, Ref<IPassData> setupData)
 		{
-			PROFILE_SCOPE("ZOnlyPass Execute");
-
 			Ref<ZOnlyPassData> data = std::dynamic_pointer_cast<ZOnlyPassData>(setupData);
 
 
@@ -104,8 +101,6 @@ void AddOpaquePass(Vector<Ref<Model>>& modelList)
 	g_renderPassManager.AddPass("OpaquePass",
 		[&](Ref<IPassData> passData) 
 		{
-			PROFILE_SCOPE("OpaquePass Setup");
-
 			Ref<OpaquePassData> data = std::make_shared<OpaquePassData>();
 
 			data->shaders[0] = std::make_shared<Shader>("Resources/Shaders/model.vs", "Resources/Shaders/model.fs");
@@ -117,8 +112,6 @@ void AddOpaquePass(Vector<Ref<Model>>& modelList)
 		},
 		[&](Ref<IPassData> passData, Ref<IPassData> setupData)
 		{
-			PROFILE_SCOPE("OpaquePass Execute");
-
 			Ref<OpaquePassData> data = std::dynamic_pointer_cast<OpaquePassData>(setupData);
 
 			g_renderer.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -148,4 +141,77 @@ void AddShadowPass()
 void AddPostProcessingPass()
 {
 
+}
+
+void AddGBufferPass(Scene& scene)
+{
+	struct GBuffer : public IPassData
+	{
+
+		GBuffer()
+		{
+			isValid = true;
+		}
+
+		Ref<GLTexture> positionBuffer; //color buffer
+		Ref<GLTexture> normalBuffer; //color buffer
+		Ref<GLTexture> specBuffer; //color buffer
+		Ref<GLRenderBuffer> rbo; //for depth
+
+		Ref<GLFramebuffer> frameBuffer;
+
+		Ref<Shader> instancedGeometryShader;
+		Ref<Shader> geometryShader;
+	};
+
+	g_renderPassManager.AddPass("GBufferPass",
+		[&](Ref<IPassData> data) 
+		{
+			
+			Ref<GBuffer> gbuffer = std::make_shared<GBuffer>();
+			
+			gbuffer->geometryShader = std::make_shared<Shader>("Resources/Shaders/gBufferGeometry.vs", "Resources/Shaders/gBufferGeometry.fs");
+			gbuffer->instancedGeometryShader = std::make_shared<Shader>("Resources/Shaders/instancedGBufferGeometry.vs", "Resources/Shaders/gBufferGeometry.fs");
+
+
+			//need a good way to get window current size instead of hardcoding 
+			gbuffer->positionBuffer = std::make_shared<GLTexture>(GL_RGBA16F, GL_RGBA, GL_TEXTURE_2D, GL_FLOAT, 1920, 1080);
+			gbuffer->normalBuffer = std::make_shared<GLTexture>(GL_RGBA16F, GL_RGBA, GL_TEXTURE_2D, GL_FLOAT, 1920, 1080);
+			gbuffer->specBuffer = std::make_shared<GLTexture>(GL_RGBA, GL_RGBA, GL_TEXTURE_2D, GL_UNSIGNED_BYTE, 1920, 1080);
+			gbuffer->rbo = std::make_shared<GLRenderBuffer>(1920, 1080, GL_DEPTH_ATTACHMENT);
+
+			gbuffer->frameBuffer = std::make_shared<GLFramebuffer>();
+			
+			gbuffer->frameBuffer->AttachTexture(AttachmentType::COLOR, gbuffer->positionBuffer);
+			gbuffer->frameBuffer->AttachTexture(AttachmentType::COLOR, gbuffer->normalBuffer);
+			gbuffer->frameBuffer->AttachTexture(AttachmentType::COLOR, gbuffer->specBuffer);
+			gbuffer->frameBuffer->AttachRenderBuffer(gbuffer->rbo);
+
+			return gbuffer;
+		}, 
+		[&](Ref<IPassData> passData, Ref<IPassData> setupData) 
+		{
+			Ref<GBuffer> data = std::dynamic_pointer_cast<GBuffer>(setupData);
+
+			data->frameBuffer->Bind();
+
+			g_renderer.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+			g_renderer.ClearBoundBufferBits();
+			
+			for (auto model : scene.getModels())
+			{
+				if (!model->getIsInstanced())
+				{
+					model->Draw(*data->geometryShader);
+				}
+				else
+				{
+					model->Draw(*data->instancedGeometryShader);
+				}
+			}
+
+			data->frameBuffer->Unbind();
+
+			return data;
+		});
 }
