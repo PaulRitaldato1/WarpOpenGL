@@ -7,15 +7,48 @@
 #include <Buffers/GLBuffers/GLFramebuffer.h>
 #include <SceneManagement/Scene/Scene.h>
 #include <SceneManagement/RenderPass/RenderPassManager.h>
+#include <Shader/ShaderManager.h>
 
-void AddZOnlyPass(uint width, uint height, Vector<Ref<Model>>& models);
+struct GBuffer : public IPassData
+{
 
-void AddDebugDepthPass(uint width, uint height);
+	GBuffer()
+	{
+		isValid = true;
+	}
 
-void AddOpaquePass(Vector<Ref<Model>>& modelList);
+	Ref<GLTexture> lightAccumulationBuffer; //color buffer
+	Ref<GLTexture> diffuseBuffer;
+	Ref<GLTexture> normalBuffer; //color buffer
+	Ref<GLTexture> specBuffer; //color buffer
+	Ref<GLRenderBuffer> rbo; //for depth
 
-void AddShadowPass();
+	Ref<GLFramebuffer> frameBuffer;
 
-void AddPostProcessingPass();
+	Ref<Shader> instancedGeometryShader;
+	Ref<Shader> geometryShader;
+};
 
-void AddGBufferPass(Scene& scene);
+class RenderPassCollection
+{
+public:
+	RenderPassCollection() : m_shaderManager("Resources/Shaders/ShaderDefs/ShaderDefs.json")
+	{
+	}
+
+	void AddZOnlyPass(uint width, uint height, Vector<Ref<Model>>& models);
+
+	void AddDebugDepthPass(uint width, uint height);
+
+	void AddOpaquePass(Vector<Ref<Model>>& modelList);
+
+	void AddShadowPass();
+
+	void AddPostProcessingPass();
+
+	void AddGBufferPass(Scene& scene);
+
+	void AddGBufferLightingPass(Scene& scene);
+private:
+	ShaderManager m_shaderManager;
+};

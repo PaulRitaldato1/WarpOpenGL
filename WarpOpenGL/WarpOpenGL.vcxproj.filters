@@ -154,6 +154,7 @@
     <ClInclude Include="Lights\Spotlight.h" />
     <ClInclude Include="SceneManagement\Scene\Scene.h" />
     <ClInclude Include="Lights\DirectionalLight.h" />
+    <ClInclude Include="Includes\json\json.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\model.vs" />
@@ -168,6 +169,7 @@
     <None Include="Resources\Shaders\gBufferGeometry.vs" />
     <None Include="Resources\Shaders\gBufferGeometry.fs" />
     <None Include="Resources\Shaders\instancedGBufferGeometry.vs" />
+    <None Include="Resources\Shaders\ShaderDefs\ShaderDefs.json" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Backpack\ao.jpg" />

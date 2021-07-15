@@ -3,13 +3,13 @@
 #include <Buffers/GLBuffers/UniformBufferObject.h>
 #include <Texture/GLTexture/GLTexture.h>
 #include <Renderer/GLRenderer/GLRenderer.h>
-#include <Shader/Shader.h>
 #include <time.h>
+#include <Shader/ShaderManager.h>
 
 RenderPassManager g_renderPassManager;
 
 
-void AddZOnlyPass(uint width, uint height, Vector<Ref<Model>>& models)
+void RenderPassCollection::AddZOnlyPass(uint width, uint height, Vector<Ref<Model>>& models)
 {
 	struct ZOnlyPassData : public IPassData
 	{
@@ -20,7 +20,8 @@ void AddZOnlyPass(uint width, uint height, Vector<Ref<Model>>& models)
 
 		Ref<GLTexture> depthTexture;
 		Ref<GLFramebuffer> frameBuffer;
-		Array<Ref<Shader>, 2> shaders;
+		uint shaderId;
+		uint instancedShaderId;
 	};
 
 	g_renderPassManager.AddPass("ZOnlyPass",
@@ -45,12 +46,12 @@ void AddZOnlyPass(uint width, uint height, Vector<Ref<Model>>& models)
 			DYNAMIC_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Frambuffer machine broke");
 
 			zPassData->frameBuffer->Unbind();
-			zPassData->shaders[0] = std::make_shared<Shader>("Resources/Shaders/ZOnly.vs", "Resources/Shaders/ZOnly.fs");
-			zPassData->shaders[1] = std::make_shared<Shader>("Resources/Shaders/ZOnlyInstanced.vs", "Resources/Shaders/ZOnly.fs");
+			zPassData->shaderId = m_shaderManager.getShaderId("ZOnly");
+			zPassData->instancedShaderId = m_shaderManager.getShaderId("ZOnlyInstanced");
 
 			return zPassData;
 		},
-		[=](Ref<IPassData> passData, Ref<IPassData> setupData)
+		[=](Ref<IPassData> dependencyData, Ref<IPassData> setupData)
 		{
 			Ref<ZOnlyPassData> data = std::dynamic_pointer_cast<ZOnlyPassData>(setupData);
 
@@ -70,10 +71,10 @@ void AddZOnlyPass(uint width, uint height, Vector<Ref<Model>>& models)
 				{
 					if (!model->getIsInstanced())
 					{
-						model->Draw(*data->shaders[0]);
+						model->Draw(m_shaderManager.getShaderById(data->shaderId));
 					}
 					else
-						model->Draw(*data->shaders[1]);
+						model->Draw(m_shaderManager.getShaderById(data->instancedShaderId));
 				}
 			}
 
@@ -84,7 +85,7 @@ void AddZOnlyPass(uint width, uint height, Vector<Ref<Model>>& models)
 		});
 }
 
-void AddOpaquePass(Vector<Ref<Model>>& modelList) 
+void RenderPassCollection::RenderPassCollection::AddOpaquePass(Vector<Ref<Model>>& modelList)
 {
 	struct OpaquePassData : public IPassData
 	{
@@ -94,7 +95,8 @@ void AddOpaquePass(Vector<Ref<Model>>& modelList)
 		}
 
 		//Vector<glm::mat4> instancedModelMatrices;
-		Array<Ref<Shader>, 2> shaders;
+		uint shaderId;
+		uint instancedShaderId;
 		Vector<Ref<Model>> models;
 	};
 
@@ -103,14 +105,14 @@ void AddOpaquePass(Vector<Ref<Model>>& modelList)
 		{
 			Ref<OpaquePassData> data = std::make_shared<OpaquePassData>();
 
-			data->shaders[0] = std::make_shared<Shader>("Resources/Shaders/model.vs", "Resources/Shaders/model.fs");
-			data->shaders[1] = std::make_shared<Shader>("Resources/Shaders/instancedModel.vs", "Resources/Shaders/model.fs");
+			data->shaderId = m_shaderManager.getShaderId("BasicModel");
+			data->instancedShaderId = m_shaderManager.getShaderId("InstancedBasicModel");
 
 			data->models = modelList;
 
 			return data;
 		},
-		[&](Ref<IPassData> passData, Ref<IPassData> setupData)
+		[&](Ref<IPassData> dependencyData, Ref<IPassData> setupData)
 		{
 			Ref<OpaquePassData> data = std::dynamic_pointer_cast<OpaquePassData>(setupData);
 
@@ -121,11 +123,11 @@ void AddOpaquePass(Vector<Ref<Model>>& modelList)
 			{
 				if (!model->getIsInstanced())
 				{
-					model->Draw(*data->shaders[0]);
+					model->Draw(m_shaderManager.getShaderById(data->shaderId));
 				}
 				else
 				{
-					model->Draw(*data->shaders[1]);
+					model->Draw(m_shaderManager.getShaderById(data->instancedShaderId));
 				}
 			}
 
@@ -133,36 +135,18 @@ void AddOpaquePass(Vector<Ref<Model>>& modelList)
 		});
 }
 
-void AddShadowPass()
+void RenderPassCollection::AddShadowPass()
 {
 
 }
 
-void AddPostProcessingPass()
+void RenderPassCollection::AddPostProcessingPass()
 {
 
 }
 
-void AddGBufferPass(Scene& scene)
+void RenderPassCollection::AddGBufferPass(Scene& scene)
 {
-	struct GBuffer : public IPassData
-	{
-
-		GBuffer()
-		{
-			isValid = true;
-		}
-
-		Ref<GLTexture> positionBuffer; //color buffer
-		Ref<GLTexture> normalBuffer; //color buffer
-		Ref<GLTexture> specBuffer; //color buffer
-		Ref<GLRenderBuffer> rbo; //for depth
-
-		Ref<GLFramebuffer> frameBuffer;
-
-		Ref<Shader> instancedGeometryShader;
-		Ref<Shader> geometryShader;
-	};
 
 	g_renderPassManager.AddPass("GBufferPass",
 		[&](Ref<IPassData> data) 
@@ -170,26 +154,28 @@ void AddGBufferPass(Scene& scene)
 			
 			Ref<GBuffer> gbuffer = std::make_shared<GBuffer>();
 			
-			gbuffer->geometryShader = std::make_shared<Shader>("Resources/Shaders/gBufferGeometry.vs", "Resources/Shaders/gBufferGeometry.fs");
-			gbuffer->instancedGeometryShader = std::make_shared<Shader>("Resources/Shaders/instancedGBufferGeometry.vs", "Resources/Shaders/gBufferGeometry.fs");
+			//gbuffer->geometryShader = std::make_shared<Shader>("Resources/Shaders/gBufferGeometry.vs", "Resources/Shaders/gBufferGeometry.fs");
+			//gbuffer->instancedGeometryShader = std::make_shared<Shader>("Resources/Shaders/instancedGBufferGeometry.vs", "Resources/Shaders/gBufferGeometry.fs");
 
 
 			//need a good way to get window current size instead of hardcoding 
-			gbuffer->positionBuffer = std::make_shared<GLTexture>(GL_RGBA16F, GL_RGBA, GL_TEXTURE_2D, GL_FLOAT, 1920, 1080);
+			gbuffer->lightAccumulationBuffer = std::make_shared<GLTexture>(GL_RGBA16F, GL_RGBA, GL_TEXTURE_2D, GL_FLOAT, 1920, 1080);
+			gbuffer->diffuseBuffer = std::make_shared<GLTexture>(GL_RGBA16F, GL_RGBA, GL_TEXTURE_2D, GL_FLOAT, 1920, 1080);
 			gbuffer->normalBuffer = std::make_shared<GLTexture>(GL_RGBA16F, GL_RGBA, GL_TEXTURE_2D, GL_FLOAT, 1920, 1080);
 			gbuffer->specBuffer = std::make_shared<GLTexture>(GL_RGBA, GL_RGBA, GL_TEXTURE_2D, GL_UNSIGNED_BYTE, 1920, 1080);
 			gbuffer->rbo = std::make_shared<GLRenderBuffer>(1920, 1080, GL_DEPTH_ATTACHMENT);
 
 			gbuffer->frameBuffer = std::make_shared<GLFramebuffer>();
 			
-			gbuffer->frameBuffer->AttachTexture(AttachmentType::COLOR, gbuffer->positionBuffer);
+			gbuffer->frameBuffer->AttachTexture(AttachmentType::COLOR, gbuffer->lightAccumulationBuffer);
+			gbuffer->frameBuffer->AttachTexture(AttachmentType::COLOR, gbuffer->diffuseBuffer);
 			gbuffer->frameBuffer->AttachTexture(AttachmentType::COLOR, gbuffer->normalBuffer);
 			gbuffer->frameBuffer->AttachTexture(AttachmentType::COLOR, gbuffer->specBuffer);
 			gbuffer->frameBuffer->AttachRenderBuffer(gbuffer->rbo);
 
 			return gbuffer;
 		}, 
-		[&](Ref<IPassData> passData, Ref<IPassData> setupData) 
+		[&](Ref<IPassData> dependencyData, Ref<IPassData> setupData) 
 		{
 			Ref<GBuffer> data = std::dynamic_pointer_cast<GBuffer>(setupData);
 
@@ -213,5 +199,35 @@ void AddGBufferPass(Scene& scene)
 			data->frameBuffer->Unbind();
 
 			return data;
+		});
+}
+
+void RenderPassCollection::AddGBufferLightingPass(Scene& scene)
+{
+	struct GBufferLighting : IPassData
+	{
+		GBufferLighting()
+		{
+			isValid = true;
+		}
+
+		Ref<Shader> gBufferLightingShader;
+	};
+	
+	g_renderPassManager.AddPass("GBufferLightingPass", "GBufferPass", 
+		[&](Ref<IPassData> passData) 
+		{
+			Ref<GBufferLighting> lightData = std::make_shared<GBufferLighting>();
+
+			//lightData->gBufferLightingShader = std::make_shared<Shader>("Resources/Shaders/gBufferLighting.vs", "Resources/Shaders/gBufferLighting.fs");
+
+			return lightData;
+		}, 
+		[&](Ref<IPassData> dependencyData, Ref<IPassData> setupData)
+		{
+			Ref<GBuffer> gbuffer = std::dynamic_pointer_cast<GBuffer>(dependencyData);
+			Ref<GBufferLighting> lightingData = std::dynamic_pointer_cast<GBufferLighting>(setupData);
+
+			return gbuffer;
 		});
 }

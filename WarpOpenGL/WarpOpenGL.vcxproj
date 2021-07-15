@@ -263,6 +263,7 @@
     <ClInclude Include="Includes\Imgui\imstb_rectpack.h" />
     <ClInclude Include="Includes\Imgui\imstb_textedit.h" />
     <ClInclude Include="Includes\Imgui\imstb_truetype.h" />
+    <ClInclude Include="Includes\json\json.h" />
     <ClInclude Include="Lights\DirectionalLight.h" />
     <ClInclude Include="Lights\Pointlight.h" />
     <ClInclude Include="Lights\Spotlight.h" />
@@ -318,6 +319,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Final|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
+    <None Include="Resources\Shaders\ShaderDefs\ShaderDefs.json" />
     <None Include="Resources\Shaders\simpleDepthDebug.fs">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>

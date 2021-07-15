@@ -18,6 +18,7 @@
 #include <Mesh/GeoGen.h>
 #include <Mesh/ModelLoader.h>
 #include <SceneManagement/RenderPass/RenderPassDefs/RenderPassCollection.h>
+#include <Shader/ShaderManager.h>
 
 /*TO DO spitballing goes here*/
 
@@ -138,6 +139,7 @@ int main()
 	initGLAD();
 	ImGuiWrapper imgui(window);
 	ModelLoader loader("Resources/");
+	RenderPassCollection passCollection;
 	//GLRenderer g_renderer;
 #ifdef _DEBUG
 	g_renderer.Enable(GL_DEBUG_OUTPUT);
@@ -163,7 +165,7 @@ int main()
 	//load model
 	Vector<ModelDesc> modelDescs;
 	//modelDescs.push_back({"Resources/Backpack/backpack.obj", false, false});
-	modelDescs.push_back({ "Resources/rock/rock.obj", false, false, true, modelMatrices});
+	modelDescs.push_back({ "Resources/rock/rock.obj", false, true, true, modelMatrices});
 	modelDescs.push_back({ "Resources/planet/planet.obj", false, true, false });
 	Vector<Ref<Model>> models = loader.loadModelsAsync(modelDescs);
 	
@@ -174,8 +176,8 @@ int main()
 	model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
 	models[1]->setTransform(model);
 
-	AddZOnlyPass(1024, 1024, models);
-	AddOpaquePass(models);
+	passCollection.AddZOnlyPass(1024, 1024, models);
+	passCollection.AddOpaquePass(models);
 
 	// render loop
 	// -----------

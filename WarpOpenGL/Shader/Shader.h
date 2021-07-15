@@ -8,6 +8,14 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <Common/Assert.h>
 
+struct ShaderParams
+{
+	string vertPath;
+	string fragPath;
+	string geoPath;
+	string computePath;
+};
+
 class Shader
 {
 public:
@@ -21,6 +29,27 @@ public:
 		compile();
 	}
 
+	Shader(ShaderParams& params)
+	{
+		if (params.vertPath.size() > 0)
+		{
+			m_vertPath = params.vertPath;
+		}
+		if (params.fragPath.size() > 0)
+		{
+			m_fragPath = params.fragPath;
+		}
+		if (params.geoPath.size() > 0)
+		{
+			m_geoPath = params.geoPath;
+		}
+		if (params.computePath.size() > 0)
+		{
+			m_computePath = params.computePath;
+		}
+
+		compile();
+	}
 	//Shader(string vertexPath, string fragmentPath, string geometryPath = "") :
 	//	m_vertPath(vertexPath)
 	//	, m_fragPath(fragmentPath)
