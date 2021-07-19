@@ -150,26 +150,35 @@
     <ClInclude Include="Buffers\GLBuffers\GLFramebuffer.h" />
     <ClInclude Include="Buffers\GLBuffers\GLRenderBuffer.h" />
     <ClInclude Include="Texture\GLTexture\TextureTracker.h" />
-    <ClInclude Include="Lights\Pointlight.h" />
-    <ClInclude Include="Lights\Spotlight.h" />
+    <ClInclude Include="Lighting\Pointlight.h" />
+    <ClInclude Include="Lighting\Spotlight.h" />
     <ClInclude Include="SceneManagement\Scene\Scene.h" />
-    <ClInclude Include="Lights\DirectionalLight.h" />
+    <ClInclude Include="Lighting\DirectionalLight.h" />
     <ClInclude Include="Includes\json\json.h" />
+    <ClInclude Include="Lighting\LightTypeEnum.h" />
+    <ClInclude Include="Lighting\ILight.h" />
+    <ClInclude Include="Lighting\LightShaderParams.h" />
+    <ClInclude Include="Lighting\Material.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Shaders\model.vs" />
-    <None Include="Resources\Shaders\model.fs" />
+    <None Include="Resources\Shaders\model.vert" />
+    <None Include="Resources\Shaders\model.frag" />
     <None Include="Resources\Backpack\backpack.mtl" />
-    <None Include="Resources\Shaders\instancedModel.vs" />
-    <None Include="Resources\Shaders\ZOnly.vs" />
-    <None Include="Resources\Shaders\ZOnly.fs" />
-    <None Include="Resources\Shaders\ZOnlyInstanced.vs" />
-    <None Include="Resources\Shaders\simpleDepthDebug.vs" />
-    <None Include="Resources\Shaders\simpleDepthDebug.fs" />
-    <None Include="Resources\Shaders\gBufferGeometry.vs" />
-    <None Include="Resources\Shaders\gBufferGeometry.fs" />
-    <None Include="Resources\Shaders\instancedGBufferGeometry.vs" />
+    <None Include="Resources\Shaders\instancedModel.vert" />
+    <None Include="Resources\Shaders\ZOnly.vert" />
+    <None Include="Resources\Shaders\ZOnly.frag" />
+    <None Include="Resources\Shaders\ZOnlyInstanced.vert" />
+    <None Include="Resources\Shaders\simpleDepthDebug.vert" />
+    <None Include="Resources\Shaders\simpleDepthDebug.frag" />
+    <None Include="Resources\Shaders\gBufferGeometry.vert" />
+    <None Include="Resources\Shaders\gBufferGeometry.frag" />
+    <None Include="Resources\Shaders\instancedGBufferGeometry.vert" />
     <None Include="Resources\Shaders\ShaderDefs\ShaderDefs.json" />
+    <None Include="Resources\Shaders\gBufferLighting.vert" />
+    <None Include="Resources\Shaders\gBufferLighting.frag" />
+    <None Include="Resources\Shaders\InstancedGBufferLighting.vert" />
+    <None Include="Resources\Shaders\QuadDraw.frag" />
+    <None Include="Resources\Shaders\QuadDraw.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Backpack\ao.jpg" />

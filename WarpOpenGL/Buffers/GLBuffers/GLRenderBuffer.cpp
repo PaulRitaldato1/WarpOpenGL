@@ -1,9 +1,11 @@
 #include <Buffers/GLBuffers/GLRenderBuffer.h>
 
-GLRenderBuffer::GLRenderBuffer(uint width, uint height, GLenum format) : m_format(format)
+GLRenderBuffer::GLRenderBuffer(uint width, uint height, GLenum componentFormat, GLenum format) : m_format(format)
 {
 	glGenRenderbuffers(1, &m_id);
-	glRenderbufferStorage(GL_RENDERBUFFER, format, width, height);
+	Bind();
+	glRenderbufferStorage(GL_RENDERBUFFER, componentFormat, width, height);
+	Unbind();
 }
 
 GLRenderBuffer::~GLRenderBuffer()

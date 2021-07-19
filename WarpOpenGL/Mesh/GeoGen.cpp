@@ -87,7 +87,7 @@ Mesh GeoGen::CreateBox(float width, float height, float depth, uint numSubdivisi
 	return Mesh(v,i);
 }
 
-Mesh GeoGen::CreateSphere(float radius, uint sliceCount, uint stackCount)
+Ref<Mesh> GeoGen::CreateSphere(float radius, uint sliceCount, uint stackCount)
 {
 	PROFILE_FUNCTION();
 
@@ -162,7 +162,7 @@ Mesh GeoGen::CreateSphere(float radius, uint sliceCount, uint stackCount)
 		indices.push_back(baseIndex + i + 1);
 	}
 
-	return Mesh(verts, indices);
+	return std::make_shared<Mesh>(verts, indices);
 }
 
 Mesh GeoGen::CreateGeoSphere(float radius, uint numSubdivisions)

@@ -52,7 +52,6 @@ public:
 
 	void ExecutePass(Ref<IPassData> data)
 	{
-		//Marker marker(m_name + " Execute");
 		GPUMarker(m_name + " Execute");
 		PROFILE_SCOPE(string(m_name + " Execute").c_str());
 
@@ -62,7 +61,6 @@ public:
 
 	void ExecuteSetup(Ref<IPassData> data)
 	{
-		//Marker marker(m_name + " Setup");
 		GPUMarker(m_name + " Setup");
 		PROFILE_SCOPE(string(m_name + " Setup").c_str());
 
@@ -80,6 +78,7 @@ public:
 
 	Ref<IPassData> getOutput() { return m_output; }
 	Ref<IPassData> getSetupOutput() { return m_setupOutput; }
+
 private:
 	string m_name;
 

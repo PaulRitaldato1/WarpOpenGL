@@ -27,13 +27,32 @@
 #include <Buffers/GLBuffers/GLSSBO.h>
 #include <Renderer/GLRenderer/GLRenderer.h>
 
+#include <Lighting/Material.h>
+
 struct ModelDesc
 {
+	ModelDesc(string path, bool gamma, bool hasShadow, glm::mat4 transform)
+		: path(path)
+		, gamma(gamma)
+		, hasShadow(hasShadow)
+		, isInstanced(false)
+		, transform(transform)
+	{}
+
+	ModelDesc(string path, bool gamma, bool hasShadow, Vector<glm::mat4> instances)
+		: path(path)
+		, gamma(gamma)
+		, hasShadow(hasShadow)
+		, isInstanced(true)
+		, instances(instances)
+	{}
+
 	string path;
 	bool gamma;
 	bool hasShadow;
 	bool isInstanced;
 	Vector<glm::mat4> instances;
+	glm::mat4 transform;
 };
 
 class Model
@@ -59,6 +78,10 @@ public:
 		//	m_ssbo = std::make_unique<GLSSBO>(desc.instances.size() * sizeof(glm::mat4), 1);
 			m_instances.insert(m_instances.end(), std::make_move_iterator(desc.instances.begin()), std::make_move_iterator(desc.instances.end()));
 		}
+		else
+			setTransform(desc.transform);
+
+		m_material = g_MaterialPresets[MaterialPresets::DEFAULT];
 	}
 
 	Model(const Model& copy) = delete;
@@ -71,15 +94,38 @@ public:
 		}
 	}
 
-	void Draw(Shader& shader)
+	void Draw(Shader& shader) const
 	{
 		string s = m_name + " draw";
 		PROFILE_SCOPE(s.c_str());
 		GPUMarker(s);
-		//Marker marker(m_name);
+
 
 		shader.Bind();
 		
+		//shader.setUniform("mat.GlobalAmbient", m_material.GlobalAmbient);
+		//shader.setUniform("mat.AmbientColor", m_material.AmbientColor);
+
+		//shader.setUniform("mat.EmissiveColor", m_material.EmissiveColor);
+		shader.setUniform("mat.DiffuseColor", m_material.DiffuseColor);
+		//shader.setUniform("mat.SpecularColor", m_material.SpecularColor);
+
+		/*shader.setUniform("mat.Reflectance", m_material.Reflectance);
+
+		shader.setUniform("mat.Opacity", m_material.Opacity);
+		shader.setUniform("mat.SpecularPower", m_material.SpecularPower);
+		shader.setUniform("mat.IndexOfRefraction", m_material.IndexOfRefraction);
+
+		shader.setUniform("mat.HasAmbientTexture", m_material.HasAmbientTexture);
+		shader.setUniform("mat.HasEmissiveTexture", m_material.HasEmissiveTexture);*/
+		shader.setUniform("mat.HasDiffuseTexture", m_material.HasDiffuseTexture);
+		shader.setUniform("mat.HasSpecularTexture", m_material.HasSpecularTexture);
+		//shader.setUniform("mat.HasSpecularPowerTexture", m_material.HasSpecularPowerTexture);
+		//shader.setUniform("mat.HasNormalTexture", m_material.HasNormalTexture);
+
+		//shader.setUniform("mat.SpecularScale", m_material.SpecularScale);
+		//shader.setUniform("mat.AlphaThreshold", m_material.AlphaThreshold);
+
 		if (m_isInstanced && m_ssbo->isDirty())
 		{
 			m_ssbo->BindSubdata<Vector<glm::mat4>> (m_instances);
@@ -118,6 +164,12 @@ public:
 
 	bool getHasShadow() const { return m_hasShadow; }
 	bool setHasShadow(bool value) { m_hasShadow = value; }
+
+	Vector<Ref<GLTexture>> getTexturesFromAMesh()
+	{
+		return m_meshes.back()->getTextures();
+	}
+
 private:
 
 	Vector<Ref<Mesh>> m_meshes;
@@ -132,4 +184,5 @@ private:
 	bool m_isInstanced;
 	URef<GLSSBO> m_ssbo; //ssbo for instanced models
 	Vector<glm::mat4> m_instances;
+	Material m_material;
 };

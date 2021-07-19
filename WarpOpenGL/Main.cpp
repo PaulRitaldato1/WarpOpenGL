@@ -19,6 +19,7 @@
 #include <Mesh/ModelLoader.h>
 #include <SceneManagement/RenderPass/RenderPassDefs/RenderPassCollection.h>
 #include <Shader/ShaderManager.h>
+#include <SceneManagement/Scene/Scene.h>
 
 /*TO DO spitballing goes here*/
 
@@ -26,7 +27,10 @@
 //TODO LIST OF RENDER ITEMS THAT CAN BE SORTED BY DISTANCE TO CAMERA
 //TODO SHOULD ALL BUFFER ALLOC GO THROUGH RENDERER? 
 //	1. COULD MAKE DRAW CALLS EASIER?
-
+//TODO create psuedo command lists. Render passes record commands into a vector
+// without making any GL calls. Then render thread executes these commands with the current context
+// this should allow asyn render passes
+//TODO materials and lighting. Already being worked on but needs a lot of work
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -39,7 +43,7 @@ void MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLs
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-FPCamera camera(glm::vec3(0.0f, 80.0f, 300.0f));
+FPCamera camera(glm::vec3(0.0f, 0.0f, 10.0f));
 bool firstMouse = true;
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
@@ -150,35 +154,54 @@ int main()
 
 	g_renderer.Enable(GL_DEPTH_TEST);
 	g_renderer.Enable(GL_MULTISAMPLE);
-	//g_renderer.Enable(GL_FRAMEBUFFER_SRGB);
-	//backface culling
 	g_renderer.Enable(GL_CULL_FACE);
 
-	//load shader
-
-	Shader debugShader("Resources/Shaders/simpleDepthDebug.vs", "Resources/Shaders/simpleDepthDebug.fs");
-
-	uint amount = 100000;
-	int imguiAmount = amount;
-	Vector<glm::mat4> modelMatrices = generateAsteroidPositions(amount);
+	//uint amount = 100000;
+	//Vector<glm::mat4> modelMatrices = generateAsteroidPositions(amount);
 	
+	std::vector<glm::vec3> objectPositions;
+	objectPositions.push_back(glm::vec3(-3.0, -0.5, -3.0));
+	objectPositions.push_back(glm::vec3(0.0, -0.5, -3.0));
+	objectPositions.push_back(glm::vec3(3.0, -0.5, -3.0));
+	objectPositions.push_back(glm::vec3(-3.0, -0.5, 0.0));
+	objectPositions.push_back(glm::vec3(0.0, -0.5, 0.0));
+	objectPositions.push_back(glm::vec3(3.0, -0.5, 0.0));
+	objectPositions.push_back(glm::vec3(-3.0, -0.5, 3.0));
+	objectPositions.push_back(glm::vec3(0.0, -0.5, 3.0));
+	objectPositions.push_back(glm::vec3(3.0, -0.5, 3.0));
+
+	Vector<glm::mat4> modelMatrices;
+	glm::mat4 base = glm::mat4(1.0f);
+	base = glm::scale(base, glm::vec3(1.0f, 1.0f, 1.0f));
+
+	for (auto& pos : objectPositions)
+		modelMatrices.push_back(glm::translate(base, pos));
+
 	//load model
 	Vector<ModelDesc> modelDescs;
-	//modelDescs.push_back({"Resources/Backpack/backpack.obj", false, false});
-	modelDescs.push_back({ "Resources/rock/rock.obj", false, true, true, modelMatrices});
-	modelDescs.push_back({ "Resources/planet/planet.obj", false, true, false });
+	modelDescs.push_back({"Resources/Backpack/backpack.obj", false, true, modelMatrices});
+	//modelDescs.emplace_back("Resources/planet/planet.obj", false, true, model);
+	//modelDescs.emplace_back("Resources/rock/rock.obj", false, true, modelMatrices);
 	Vector<Ref<Model>> models = loader.loadModelsAsync(modelDescs);
 	
+	Vector<Pointlight> pointLights;
+	pointLights.emplace_back(glm::vec3(0.0f, 3.0f, 0.0f), 1.0f, 1.0f);
+
+	Vector<Spotlight> spotlights;
+
+	Vector<FPCamera> cameras;
+	cameras.push_back(camera);
+
+	Scene scene("BasicBackpack", spotlights, pointLights, models, cameras);
+
 	UniformBufferObject viewProjUBO(2*sizeof(glm::mat4), 0);
-	
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(0.0f, -3.0f, 0.0f));
-	model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
-	models[1]->setTransform(model);
 
-	passCollection.AddZOnlyPass(1024, 1024, models);
-	passCollection.AddOpaquePass(models);
+	passCollection.AddGBufferPass(scene);
+	passCollection.AddGBufferLightingPass(scene);
 
+	//passCollection.AddZOnlyPass(1024, 1024, models);
+	//passCollection.AddOpaquePass(models);
+	// 
 	// render loop
 	// -----------
 	while (!glfwWindowShouldClose(window))

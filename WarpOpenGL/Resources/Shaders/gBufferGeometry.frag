@@ -1,9 +1,8 @@
 #version 460 core
 
-layout (location = 0) out vec4 gLightAccumulation;
-layout (location = 1) out vec4 gDiffuse;
-layout (location = 2) out vec4 gNormal;
-layout (location = 3) out vec4 gSpec;
+layout (location = 0) out vec3 gPos;
+layout (location = 1) out vec4 gDiffuseSpec;
+layout (location = 2) out vec3 gNormal;
 
 struct Material
 {
@@ -43,19 +42,21 @@ vec3 expandNormal(vec3 n)
 {
     return n * 2.0 - 1.0;
 }
-vec4 calcNormalMapping(mat3 TBN, sampler2D normalTex, vec2 uv)
+
+vec3 calcNormalMapping(mat3 TBN, sampler2D normalTex, vec2 uv)
 {
     vec3 normal = texture(normalTex, uv).xyz;
     normal = expandNormal(normal);
 
     normal = TBN * normal;
-    return normalize(vec4(normal, 0.0));
+    return normalize(normal);
 }
 
 in vec2 TexCoords;
-in vec3 NormalVS;
-in vec3 TangentVS;
-in vec3 BinormalVS;
+in vec3 Normal;
+in vec3 Tangent;
+in vec3 Binormal;
+in vec3 FragPos;
 
 uniform sampler2D texture_diffuse0;
 uniform sampler2D texture_specular0;
@@ -81,61 +82,31 @@ void main()
         }
     }
 
-    vec4 ambient = mat.AmbientColor;
-    if(mat.HasAmbientTexture)
-    {
-        vec4 ambientFromTex = texture(texture_ambient0, TexCoords);
-        if(any(ambient.rgb))
-        {
-            ambient *= ambientFromTex;
-        }
-        else
-        {
-            ambient = ambientFromTex;
-        }
-    }
+//    vec4 specular = mat.SpecularColor;
+//    float specularPower = mat.SpecularPower;
+//    if(mat.HasSpecularTexture)
+//    {
+//        vec4 specularFromTex = texture(texture_specular0, TexCoords);
+//        specularPower = specularFromTex.r;
+//        if(any(specular.rgb))
+//        {
+//            specular *= specularFromTex;
+//        }
+//        else
+//        {
+//            specular = specularFromTex;
+//        }
+//    }
+//
+//    vec3 N = normalize(Normal);
+//    if(mat.HasNormalTexture)
+//    {
+//        mat3 TBN = mat3(normalize(Tangent), normalize(Binormal), normalize(Normal));
+//        N = calcNormalMapping(TBN, texture_normal0, TexCoords);
+//    }
 
-    ambient *= mat.GlobalAmbient;
-
-    vec4 emissive = mat.EmissiveColor;
-    if(mat.HasEmissiveTexture)
-    {
-        vec4 emissiveFromTex = texture(texture_emissive0, TexCoords);
-        if(any(emissive.rgb))
-        {
-            emissive *= emissiveFromTex;
-        }
-        else
-        {
-            emissive = emissiveFromTex;
-        }
-    }
-
-    vec4 specular = mat.SpecularColor;
-    float specularPower = mat.SpecularPower;
-    if(mat.HasSpecularTexture)
-    {
-        vec4 specularFromTex = texture(texture_specular0, TexCoords);
-        specularPower = specularFromTex.r;
-        if(any(specular.rgb))
-        {
-            specular *= specularFromTex;
-        }
-        else
-        {
-            specular = specularFromTex;
-        }
-    }
-
-    vec4 N = vec4(normalize(NormalVS), 0.0);
-    if(mat.HasNormalTexture)
-    {
-        mat3 TBN = mat3(normalize(TangentVS), normalize(BinormalVS), normalize(NormalVS));
-        N = calcNormalMapping(TBN, texture_normal0, TexCoords);
-    }
-
-    gLightAccumulation = (ambient + emissive);
-    gDiffuse = diffuse;
-    gNormal = N;
-    gSpec = vec4(specular.rgb, log2(specularPower)/10.5);
+    gPos = FragPos;
+    gNormal = normalize(Normal);
+    gDiffuseSpec.rgb = diffuse.rgb;
+    gDiffuseSpec.a = texture(texture_specular0, TexCoords).r;
 }

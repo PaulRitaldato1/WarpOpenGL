@@ -29,6 +29,18 @@ public:
 
 	Vector<Ref<Model>> loadModelsAsync(Vector<ModelDesc>& modelArgs);
 	Ref<Model> loadModel(ModelDesc& desc);
+
+	Vector<Ref<GLTexture>> getTextures()
+	{
+		Vector<Ref<GLTexture>> textures;
+		for (auto& [name, texture] : m_textures)
+		{
+			textures.push_back(texture);
+		}
+
+		return textures;
+	}
+
 private:
 
 	void traverseSceneGraph(aiNode* node, string& directory, Vector<Ref<Mesh>>& meshList, const aiScene* scene);

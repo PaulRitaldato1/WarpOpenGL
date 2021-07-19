@@ -53,8 +53,9 @@ public:
 	void setDrawBuffer(GLenum setting);
 	void setReadBuffer(GLenum setting);
 
-	void DrawIndexed(GLIndexedDrawCall& args);
+	void DrawIndexed(const GLIndexedDrawCall& args);
 	void DrawInstanced(GLInstancedDrawCall& args);
+	void DrawArrays(uint topology, uint first, uint count, GLVertexArray& vao);
 private:
 	uint m_boundBufferbits = 0;
 };

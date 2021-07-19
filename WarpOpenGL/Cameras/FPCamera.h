@@ -14,7 +14,7 @@ enum CameraMovement
 };
 
 const float YAW = -90.0f;
-const float PITCH = -25.0f;
+const float PITCH = 0.0f;
 const float SPEED = 30.0f;
 const float SENSITIVITY = 0.1f;
 const float ZOOM = 45.0f;
@@ -23,9 +23,13 @@ class FPCamera
 {
 public:
 	
-	FPCamera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) : m_front(glm::vec3(0.0f, 0.0f, -1.0f)), m_movementSpeed(SPEED), m_mouseSensitivity(SENSITIVITY), m_zoom(ZOOM)
+	FPCamera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) 
+		: m_front(glm::vec3(0.0f, 0.0f, -1.0f))
+		, m_movementSpeed(SPEED)
+		, m_mouseSensitivity(SENSITIVITY)
+		, m_zoom(ZOOM)
 	{
-		m_position = position;
+		setPosition(position);
 		m_worldUp = up;
 		m_yaw = yaw;
 		m_pitch = pitch;
@@ -34,7 +38,7 @@ public:
 
 	FPCamera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) : m_front(glm::vec3(0.0f, 0.0f, -1.0f)), m_movementSpeed(SPEED), m_mouseSensitivity(SENSITIVITY), m_zoom(ZOOM)
 	{
-		m_position = glm::vec3(posX, posY, posZ);
+		setPosition(glm::vec3(posX, posY, posZ));
 		m_worldUp = glm::vec3(upX, upY, upZ);
 		m_yaw = yaw;
 		m_pitch = pitch;
@@ -43,20 +47,20 @@ public:
 
 	glm::mat4 getViewMatrix()
 	{
-		return glm::lookAt(m_position, m_position + m_front, m_up);
+		return glm::lookAt(getPosition(), getPosition() + m_front, m_up);
 	}
 
 	void processKeyboard(CameraMovement dir, float deltaTime)
 	{
 		float velocity = m_movementSpeed * deltaTime;
 		if (dir == FORWARD)
-			m_position += m_front * velocity;
+			setPosition(getPosition() + m_front * velocity);
 		if (dir == BACKWARD)
-			m_position -= m_front * velocity;
+			setPosition(getPosition() - m_front * velocity);
 		if (dir == LEFT)
-			m_position -= m_right * velocity;
+			setPosition(getPosition() - m_right * velocity);
 		if (dir == RIGHT)
-			m_position += m_right * velocity;
+			setPosition(getPosition() + m_right * velocity);
 	}
 
 	void processMouseMovement(float offsetX, float offsetY, GLboolean constrainPitch = true)
@@ -111,6 +115,9 @@ public:
 	{
 		return m_mouseSensitivity;
 	}
+	
+	glm::vec3 getPosition() const { return m_position; }
+	void setPosition(glm::vec3 val) { m_position = val; }
 private:
 	
 	glm::vec3 m_position;

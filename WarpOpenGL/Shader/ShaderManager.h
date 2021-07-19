@@ -49,7 +49,8 @@ public:
 					params.computePath = item.value();
 				}
 			}
-	
+			
+			params.name = shaderName;
 			m_shaders.push_back(std::make_shared<Shader>(params));
 			//map shader names to an index
 			m_shaderIndexMap[shaderName] = m_shaders.size() - 1;
@@ -60,6 +61,7 @@ public:
 	uint getShaderId(string&& name) { return m_shaderIndexMap[name]; }
 	uint getShaderId(string& name) { return m_shaderIndexMap[name]; }
 	Shader& getShaderById(uint id) { return *m_shaders[id]; }
+
 private:
 	Vector<Ref<Shader>> m_shaders;
 	HashMap<string, uint> m_shaderIndexMap;

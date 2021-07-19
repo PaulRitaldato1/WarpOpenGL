@@ -30,7 +30,7 @@ void GLFramebuffer::AttachTexture(GLenum attachmentType, Ref<GLTexture> texture)
 		m_colorAttachments.push_back(attachmentType + m_colorAttachments.size());
 	}
 
-	uint attachmentNum = (attachmentType == AttachmentType::COLOR) ? m_colorAttachments.size() : 0;
+	uint attachmentNum = (attachmentType == AttachmentType::COLOR) ? m_colorAttachments.size() - 1 : 0;
 
 	if (texture->TexType == GL_TEXTURE_1D)
 	{
@@ -44,11 +44,11 @@ void GLFramebuffer::AttachTexture(GLenum attachmentType, Ref<GLTexture> texture)
 	//{
 	//	glFramebufferTexture3D(GL_FRAMEBUFFER, attachmentType + attachmentNum, texture->Format, texture->Id, 0);
 	//}
+}
 
-	if (attachmentType == AttachmentType::COLOR)
-	{
-		glDrawBuffers(m_colorAttachments.size(), m_colorAttachments.data());
-	}
+void GLFramebuffer::setDrawBuffers()
+{
+	glDrawBuffers(m_colorAttachments.size(), m_colorAttachments.data());
 }
 
 void GLFramebuffer::AttachRenderBuffer(Ref<GLRenderBuffer> rbo)

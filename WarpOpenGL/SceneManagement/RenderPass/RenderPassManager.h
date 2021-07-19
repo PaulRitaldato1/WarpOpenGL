@@ -5,6 +5,9 @@
 class RenderPassManager 
 {
 public:
+	RenderPassManager() : m_isFirstExecute(true)
+	{}
+
 	void AddPass(Ref<RenderPass> pass)
 	{
 		m_passOrder.push_back(pass);
@@ -29,6 +32,37 @@ public:
 		m_passOrder.back()->ExecuteSetup(nullptr);
 	}
 
+
+	void ExecutePasses()
+	{
+		PROFILE_SCOPE("Frame Start");
+
+		if (m_isFirstExecute)
+		{
+			resolveDependencies();
+			m_isFirstExecute = false;
+		}
+
+		for (Ref<RenderPass>& pass : m_passOrder)
+		{
+			if (m_dependencies.find(pass->getName()) == m_dependencies.end())
+			{
+				pass->ExecutePass(nullptr);
+			}
+			else
+			{
+				pass->ExecutePass(m_dependencies[pass->getName()]->getOutput());
+			}
+		}
+	}
+
+	Ref<IPassData> getPassOutput(string passName)
+	{
+		return m_passLookup[passName]->getOutput();
+	}
+
+private:
+
 	void resolveDependencies()
 	{
 		for (auto& pass : m_passOrder)
@@ -41,28 +75,7 @@ public:
 		}
 	}
 
-	void ExecutePasses()
-	{
-		PROFILE_SCOPE("Frame Start");
-		for (Ref<RenderPass>& pass : m_passOrder)
-		{
-			if (m_dependencies.find(pass->getDependency()) == m_dependencies.end())
-			{
-				pass->ExecutePass(nullptr);
-			}
-			else
-			{
-				pass->ExecutePass(m_dependencies[pass->getDependency()]->getOutput());
-			}
-		}
-	}
-
-	Ref<IPassData> getPassOutput(string passName)
-	{
-		return m_passLookup[passName]->getOutput();
-	}
-
-private:
+	bool m_isFirstExecute;
 	Vector<Ref<RenderPass>> m_passOrder;
 	HashMap<string, Ref<RenderPass>> m_passLookup;
 	HashMap<string, Ref<RenderPass>> m_dependencies;

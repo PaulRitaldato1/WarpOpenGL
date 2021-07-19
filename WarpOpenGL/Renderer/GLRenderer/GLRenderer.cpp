@@ -58,7 +58,7 @@ void GLRenderer::setReadBuffer(GLenum setting)
 	glReadBuffer(setting);
 }
 
-void GLRenderer::DrawIndexed(GLIndexedDrawCall& args)
+void GLRenderer::DrawIndexed(const GLIndexedDrawCall& args)
 {
 	args.vertexArrayBuffer->Bind();
 	args.indexBuffer->Bind();
@@ -70,4 +70,10 @@ void GLRenderer::DrawInstanced(GLInstancedDrawCall& args)
 	args.vertexArrayBuffer->Bind();
 	args.indexBuffer->Bind();
 	glDrawElementsInstanced(GL_TRIANGLES, args.indexCount, GL_UNSIGNED_INT, 0, args.instanceCount);
+}
+
+void GLRenderer::DrawArrays(uint topology, uint first, uint count, GLVertexArray& vao)
+{
+	vao.Bind();
+	glDrawArrays(topology, first, count);
 }

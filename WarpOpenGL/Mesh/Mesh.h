@@ -100,10 +100,11 @@ public:
 	{
 		PROFILE_SCOPE("MeshDraw");
 
-		FATAL_ASSERT(m_textures.size() > 0, "No textures attached to mesh");
+		//DYNAMIC_ASSERT(m_textures.size() > 0, "No textures attached to mesh");
 
-		uint totalTexCount = 0;
-		for (auto texture : m_textures)
+		//needs to be an int because it is used to set the shader param and textures are ints
+		int totalTexCount = 0;
+		for (auto& texture : m_textures)
 		{
 			for (uint i = 0; i <= m_textureNameCount[texture->Type]; ++i)
 			{
@@ -112,6 +113,12 @@ public:
 				++totalTexCount;
 			}
 		}
+
+		//for (int i = 0; i < m_textures.size(); ++i)
+		//{
+		//	shader.setUniform(m_textures[i]->Type, i);
+		//	m_textures[i]->Bind(i);
+		//}
 
 		if (m_isInstanced)
 		{
@@ -194,6 +201,13 @@ public:
 		m_indexedDraw.indexBuffer = m_ibo;
 
 		
+	}
+
+	const GLIndexedDrawCall& getIndexedDrawCall() const { return m_indexedDraw; }
+
+	Vector<Ref<GLTexture>> getTextures()
+	{
+		return m_textures;
 	}
 
 private:

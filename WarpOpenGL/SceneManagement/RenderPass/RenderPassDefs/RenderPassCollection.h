@@ -17,16 +17,15 @@ struct GBuffer : public IPassData
 		isValid = true;
 	}
 
-	Ref<GLTexture> lightAccumulationBuffer; //color buffer
-	Ref<GLTexture> diffuseBuffer;
+	Ref<GLTexture> positionBuffer; //color buffer
 	Ref<GLTexture> normalBuffer; //color buffer
-	Ref<GLTexture> specBuffer; //color buffer
+	Ref<GLTexture> diffuseSpec; //color buffer
 	Ref<GLRenderBuffer> rbo; //for depth
 
 	Ref<GLFramebuffer> frameBuffer;
 
-	Ref<Shader> instancedGeometryShader;
-	Ref<Shader> geometryShader;
+	uint instancedGeometryShader;
+	uint geometryShader;
 };
 
 class RenderPassCollection
@@ -49,6 +48,8 @@ public:
 	void AddGBufferPass(Scene& scene);
 
 	void AddGBufferLightingPass(Scene& scene);
+
+	void AddDebugQuadDraw(Vector<Ref<GLTexture>>& textures);
 private:
 	ShaderManager m_shaderManager;
 };

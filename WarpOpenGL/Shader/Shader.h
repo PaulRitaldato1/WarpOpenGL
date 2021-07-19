@@ -10,6 +10,7 @@
 
 struct ShaderParams
 {
+	string name;
 	string vertPath;
 	string fragPath;
 	string geoPath;
@@ -29,8 +30,10 @@ public:
 		compile();
 	}
 
-	Shader(ShaderParams& params)
+	Shader(ShaderParams& params) : m_name(params.name)
 	{
+
+		//might not need this since string will be "" and ignored during compile anyway
 		if (params.vertPath.size() > 0)
 		{
 			m_vertPath = params.vertPath;
@@ -137,7 +140,7 @@ public:
 		}
 		catch (std::ifstream::failure& e)
 		{
-			std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ: " << e.what() << std::endl;
+			std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ for shader " << m_name << ": "<<  e.what() << std::endl;
 		}
 
 		const char* vShaderCode = vCode.c_str();
@@ -208,7 +211,7 @@ public:
 	template<>
 	void setUniform<uint>(const std::string& name, const uint& value)
 	{
-		glUniform1i(getUniformLocation(name), value);
+		glUniform1ui(getUniformLocation(name), value);
 	}
 	// ------------------------------------------------------------------------
 	template<>
@@ -262,7 +265,7 @@ private:
 	string m_geoPath;
 	string m_computePath;
 	uint m_id;
-
+	string m_name;
 	enum shaderType { VERTEX = 0, FRAGMENT, GEOMETRY, COMPUTE,PROGRAM };
 
 	int getUniformLocation(const string& name)
@@ -290,7 +293,7 @@ private:
 			{
 				Array<string, 2> converter = { "VERTEX", "FRAGMENT" };
 				glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-				std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << converter[type] << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+				std::cout << "ERROR Shader: " << m_name << "\n" << "ERROR::SHADER_COMPILATION_ERROR of type: " << converter[type] << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
 			}
 		}
 		else
@@ -299,7 +302,7 @@ private:
 			if (!success)
 			{
 				glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-				std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: PROGRAM" << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+				std::cout << "ERROR Shader: " << m_name << "\n" << "ERROR::PROGRAM_LINKING_ERROR of type: PROGRAM" << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
 			}
 		}
 	}

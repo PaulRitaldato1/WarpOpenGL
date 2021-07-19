@@ -5,6 +5,9 @@
 #include <Renderer/GLRenderer/GLRenderer.h>
 #include <time.h>
 #include <Shader/ShaderManager.h>
+#include <Imgui/ImGuiWrapper.h>
+#include <Buffers/GLBuffers/GLVertexArray.h>
+#include <Buffers/GLBuffers/GLVertexBuffer.h>
 
 RenderPassManager g_renderPassManager;
 
@@ -116,7 +119,7 @@ void RenderPassCollection::RenderPassCollection::AddOpaquePass(Vector<Ref<Model>
 		{
 			Ref<OpaquePassData> data = std::dynamic_pointer_cast<OpaquePassData>(setupData);
 
-			g_renderer.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+			g_renderer.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			g_renderer.ClearBoundBufferBits();
 
 			for (auto& model : data->models)
@@ -154,24 +157,25 @@ void RenderPassCollection::AddGBufferPass(Scene& scene)
 			
 			Ref<GBuffer> gbuffer = std::make_shared<GBuffer>();
 			
-			//gbuffer->geometryShader = std::make_shared<Shader>("Resources/Shaders/gBufferGeometry.vs", "Resources/Shaders/gBufferGeometry.fs");
-			//gbuffer->instancedGeometryShader = std::make_shared<Shader>("Resources/Shaders/instancedGBufferGeometry.vs", "Resources/Shaders/gBufferGeometry.fs");
+			gbuffer->geometryShader = m_shaderManager.getShaderId("gBufferGeometry");
+			gbuffer->instancedGeometryShader = m_shaderManager.getShaderId("InstancedGBufferGeometry");
 
 
-			//need a good way to get window current size instead of hardcoding 
-			gbuffer->lightAccumulationBuffer = std::make_shared<GLTexture>(GL_RGBA16F, GL_RGBA, GL_TEXTURE_2D, GL_FLOAT, 1920, 1080);
-			gbuffer->diffuseBuffer = std::make_shared<GLTexture>(GL_RGBA16F, GL_RGBA, GL_TEXTURE_2D, GL_FLOAT, 1920, 1080);
+			//need a good way to get window current size instead of hard coding 
+			gbuffer->positionBuffer = std::make_shared<GLTexture>(GL_RGBA16F, GL_RGBA, GL_TEXTURE_2D, GL_FLOAT, 1920, 1080);
 			gbuffer->normalBuffer = std::make_shared<GLTexture>(GL_RGBA16F, GL_RGBA, GL_TEXTURE_2D, GL_FLOAT, 1920, 1080);
-			gbuffer->specBuffer = std::make_shared<GLTexture>(GL_RGBA, GL_RGBA, GL_TEXTURE_2D, GL_UNSIGNED_BYTE, 1920, 1080);
-			gbuffer->rbo = std::make_shared<GLRenderBuffer>(1920, 1080, GL_DEPTH_ATTACHMENT);
+			gbuffer->diffuseSpec = std::make_shared<GLTexture>(GL_RGBA, GL_RGBA, GL_TEXTURE_2D, GL_UNSIGNED_BYTE, 1920, 1080);
+			gbuffer->rbo = std::make_shared<GLRenderBuffer>(1920, 1080, GL_DEPTH_COMPONENT, GL_DEPTH_ATTACHMENT);
 
 			gbuffer->frameBuffer = std::make_shared<GLFramebuffer>();
-			
-			gbuffer->frameBuffer->AttachTexture(AttachmentType::COLOR, gbuffer->lightAccumulationBuffer);
-			gbuffer->frameBuffer->AttachTexture(AttachmentType::COLOR, gbuffer->diffuseBuffer);
+			gbuffer->frameBuffer->Bind();
+			gbuffer->frameBuffer->AttachTexture(AttachmentType::COLOR, gbuffer->positionBuffer);
+			gbuffer->frameBuffer->AttachTexture(AttachmentType::COLOR, gbuffer->diffuseSpec);
 			gbuffer->frameBuffer->AttachTexture(AttachmentType::COLOR, gbuffer->normalBuffer);
-			gbuffer->frameBuffer->AttachTexture(AttachmentType::COLOR, gbuffer->specBuffer);
+			gbuffer->frameBuffer->setDrawBuffers();
 			gbuffer->frameBuffer->AttachRenderBuffer(gbuffer->rbo);
+			gbuffer->frameBuffer->Unbind();
+			FATAL_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Frambuffer machine broke");
 
 			return gbuffer;
 		}, 
@@ -183,20 +187,22 @@ void RenderPassCollection::AddGBufferPass(Scene& scene)
 
 			g_renderer.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			g_renderer.ClearBoundBufferBits();
+
 			
 			for (auto model : scene.getModels())
 			{
 				if (!model->getIsInstanced())
 				{
-					model->Draw(*data->geometryShader);
+					model->Draw(m_shaderManager.getShaderById(data->geometryShader));
 				}
 				else
 				{
-					model->Draw(*data->instancedGeometryShader);
+					model->Draw(m_shaderManager.getShaderById(data->instancedGeometryShader));
 				}
 			}
 
 			data->frameBuffer->Unbind();
+
 
 			return data;
 		});
@@ -204,30 +210,141 @@ void RenderPassCollection::AddGBufferPass(Scene& scene)
 
 void RenderPassCollection::AddGBufferLightingPass(Scene& scene)
 {
-	struct GBufferLighting : IPassData
+	struct GBufferLightingData : IPassData
 	{
-		GBufferLighting()
+		GBufferLightingData()
 		{
 			isValid = true;
 		}
-
-		Ref<Shader> gBufferLightingShader;
+		
+		uint gBufferLightingShaderId;
 	};
 	
 	g_renderPassManager.AddPass("GBufferLightingPass", "GBufferPass", 
 		[&](Ref<IPassData> passData) 
 		{
-			Ref<GBufferLighting> lightData = std::make_shared<GBufferLighting>();
+			Ref<GBufferLightingData> lightData = std::make_shared<GBufferLightingData>();
 
-			//lightData->gBufferLightingShader = std::make_shared<Shader>("Resources/Shaders/gBufferLighting.vs", "Resources/Shaders/gBufferLighting.fs");
+			lightData->gBufferLightingShaderId = m_shaderManager.getShaderId("gBufferLighting");
 
 			return lightData;
 		}, 
 		[&](Ref<IPassData> dependencyData, Ref<IPassData> setupData)
 		{
 			Ref<GBuffer> gbuffer = std::dynamic_pointer_cast<GBuffer>(dependencyData);
-			Ref<GBufferLighting> lightingData = std::dynamic_pointer_cast<GBufferLighting>(setupData);
+			Ref<GBufferLightingData> lightingData = std::dynamic_pointer_cast<GBufferLightingData>(setupData);
+
+			auto& shader = m_shaderManager.getShaderById(lightingData->gBufferLightingShaderId);
+			shader.Bind();
+			g_renderer.setCullMode(GL_FRONT);
+			for (const auto& pointlight : scene.getPointlights())
+			{
+				auto shaderParams = pointlight.getShaderParams();
+
+				shader.setUniform("gPos", 0);
+				gbuffer->positionBuffer->Bind(0);
+				shader.setUniform("gDiffuseSpec", 1);
+				gbuffer->diffuseSpec->Bind(1);
+				shader.setUniform("gNormal", 2);
+				gbuffer->normalBuffer->Bind(2);
+
+				shader.setUniform("viewPos", scene.getActiveCamera().getPosition());
+
+				shader.setUniform("light.position", shaderParams.position);
+				shader.setUniform("light.direction", shaderParams.direction);
+				shader.setUniform("light.color", shaderParams.color);
+				shader.setUniform("light.spotlightAngle", shaderParams.spotlightAngle);
+				shader.setUniform("light.radius", shaderParams.radius);
+				shader.setUniform("light.intensity", shaderParams.intensity);
+				shader.setUniform("light.enable", shaderParams.enable);
+				shader.setUniform("light.type", (uint)shaderParams.type);
+				shader.setUniform("light.linear", (float)0.7);
+				shader.setUniform("light.linear", (float)1.8);
+
+				/*g_renderer.DrawIndexed(pointlight.getLightVolume().getIndexedDrawCall());*/
+				pointlight.getLightVolume().Draw(shader);
+
+			}
+
+			g_renderer.setCullMode(GL_BACK);
 
 			return gbuffer;
+		});
+}
+
+void RenderPassCollection::AddDebugQuadDraw(Vector<Ref<GLTexture>>& textures)
+{
+	struct QuadDrawData : IPassData
+	{
+		QuadDrawData()
+		{
+			isValid = true;
+		}
+
+		uint shaderId;
+		Ref<GLVertexBuffer> vbo;
+		Ref<GLVertexArray> vao;
+		Array<float, 20> vertices;
+	};
+
+	g_renderPassManager.AddPass("QuadPass",
+		[&](Ref<IPassData> passData) 
+		{
+			Ref<QuadDrawData> data = std::make_shared<QuadDrawData>();
+			data->vertices[0] = -1.0f;
+			data->vertices[1] = 1.0f;
+			data->vertices[2] = 0.0f;
+			data->vertices[3] = 0.0f;
+			data->vertices[4] = 1.0f;
+
+			data->vertices[5] = -1.0f;
+			data->vertices[6] = -1.0f;
+			data->vertices[7] = 0.0f;
+			data->vertices[8] = 0.0f;
+			data->vertices[9] = 0.0f;
+
+			data->vertices[10] = 1.0f;
+			data->vertices[11] = 1.0f;
+			data->vertices[12] = 0.0f;
+			data->vertices[13] = 1.0f;
+			data->vertices[14] = 1.0f;
+
+			data->vertices[15] = 1.0f;
+			data->vertices[16] = -1.0f;
+			data->vertices[17] = 0.0f;
+			data->vertices[18] = 1.0f;
+			data->vertices[19] = 0.0f;
+			
+			data->vbo = std::make_shared<GLVertexBuffer>(data->vertices.data(), sizeof(float) * data->vertices.size());
+			data->vao = std::make_shared<GLVertexArray>();
+
+			GLVertexBufferLayout layout;
+			layout.Push<float>(3);
+			layout.Push<float>(2);
+			data->vao->AddBuffer(*data->vbo, layout);
+
+			data->shaderId = m_shaderManager.getShaderId("QuadDraw");
+
+			return data;
+		}, 
+		[&](Ref<IPassData> dependencyData, Ref<IPassData> setupData)
+		{
+			Ref<QuadDrawData> data = std::dynamic_pointer_cast<QuadDrawData>(setupData);
+
+			auto& shader = m_shaderManager.getShaderById(data->shaderId);
+			shader.Bind();
+			
+			shader.setUniform("tex", 0);
+			textures[0]->Bind(0);
+
+			shader.setUniform("tex1", 1);
+			textures[1]->Bind(1);
+
+			shader.setUniform("tex2", 2);
+			textures[2]->Bind(2);
+
+			g_renderer.DrawArrays(GL_TRIANGLE_STRIP, 0, 4, *data->vao);
+			
+			return data;
 		});
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include <Common/CommonTypes.h>
-#include <Lights/Pointlight.h>
-#include <Lights/Spotlight.h>
+#include <Lighting/Pointlight.h>
+#include <Lighting/Spotlight.h>
 #include <Mesh/Model.h>
 #include <Cameras/FPCamera.h>
 

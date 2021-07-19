@@ -6,7 +6,7 @@ class GLRenderBuffer : public GenericBuffer
 {
 public:
 
-	GLRenderBuffer(uint width, uint height, GLenum format);
+	GLRenderBuffer(uint width, uint height, GLenum componentFormat, GLenum format);
 	~GLRenderBuffer();
 
 	void Bind() const override;

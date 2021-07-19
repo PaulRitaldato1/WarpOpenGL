@@ -25,6 +25,7 @@ public:
 
 	void AttachTexture(GLenum attachmentType, Ref<GLTexture> texture);
 	
+	void setDrawBuffers();
 	void AttachRenderBuffer(Ref<GLRenderBuffer> rbo);
 
 private:

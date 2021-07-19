@@ -8,9 +8,10 @@ layout (location = 4) in vec3 aBitangent;
 
 
 out vec2 TexCoords;
-out vec3 NormalVS;
-out vec3 TangentVS;
-out vec3 BinormalVS;
+out vec3 Normal;
+out vec3 Tangent;
+out vec3 Binormal;
+out vec3 FragPos;
 
 layout (std140, binding = 0) uniform Matrices
 {
@@ -24,11 +25,14 @@ void main()
 {
     TexCoords = aTexCoords;
 
-    //convert to view space
-    //openGL is column major order, for HLSL switch to model * view 
-    NormalVS = mat3(view * model) * aNormal;
-    TangentVS = mat3(view * model) * aTangent;
-    BinormalVS = mat3(view * model) * aBitangent;
+    vec4 worldPos = model * vec4(aPos, 1.0);
+    FragPos = worldPos.xyz;
 
-    gl_Position = projection * view * model * vec4(aPos, 1.0);
+    mat3 invTranspose = transpose(inverse(mat3(model)));
+
+    Normal = invTranspose * aNormal;
+    Tangent = invTranspose * aTangent;
+    Binormal = invTranspose * aBitangent;
+
+    gl_Position = projection * view * worldPos;
 }

@@ -6,7 +6,7 @@ class GeoGen
 {
 public:
 	static Mesh CreateBox(float width, float height, float depth, uint numSubdivisions);
-	static Mesh CreateSphere(float radius, uint sliceCount, uint stackCount);
+	static Ref<Mesh> CreateSphere(float radius, uint sliceCount, uint stackCount);
 	static Mesh CreateGeoSphere(float radius, uint numSubdivisions);
 	static Mesh CreateCylinder(float bottomRadius, float topRadius, float height, uint sliceCount, uint stackCount);
 	static Mesh CreateGrid(float width, float depth, uint m, uint n);
