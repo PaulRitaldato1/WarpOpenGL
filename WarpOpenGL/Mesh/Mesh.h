@@ -114,12 +114,6 @@ public:
 			}
 		}
 
-		//for (int i = 0; i < m_textures.size(); ++i)
-		//{
-		//	shader.setUniform(m_textures[i]->Type, i);
-		//	m_textures[i]->Bind(i);
-		//}
-
 		if (m_isInstanced)
 		{
 			g_renderer.DrawInstanced(m_instancedDraw);
