@@ -1,5 +1,4 @@
 #version 460 core
-
 #define DIRECTIONAL_LIGHT 0
 #define SPOTLIGHT 1
 #define POINTLIGHT 2
@@ -24,13 +23,15 @@ uniform sampler2D gPos;
 uniform sampler2D gDiffuseSpec;
 uniform sampler2D gNormal;
 
-in vec2 TexCoord;
 
 uniform Light light;
 uniform vec3 viewPos;
 
 void main()
 {
+
+	vec2 TexCoord = gl_FragCoord.xy/vec2(1920, 1080); //doesnt matter which tex, they are all the same size
+
 	vec3 FragPos = texture(gPos, TexCoord).rgb;
 	vec3 Normal = texture(gNormal, TexCoord).rgb;
 	vec3 Diffuse = texture(gDiffuseSpec, TexCoord).rgb;
@@ -54,8 +55,6 @@ void main()
         diffuse *= attenuation;
         specular *= attenuation;
 		result += diffuse + specular;
-//		result += vec3(1.0, 0.0, 0.0);
-
 	}
 	else if(light.type == SPOTLIGHT)
 	{

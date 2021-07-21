@@ -96,6 +96,12 @@ public:
 		glDeleteShader(computeId);
 	}
 
+	void recompile()
+	{
+		glDeleteShader(m_id);
+		compile();
+	}
+
 	//separate gl calls into their own function
 	void compile()
 	{
@@ -257,6 +263,7 @@ public:
 	}
 
 	uint getId() const { return m_id; }
+	const string& getName() const { return m_name; }
 private:
 
 	HashMap<string, int> m_locationCache;

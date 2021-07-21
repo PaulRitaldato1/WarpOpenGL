@@ -185,8 +185,8 @@ int main()
 	Vector<Ref<Model>> models = loader.loadModelsAsync(modelDescs);
 	
 	Vector<Pointlight> pointLights;
-	pointLights.emplace_back(glm::vec3(0.0f, 3.0f, 0.0f), 1.0f, 1.0f);
-
+	pointLights.emplace_back(glm::vec3(0.0f, 0.0f, 5.0f), 10.0f, 1.0f);
+	//pointLights.emplace_back(glm::vec3(0.0f, 5.0f, 0.0f), 10.0f, 1.0f);
 	Vector<Spotlight> spotlights;
 
 	Vector<FPCamera> cameras;
@@ -199,6 +199,7 @@ int main()
 	passCollection.AddGBufferPass(scene);
 	passCollection.AddGBufferLightingPass(scene);
 
+	auto& shaders = passCollection.getShaderManager().getShaders();
 	//passCollection.AddZOnlyPass(1024, 1024, models);
 	//passCollection.AddOpaquePass(models);
 	// 
@@ -213,6 +214,18 @@ int main()
 		imgui.newFrame();
 		ImGui::Begin("Performance Monitor");
 		ImGui::Text("Frame Time: %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		for (uint i = 0; i < shaders.size(); ++i)
+		{
+			auto& shader = shaders[i];
+			ImGui::PushID(i);
+			ImGui::Text(shader->getName().c_str());
+			ImGui::SameLine();
+			if (ImGui::Button("Recompile"))
+			{
+				shader->recompile();
+			}
+			ImGui::PopID();
+		}
 		ImGui::End();
 
 

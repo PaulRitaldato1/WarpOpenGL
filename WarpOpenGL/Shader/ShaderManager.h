@@ -61,7 +61,7 @@ public:
 	uint getShaderId(string&& name) { return m_shaderIndexMap[name]; }
 	uint getShaderId(string& name) { return m_shaderIndexMap[name]; }
 	Shader& getShaderById(uint id) { return *m_shaders[id]; }
-
+	Vector<Ref<Shader>>& getShaders() { return m_shaders; }
 private:
 	Vector<Ref<Shader>> m_shaders;
 	HashMap<string, uint> m_shaderIndexMap;

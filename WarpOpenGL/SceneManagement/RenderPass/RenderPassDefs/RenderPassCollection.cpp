@@ -163,8 +163,17 @@ void RenderPassCollection::AddGBufferPass(Scene& scene)
 
 			//need a good way to get window current size instead of hard coding 
 			gbuffer->positionBuffer = std::make_shared<GLTexture>(GL_RGBA16F, GL_RGBA, GL_TEXTURE_2D, GL_FLOAT, 1920, 1080);
+			gbuffer->positionBuffer->setParameteri(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			gbuffer->positionBuffer->setParameteri(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
 			gbuffer->normalBuffer = std::make_shared<GLTexture>(GL_RGBA16F, GL_RGBA, GL_TEXTURE_2D, GL_FLOAT, 1920, 1080);
+			gbuffer->normalBuffer->setParameteri(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			gbuffer->normalBuffer->setParameteri(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
 			gbuffer->diffuseSpec = std::make_shared<GLTexture>(GL_RGBA, GL_RGBA, GL_TEXTURE_2D, GL_UNSIGNED_BYTE, 1920, 1080);
+			gbuffer->diffuseSpec->setParameteri(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			gbuffer->diffuseSpec->setParameteri(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
 			gbuffer->rbo = std::make_shared<GLRenderBuffer>(1920, 1080, GL_DEPTH_COMPONENT, GL_DEPTH_ATTACHMENT);
 
 			gbuffer->frameBuffer = std::make_shared<GLFramebuffer>();
@@ -203,7 +212,9 @@ void RenderPassCollection::AddGBufferPass(Scene& scene)
 
 			data->frameBuffer->Unbind();
 
-
+			ImGui::Begin("Tex Debug");
+			ImGui::Image((void*)(intptr_t)data->normalBuffer->Id, ImVec2(512, 512));
+			ImGui::End();
 			return data;
 		});
 }
@@ -218,6 +229,11 @@ void RenderPassCollection::AddGBufferLightingPass(Scene& scene)
 		}
 		
 		uint gBufferLightingShaderId;
+		Ref<GLTexture> buffer; //color buffer
+		Ref<GLTexture> buffer2;
+		Ref<GLRenderBuffer> rbo; //for depth
+		Ref<GLFramebuffer> frameBuffer;
+
 	};
 	
 	g_renderPassManager.AddPass("GBufferLightingPass", "GBufferPass", 
@@ -226,6 +242,17 @@ void RenderPassCollection::AddGBufferLightingPass(Scene& scene)
 			Ref<GBufferLightingData> lightData = std::make_shared<GBufferLightingData>();
 
 			lightData->gBufferLightingShaderId = m_shaderManager.getShaderId("gBufferLighting");
+			lightData->rbo = std::make_shared<GLRenderBuffer>(1920, 1080, GL_DEPTH_COMPONENT, GL_DEPTH_ATTACHMENT);
+			lightData->buffer = std::make_shared<GLTexture>(GL_RGBA16F, GL_RGBA, GL_TEXTURE_2D, GL_FLOAT, 1920, 1080);
+			lightData->buffer2 = std::make_shared<GLTexture>(GL_RGBA16F, GL_RGBA, GL_TEXTURE_2D, GL_FLOAT, 1920, 1080);
+
+			lightData->frameBuffer = std::make_shared<GLFramebuffer>();
+			lightData->frameBuffer->Bind();
+			lightData->frameBuffer->AttachTexture(AttachmentType::COLOR, lightData->buffer);
+			lightData->frameBuffer->AttachTexture(AttachmentType::COLOR, lightData->buffer2);
+			lightData->frameBuffer->setDrawBuffers();
+			lightData->frameBuffer->AttachRenderBuffer(lightData->rbo);
+			lightData->frameBuffer->Unbind();
 
 			return lightData;
 		}, 
@@ -234,8 +261,12 @@ void RenderPassCollection::AddGBufferLightingPass(Scene& scene)
 			Ref<GBuffer> gbuffer = std::dynamic_pointer_cast<GBuffer>(dependencyData);
 			Ref<GBufferLightingData> lightingData = std::dynamic_pointer_cast<GBufferLightingData>(setupData);
 
+			//lightingData->frameBuffer->Bind();
+
 			auto& shader = m_shaderManager.getShaderById(lightingData->gBufferLightingShaderId);
+			g_renderer.ClearBoundBufferBits();
 			shader.Bind();
+
 			g_renderer.setCullMode(GL_FRONT);
 			for (const auto& pointlight : scene.getPointlights())
 			{
@@ -267,6 +298,8 @@ void RenderPassCollection::AddGBufferLightingPass(Scene& scene)
 			}
 
 			g_renderer.setCullMode(GL_BACK);
+
+			//lightingData->frameBuffer->Unbind();
 
 			return gbuffer;
 		});

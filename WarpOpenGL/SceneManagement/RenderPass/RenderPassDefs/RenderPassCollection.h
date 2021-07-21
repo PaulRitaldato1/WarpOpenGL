@@ -50,6 +50,8 @@ public:
 	void AddGBufferLightingPass(Scene& scene);
 
 	void AddDebugQuadDraw(Vector<Ref<GLTexture>>& textures);
+
+	ShaderManager& getShaderManager() { return m_shaderManager; }
 private:
 	ShaderManager m_shaderManager;
 };

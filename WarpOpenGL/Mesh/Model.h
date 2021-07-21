@@ -130,7 +130,7 @@ public:
 		{
 			m_ssbo->BindSubdata<Vector<glm::mat4>> (m_instances);
 		}
-		else
+		else if(!m_isInstanced)
 		{
 			shader.setUniform("model", m_modelTransform);
 		}
