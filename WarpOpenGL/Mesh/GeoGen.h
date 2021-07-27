@@ -10,7 +10,8 @@ public:
 	static Mesh CreateGeoSphere(float radius, uint numSubdivisions);
 	static Mesh CreateCylinder(float bottomRadius, float topRadius, float height, uint sliceCount, uint stackCount);
 	static Mesh CreateGrid(float width, float depth, uint m, uint n);
-	static Mesh CreateQuad(float x, float y, float w, float h, float depth);
+	static Ref<Mesh> CreateQuad(float x, float y, float w, float h, float depth);
+	static Ref<Mesh> CreateDefaultQuad();
 private:
 	static void Subdivide(Mesh& mesh);
 	static Vertex MidPoint(const Vertex& v0, const Vertex& v1);

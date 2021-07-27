@@ -28,11 +28,14 @@ void main()
     vec4 worldPos = model * vec4(aPos, 1.0);
     FragPos = worldPos.xyz;
 
-    mat3 invTranspose = transpose(inverse(mat3(model)));
+//    mat3 invTranspose = transpose(inverse(mat3(model)));
 
-    Normal = invTranspose * aNormal;
-    Tangent = invTranspose * aTangent;
-    Binormal = invTranspose * aBitangent;
+//    Normal = invTranspose * aNormal;
+//    Tangent = invTranspose * aTangent;
+//    Binormal = invTranspose * aBitangent;
+    Normal = (mat3(view * model) * aNormal).xyz;
+    Tangent = (mat3(view * model) * aTangent).xyz;
+    Binormal = (mat3(view * model) * aBitangent).xyz;
 
     gl_Position = projection * view * worldPos;
 }

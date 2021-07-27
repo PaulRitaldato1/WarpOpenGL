@@ -2,6 +2,7 @@
 #include <Common/CommonTypes.h>
 #include <Lighting/Pointlight.h>
 #include <Lighting/Spotlight.h>
+#include <Lighting/DirectionalLight.h>
 #include <Mesh/Model.h>
 #include <Cameras/FPCamera.h>
 
@@ -10,10 +11,11 @@ class Scene
 public:
 
 	//expensive constructor, but this should only be run during setup, or loading, not per frame
-	Scene(string name, Vector<Spotlight> spotlights, Vector<Pointlight> pointlights, Vector<Ref<Model>> models, Vector<FPCamera> cameras)
+	Scene(string name, Vector<Spotlight> spotlights, Vector<Pointlight> pointlights, Vector<DirectionalLight> directionalLights, Vector<Ref<Model>> models, Vector<FPCamera> cameras)
 		: m_name(name)
 		, m_spotlights(spotlights)
 		, m_pointlights(pointlights)
+		, m_directionalLights(directionalLights)
 		, m_models(models)
 		, m_cameras(cameras)
 		, m_activeCameraIndex(0)
@@ -35,7 +37,10 @@ public:
 
 	const Vector<Pointlight>& getPointlights() { return m_pointlights; }
 	const Vector<Spotlight>& getSpotlights() { return m_spotlights; }
+	const Vector<DirectionalLight>& getDirectionalLights() { return m_directionalLights; }
+
 	const Vector<Ref<Model>>& getModels() { return m_models; }
+
 	const Vector<FPCamera>& getCamera() { return m_cameras; }
 
 	const FPCamera& getActiveCamera() { return m_cameras[m_activeCameraIndex]; }
@@ -50,6 +55,7 @@ private:
 	uint m_activeCameraIndex;
 	Vector<Spotlight> m_spotlights;
 	Vector<Pointlight> m_pointlights;
+	Vector<DirectionalLight> m_directionalLights;
 	Vector<Ref<Model>> m_models;
 	Vector<FPCamera> m_cameras;
 };

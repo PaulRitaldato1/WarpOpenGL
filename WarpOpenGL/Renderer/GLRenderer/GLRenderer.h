@@ -43,6 +43,9 @@ public:
 	void Enable(uint toEnable);
 	void Disable(uint toDisable);
 
+	void setBlendFunc(uint sFactor, uint blendFunc);
+	void setBlendEquation(GLenum mode);
+
 	void ClearColor(float r, float g, float b, float a);
 	void ClearColor(glm::vec4 color);
 
@@ -56,6 +59,8 @@ public:
 	void DrawIndexed(const GLIndexedDrawCall& args);
 	void DrawInstanced(GLInstancedDrawCall& args);
 	void DrawArrays(uint topology, uint first, uint count, GLVertexArray& vao);
+
+	void setDrawWireFrame(GLenum mode);
 private:
 	uint m_boundBufferbits = 0;
 };

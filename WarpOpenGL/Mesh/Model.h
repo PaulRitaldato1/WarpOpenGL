@@ -84,6 +84,12 @@ public:
 		m_material = g_MaterialPresets[MaterialPresets::DEFAULT];
 	}
 
+	Model(Ref<Mesh> mesh)
+	{
+		m_isInstanced = false;
+		m_meshes.push_back(mesh);
+	}
+
 	Model(const Model& copy) = delete;
 
 	void initTextures()

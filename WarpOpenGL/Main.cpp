@@ -185,20 +185,26 @@ int main()
 	Vector<Ref<Model>> models = loader.loadModelsAsync(modelDescs);
 	
 	Vector<Pointlight> pointLights;
-	pointLights.emplace_back(glm::vec3(0.0f, 0.0f, 5.0f), 10.0f, 1.0f);
-	//pointLights.emplace_back(glm::vec3(0.0f, 5.0f, 0.0f), 10.0f, 1.0f);
+	pointLights.emplace_back(glm::vec3(0.0f, 0.0f, 5.0f), 10.0f, 10.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+	pointLights.emplace_back(glm::vec3(1.0f, 0.0f, 5.0f), 10.0f, 10.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+	
 	Vector<Spotlight> spotlights;
+
+	Vector<DirectionalLight> directionalLights;
+	directionalLights.emplace_back(glm::vec3(.33f, .50f, .33), glm::vec3(-0.2f, -1.0f, -0.3f), false);
 
 	Vector<FPCamera> cameras;
 	cameras.push_back(camera);
 
-	Scene scene("BasicBackpack", spotlights, pointLights, models, cameras);
+	Scene scene("BasicBackpack", spotlights, pointLights, directionalLights, models, cameras);
 
 	UniformBufferObject viewProjUBO(2*sizeof(glm::mat4), 0);
 
 	passCollection.AddGBufferPass(scene);
 	passCollection.AddGBufferLightingPass(scene);
 
+	//auto textures = loader.getTextures();
+	//passCollection.AddDebugQuadDraw(textures);
 	auto& shaders = passCollection.getShaderManager().getShaders();
 	//passCollection.AddZOnlyPass(1024, 1024, models);
 	//passCollection.AddOpaquePass(models);

@@ -17,6 +17,10 @@ struct Light
 	uint type;
 };
 
+float CalcPointLight()
+{
+}
+
 out vec4 FragColor;
 
 uniform sampler2D gPos;
@@ -30,15 +34,17 @@ uniform vec3 viewPos;
 void main()
 {
 
-	vec2 TexCoord = gl_FragCoord.xy/vec2(1920, 1080); //doesnt matter which tex, they are all the same size
+	vec2 TexCoord = gl_FragCoord.xy/textureSize(gPos, 0); //doesnt matter which tex, they are all the same size
 
 	vec3 FragPos = texture(gPos, TexCoord).rgb;
 	vec3 Normal = texture(gNormal, TexCoord).rgb;
 	vec3 Diffuse = texture(gDiffuseSpec, TexCoord).rgb;
 	float Specular = texture(gDiffuseSpec, TexCoord).a;
 
-	vec3 result = Diffuse * 0.1;
+	vec3 result = Diffuse * 0.5;
 	vec3 viewDir = normalize(viewPos - FragPos);
+
+	vec4 eyePos = vec4(0.0, 0.0, 0.0, 1.0);
 
 	if(light.type == POINTLIGHT)
 	{
@@ -50,8 +56,8 @@ void main()
 		vec3 specular = light.color * spec * Specular;
 
 //		//attenuation
-        float distance = length(light.position - FragPos);
-        float attenuation = 1.0 / (1.0 + light.linear * distance + light.quadratic * distance * distance);
+        float dist = distance(light.position, FragPos);
+        float attenuation = 1.0 / (1.0 + light.linear * dist + light.quadratic * dist * dist);
         diffuse *= attenuation;
         specular *= attenuation;
 		result += diffuse + specular;
@@ -67,5 +73,5 @@ void main()
 		result = vec3(0.0, 1.0, 0.0);
 	}
 
-	FragColor = vec4(result, 1.0);
+	FragColor += vec4(result, 1.0);
 }

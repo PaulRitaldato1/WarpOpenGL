@@ -98,15 +98,15 @@ void main()
 //        }
 //    }
 //
-//    vec3 N = normalize(Normal);
-//    if(mat.HasNormalTexture)
-//    {
-//        mat3 TBN = mat3(normalize(Tangent), normalize(Binormal), normalize(Normal));
-//        N = calcNormalMapping(TBN, texture_normal0, TexCoords);
-//    }
+    vec3 N = normalize(Normal);
+    if(mat.HasNormalTexture)
+    {
+        mat3 TBN = mat3(normalize(Tangent), normalize(Binormal), normalize(Normal));
+        N = calcNormalMapping(TBN, texture_normal0, TexCoords);
+    }
 
     gPos = FragPos;
-    gNormal = normalize(Normal);
+    gNormal = N;
     gDiffuseSpec.rgb = diffuse.rgb;
     gDiffuseSpec.a = texture(texture_specular0, TexCoords).r;
 }

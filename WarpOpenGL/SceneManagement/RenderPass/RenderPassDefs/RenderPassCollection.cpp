@@ -157,8 +157,8 @@ void RenderPassCollection::AddGBufferPass(Scene& scene)
 			
 			Ref<GBuffer> gbuffer = std::make_shared<GBuffer>();
 			
-			gbuffer->geometryShader = m_shaderManager.getShaderId("gBufferGeometry");
-			gbuffer->instancedGeometryShader = m_shaderManager.getShaderId("InstancedGBufferGeometry");
+			gbuffer->geometryShaderId = m_shaderManager.getShaderId("gBufferGeometry");
+			gbuffer->instancedGeometryShaderId = m_shaderManager.getShaderId("InstancedGBufferGeometry");
 
 
 			//need a good way to get window current size instead of hard coding 
@@ -202,19 +202,16 @@ void RenderPassCollection::AddGBufferPass(Scene& scene)
 			{
 				if (!model->getIsInstanced())
 				{
-					model->Draw(m_shaderManager.getShaderById(data->geometryShader));
+					model->Draw(m_shaderManager.getShaderById(data->geometryShaderId));
 				}
 				else
 				{
-					model->Draw(m_shaderManager.getShaderById(data->instancedGeometryShader));
+					model->Draw(m_shaderManager.getShaderById(data->instancedGeometryShaderId));
 				}
 			}
 
 			data->frameBuffer->Unbind();
 
-			ImGui::Begin("Tex Debug");
-			ImGui::Image((void*)(intptr_t)data->normalBuffer->Id, ImVec2(512, 512));
-			ImGui::End();
 			return data;
 		});
 }
@@ -229,10 +226,8 @@ void RenderPassCollection::AddGBufferLightingPass(Scene& scene)
 		}
 		
 		uint gBufferLightingShaderId;
-		Ref<GLTexture> buffer; //color buffer
-		Ref<GLTexture> buffer2;
-		Ref<GLRenderBuffer> rbo; //for depth
-		Ref<GLFramebuffer> frameBuffer;
+		uint gBufferQuadLightingShaderId;
+
 
 	};
 	
@@ -242,7 +237,9 @@ void RenderPassCollection::AddGBufferLightingPass(Scene& scene)
 			Ref<GBufferLightingData> lightData = std::make_shared<GBufferLightingData>();
 
 			lightData->gBufferLightingShaderId = m_shaderManager.getShaderId("gBufferLighting");
-			lightData->rbo = std::make_shared<GLRenderBuffer>(1920, 1080, GL_DEPTH_COMPONENT, GL_DEPTH_ATTACHMENT);
+			lightData->gBufferQuadLightingShaderId = m_shaderManager.getShaderId("QuadGBufferLighting");
+
+			/*lightData->rbo = std::make_shared<GLRenderBuffer>(1920, 1080, GL_DEPTH_COMPONENT, GL_DEPTH_ATTACHMENT);
 			lightData->buffer = std::make_shared<GLTexture>(GL_RGBA16F, GL_RGBA, GL_TEXTURE_2D, GL_FLOAT, 1920, 1080);
 			lightData->buffer2 = std::make_shared<GLTexture>(GL_RGBA16F, GL_RGBA, GL_TEXTURE_2D, GL_FLOAT, 1920, 1080);
 
@@ -252,7 +249,7 @@ void RenderPassCollection::AddGBufferLightingPass(Scene& scene)
 			lightData->frameBuffer->AttachTexture(AttachmentType::COLOR, lightData->buffer2);
 			lightData->frameBuffer->setDrawBuffers();
 			lightData->frameBuffer->AttachRenderBuffer(lightData->rbo);
-			lightData->frameBuffer->Unbind();
+			lightData->frameBuffer->Unbind();*/
 
 			return lightData;
 		}, 
@@ -261,45 +258,45 @@ void RenderPassCollection::AddGBufferLightingPass(Scene& scene)
 			Ref<GBuffer> gbuffer = std::dynamic_pointer_cast<GBuffer>(dependencyData);
 			Ref<GBufferLightingData> lightingData = std::dynamic_pointer_cast<GBufferLightingData>(setupData);
 
-			//lightingData->frameBuffer->Bind();
-
-			auto& shader = m_shaderManager.getShaderById(lightingData->gBufferLightingShaderId);
+			auto& lightVolumeShader = m_shaderManager.getShaderById(lightingData->gBufferLightingShaderId);
 			g_renderer.ClearBoundBufferBits();
-			shader.Bind();
+			lightVolumeShader.Bind();
 
+			lightVolumeShader.setUniform("gPos", 0);
+			gbuffer->positionBuffer->Bind(0);
+			lightVolumeShader.setUniform("gDiffuseSpec", 1);
+			gbuffer->diffuseSpec->Bind(1);
+			lightVolumeShader.setUniform("gNormal", 2);
+			gbuffer->normalBuffer->Bind(2);
+
+			g_renderer.Enable(GL_BLEND);
+			g_renderer.setBlendFunc(GL_ONE, GL_ONE);
+			g_renderer.setBlendEquation(GL_FUNC_ADD);
 			g_renderer.setCullMode(GL_FRONT);
-			for (const auto& pointlight : scene.getPointlights())
+			for (const auto& light : scene.getPointlights())
 			{
-				auto shaderParams = pointlight.getShaderParams();
+				auto shaderParams = light.getShaderParams();
 
-				shader.setUniform("gPos", 0);
-				gbuffer->positionBuffer->Bind(0);
-				shader.setUniform("gDiffuseSpec", 1);
-				gbuffer->diffuseSpec->Bind(1);
-				shader.setUniform("gNormal", 2);
-				gbuffer->normalBuffer->Bind(2);
 
-				shader.setUniform("viewPos", scene.getActiveCamera().getPosition());
+				lightVolumeShader.setUniform("viewPos", scene.getActiveCamera().getPosition());
 
-				shader.setUniform("light.position", shaderParams.position);
-				shader.setUniform("light.direction", shaderParams.direction);
-				shader.setUniform("light.color", shaderParams.color);
-				shader.setUniform("light.spotlightAngle", shaderParams.spotlightAngle);
-				shader.setUniform("light.radius", shaderParams.radius);
-				shader.setUniform("light.intensity", shaderParams.intensity);
-				shader.setUniform("light.enable", shaderParams.enable);
-				shader.setUniform("light.type", (uint)shaderParams.type);
-				shader.setUniform("light.linear", (float)0.7);
-				shader.setUniform("light.linear", (float)1.8);
+				lightVolumeShader.setUniform("light.position", shaderParams.position);
+				lightVolumeShader.setUniform("light.direction", shaderParams.direction);
+				lightVolumeShader.setUniform("light.color", shaderParams.color);
+				lightVolumeShader.setUniform("light.spotlightAngle", shaderParams.spotlightAngle);
+				lightVolumeShader.setUniform("light.radius", shaderParams.radius);
+				lightVolumeShader.setUniform("light.intensity", shaderParams.intensity);
+				lightVolumeShader.setUniform("light.enable", shaderParams.enable);
+				lightVolumeShader.setUniform("light.type", (uint)shaderParams.type);
+				lightVolumeShader.setUniform("light.linear", (float)0.7);
+				lightVolumeShader.setUniform("light.quadratic", (float)1.8);
 
-				/*g_renderer.DrawIndexed(pointlight.getLightVolume().getIndexedDrawCall());*/
-				pointlight.getLightVolume().Draw(shader);
-
+				light.getLightVolume().Draw(lightVolumeShader);
 			}
 
+			g_renderer.Disable(GL_BLEND);
 			g_renderer.setCullMode(GL_BACK);
 
-			//lightingData->frameBuffer->Unbind();
 
 			return gbuffer;
 		});
@@ -315,47 +312,14 @@ void RenderPassCollection::AddDebugQuadDraw(Vector<Ref<GLTexture>>& textures)
 		}
 
 		uint shaderId;
-		Ref<GLVertexBuffer> vbo;
-		Ref<GLVertexArray> vao;
-		Array<float, 20> vertices;
+		Ref<Mesh> mesh;
 	};
 
 	g_renderPassManager.AddPass("QuadPass",
 		[&](Ref<IPassData> passData) 
 		{
 			Ref<QuadDrawData> data = std::make_shared<QuadDrawData>();
-			data->vertices[0] = -1.0f;
-			data->vertices[1] = 1.0f;
-			data->vertices[2] = 0.0f;
-			data->vertices[3] = 0.0f;
-			data->vertices[4] = 1.0f;
-
-			data->vertices[5] = -1.0f;
-			data->vertices[6] = -1.0f;
-			data->vertices[7] = 0.0f;
-			data->vertices[8] = 0.0f;
-			data->vertices[9] = 0.0f;
-
-			data->vertices[10] = 1.0f;
-			data->vertices[11] = 1.0f;
-			data->vertices[12] = 0.0f;
-			data->vertices[13] = 1.0f;
-			data->vertices[14] = 1.0f;
-
-			data->vertices[15] = 1.0f;
-			data->vertices[16] = -1.0f;
-			data->vertices[17] = 0.0f;
-			data->vertices[18] = 1.0f;
-			data->vertices[19] = 0.0f;
-			
-			data->vbo = std::make_shared<GLVertexBuffer>(data->vertices.data(), sizeof(float) * data->vertices.size());
-			data->vao = std::make_shared<GLVertexArray>();
-
-			GLVertexBufferLayout layout;
-			layout.Push<float>(3);
-			layout.Push<float>(2);
-			data->vao->AddBuffer(*data->vbo, layout);
-
+			data->mesh = GeoGen::CreateDefaultQuad();
 			data->shaderId = m_shaderManager.getShaderId("QuadDraw");
 
 			return data;
@@ -367,17 +331,14 @@ void RenderPassCollection::AddDebugQuadDraw(Vector<Ref<GLTexture>>& textures)
 			auto& shader = m_shaderManager.getShaderById(data->shaderId);
 			shader.Bind();
 			
-			shader.setUniform("tex", 0);
-			textures[0]->Bind(0);
+			int i = 0;
+			for (auto& texture : textures)
+			{
+				shader.setUniform("tex" + std::to_string(i), i);
+				texture->Bind(++i);
+			}
 
-			shader.setUniform("tex1", 1);
-			textures[1]->Bind(1);
-
-			shader.setUniform("tex2", 2);
-			textures[2]->Bind(2);
-
-			g_renderer.DrawArrays(GL_TRIANGLE_STRIP, 0, 4, *data->vao);
-			
+			data->mesh->Draw(shader);
 			return data;
 		});
 }

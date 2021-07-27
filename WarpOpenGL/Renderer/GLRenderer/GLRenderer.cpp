@@ -28,6 +28,16 @@ void GLRenderer::Disable(uint toDisable)
 	glDisable(toDisable);
 }
 
+void GLRenderer::setBlendFunc(uint sFactor, uint blendFunc)
+{
+	glBlendFunc(sFactor, blendFunc);
+}
+
+void GLRenderer::setBlendEquation(GLenum mode)
+{
+	glBlendEquation(mode);
+}
+
 void GLRenderer::ClearColor(float r, float g, float b, float a)
 {
 	glClearColor(r, g, b, a);
@@ -76,4 +86,9 @@ void GLRenderer::DrawArrays(uint topology, uint first, uint count, GLVertexArray
 {
 	vao.Bind();
 	glDrawArrays(topology, first, count);
+}
+
+void GLRenderer::setDrawWireFrame(GLenum mode)
+{
+	glPolygonMode(GL_FRONT_AND_BACK, mode);
 }

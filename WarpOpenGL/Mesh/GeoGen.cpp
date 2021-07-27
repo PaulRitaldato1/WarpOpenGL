@@ -232,7 +232,7 @@ Mesh GeoGen::CreateGrid(float width, float depth, uint m, uint n)
 	return Mesh(verts, indices);
 }
 
-Mesh GeoGen::CreateQuad(float x, float y, float w, float h, float depth)
+Ref<Mesh> GeoGen::CreateQuad(float x, float y, float w, float h, float depth)
 {
 	PROFILE_FUNCTION();
 
@@ -278,7 +278,53 @@ Mesh GeoGen::CreateQuad(float x, float y, float w, float h, float depth)
 	indices[4] = 2;
 	indices[5] = 3;
 
-	return Mesh(verts, indices);
+	return std::make_shared<Mesh>(verts, indices);
+}
+
+Ref<Mesh> GeoGen::CreateDefaultQuad()
+{
+	Vector<Vertex> verts;
+	Vector<uint> indices;
+	verts.resize(4);
+	indices.resize(6);
+
+	verts[0] = Vertex(
+		glm::vec3(-1.0f, 1.0f, 0.0f)
+		, glm::vec3(0.0f, 0.0f, 0.0f)
+		, glm::vec2(0.0f, 1.0f)
+		, glm::vec3(0.0f, 0.0f, 0.0f)
+		, glm::vec3(0.0f, 0.0f, 0.0f));
+
+	verts[1] = Vertex(
+		glm::vec3(-1.0f, -1.0f, 0.0f)
+		, glm::vec3(0.0f, 0.0f, 0.0f)
+		, glm::vec2(0.0f, 0.0f)
+		, glm::vec3(0.0f, 0.0f, 0.0f)
+		, glm::vec3(0.0f, 0.0f, 0.0f));
+
+	verts[2] = Vertex(
+		glm::vec3(1.0f, 1.0f, 0.0f)
+		, glm::vec3(0.0f, 0.0f, 0.0f)
+		, glm::vec2(1.0f, 1.0f)
+		, glm::vec3(0.0f, 0.0f, 0.0f)
+		, glm::vec3(0.0f, 0.0f, 0.0f));
+
+	verts[3] = Vertex(
+		glm::vec3(1.0f, -1.0f, 0.0f)
+		, glm::vec3(0.0f, 0.0f, 0.0f)
+		, glm::vec2(1.0f, 0.0f)
+		, glm::vec3(0.0f, 0.0f, 0.0f)
+		, glm::vec3(0.0f, 0.0f, 0.0f));
+
+	indices[0] = 0;
+	indices[1] = 1;
+	indices[2] = 2;
+
+	indices[3] = 1;
+	indices[4] = 3;
+	indices[5] = 2;
+
+	return std::make_shared<Mesh>(verts, indices);
 }
 
 void GeoGen::Subdivide(Mesh& mesh)

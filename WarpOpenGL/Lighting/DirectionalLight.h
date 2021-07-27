@@ -1,16 +1,18 @@
 #pragma once
 #include <Lighting/ILight.h>
+#include <Mesh/GeoGen.h>
 
 class DirectionalLight : public ILight
 {
 
 public:
 
-	DirectionalLight(glm:vec3 color, bool castsShadows)
+	DirectionalLight(glm::vec3 color, glm::vec3 direction, bool castsShadows)
 		: m_color(color)
+		, m_direction(direction)
 		, m_isShadowCaster(castsShadows)
 	{
-		//TODO set volume to full screen quad
+		m_lightVolume = std::make_shared<Model>(GeoGen::CreateDefaultQuad());
 	}
 
 	LightType getType() const override
@@ -32,13 +34,15 @@ public:
 	}
 
 
-	LightShaderParams getShaderParams() override
+	LightShaderParams getShaderParams() const override
 	{
-		return LightShaderParams();
+		LightShaderParams params;
+		params.color = m_color;
+		params.direction = m_direction;
+		return params;
 	}
 
-
-	const Mesh& getLightVolume() const override
+	const Model& getLightVolume() const override
 	{
 		return *m_lightVolume;
 	}
@@ -47,7 +51,8 @@ private:
 	bool m_isShadowCaster;
 
 	glm::vec3 m_color;
-
-	Ref<Mesh> m_lightVolume;
+	glm::vec3 m_direction;
+	
+	Ref<Model> m_lightVolume;
 
 };

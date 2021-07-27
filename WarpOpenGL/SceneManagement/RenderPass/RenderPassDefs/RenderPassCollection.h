@@ -24,8 +24,8 @@ struct GBuffer : public IPassData
 
 	Ref<GLFramebuffer> frameBuffer;
 
-	uint instancedGeometryShader;
-	uint geometryShader;
+	uint instancedGeometryShaderId;
+	uint geometryShaderId;
 };
 
 class RenderPassCollection

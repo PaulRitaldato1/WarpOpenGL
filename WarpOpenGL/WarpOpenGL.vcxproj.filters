@@ -179,6 +179,7 @@
     <None Include="Resources\Shaders\InstancedGBufferLighting.vert" />
     <None Include="Resources\Shaders\QuadDraw.frag" />
     <None Include="Resources\Shaders\QuadDraw.vert" />
+    <None Include="Resources\Shaders\QuadGBufferLighting.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Backpack\ao.jpg" />
