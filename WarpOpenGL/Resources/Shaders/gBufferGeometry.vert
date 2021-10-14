@@ -25,8 +25,8 @@ void main()
 {
     TexCoords = aTexCoords;
 
-    vec4 worldPos = model * vec4(aPos, 1.0);
-    FragPos = worldPos.xyz;
+    vec4 posVS = view * model * vec4(aPos, 1.0);
+    FragPos = posVS.xyz;
 
 //    mat3 invTranspose = transpose(inverse(mat3(model)));
 
@@ -37,5 +37,5 @@ void main()
     Tangent = (mat3(view * model) * aTangent).xyz;
     Binormal = (mat3(view * model) * aBitangent).xyz;
 
-    gl_Position = projection * view * worldPos;
+    gl_Position = projection * view * model * vec4(aPos, 1.0);
 }

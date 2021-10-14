@@ -7,6 +7,7 @@
 //this should mirror the light struct on the shader side.
 struct LightShaderParams
 {
+	glm::vec3 positionVS;
 	glm::vec3 position;
 	glm::vec3 direction;
 

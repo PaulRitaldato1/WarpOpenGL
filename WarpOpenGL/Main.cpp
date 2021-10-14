@@ -185,8 +185,8 @@ int main()
 	Vector<Ref<Model>> models = loader.loadModelsAsync(modelDescs);
 	
 	Vector<Pointlight> pointLights;
-	pointLights.emplace_back(glm::vec3(0.0f, 0.0f, 5.0f), 10.0f, 10.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-	pointLights.emplace_back(glm::vec3(1.0f, 0.0f, 5.0f), 10.0f, 10.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+	pointLights.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f), 1.0f, 100.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+	//pointLights.emplace_back(glm::vec3(1.0f, 0.0f, 5.0f), 10.0f, 10.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 	
 	Vector<Spotlight> spotlights;
 
