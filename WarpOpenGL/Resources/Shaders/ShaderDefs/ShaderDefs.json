@@ -1,0 +1,38 @@
+{
+  "BasicModel": {
+    "vertPath": "Resources/Shaders/model.vert",
+    "fragPath": "Resources/Shaders/model.frag"
+  },
+  "InstancedBasicModel": {
+    "vertPath": "Resources/Shaders/instancedModel.vert",
+    "fragPath": "Resources/Shaders/model.frag"
+  },
+  "ZOnly": {
+    "vertPath": "Resources/Shaders/ZOnly.vert",
+    "fragPath": "Resources/Shaders/ZOnly.frag"
+  },
+  "ZOnlyInstanced": {
+    "vertPath": "Resources/Shaders/ZOnlyInstanced.vert",
+    "fragPath": "Resources/Shaders/ZOnly.frag"
+  },
+  "gBufferGeometry": {
+    "vertPath": "Resources/Shaders/gBufferGeometry.vert",
+    "fragPath": "Resources/Shaders/gBufferGeometry.frag"
+  },
+  "InstancedGBufferGeometry": {
+    "vertPath": "Resources/Shaders/instancedGBufferGeometry.vert",
+    "fragPath": "Resources/Shaders/gBufferGeometry.frag"
+  },
+  "gBufferLighting": {
+    "vertPath": "Resources/Shaders/gBufferLighting.vert",
+    "fragPath": "Resources/Shaders/gBufferLighting.frag"
+  },
+  "QuadDraw": {
+    "vertPath": "Resources/Shaders/QuadDraw.vert",
+    "fragPath": "Resources/Shaders/QuadDraw.frag"
+  },
+  "QuadGBufferLighting": {
+    "vertPath": "Resources/Shaders/QuadGBufferLighting.vert",
+    "fragPath": "Resources/Shaders/gBufferLighting.frag"
+  }
+}
