@@ -47,6 +47,8 @@ struct ModelDesc
 		, instances(instances)
 	{}
 
+	ModelDesc() = default;
+
 	string path;
 	bool gamma;
 	bool hasShadow;
@@ -146,12 +148,12 @@ public:
 	}
 
 
-	const glm::mat4& getTransform() const { return m_modelTransform; }
+	glm::mat4 getTransform() const { return m_modelTransform; }
 	void setTransform(glm::mat4 transform) { m_modelTransform = transform; }
 
 	const Vector<Ref<Mesh>>& getMeshes() const { return m_meshes; }
 
-	void updateInstances(Vector<glm::mat4>& instances)
+	void setInstances(Vector<glm::mat4>& instances)
 	{
 		PROFILE_FUNCTION();
 		m_instances.clear();
@@ -159,6 +161,8 @@ public:
 
 		m_ssbo = std::make_unique<GLSSBO>(instances.size() * sizeof(glm::mat4), 1);
 	}
+
+	Vector<glm::mat4> getInstances() { return m_instances; }
 
 	void genBuffers()
 	{
@@ -182,7 +186,6 @@ private:
 	string m_path;
 	string m_name;
 
-	//unused for now
 	glm::mat4 m_modelTransform;
 
 	bool m_gammaCorrection;

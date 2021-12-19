@@ -30,6 +30,10 @@ public:
 	Vector<Ref<Model>> loadModelsAsync(Vector<ModelDesc>& modelArgs);
 	Ref<Model> loadModel(ModelDesc& desc);
 
+	Ref<Model> generateGrid(int width, int depth, int m, int n, glm::vec3 pos);
+
+	Ref<Model> generateSphere(float radius, uint sliceCount, uint stackCount, glm::vec3 pos);
+
 	Vector<Ref<GLTexture>> getTextures()
 	{
 		Vector<Ref<GLTexture>> textures;

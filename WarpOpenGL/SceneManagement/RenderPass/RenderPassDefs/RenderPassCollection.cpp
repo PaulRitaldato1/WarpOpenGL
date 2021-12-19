@@ -273,6 +273,7 @@ void RenderPassCollection::AddGBufferLightingPass(Scene& scene)
 			g_renderer.setBlendFunc(GL_ONE, GL_ONE);
 			g_renderer.setBlendEquation(GL_FUNC_ADD);
 			g_renderer.setCullMode(GL_FRONT);
+
 			for (const auto& light : scene.getPointlights())
 			{
 				auto shaderParams = light.getShaderParams();

@@ -15,12 +15,12 @@ public:
 		, m_radius(radius)
 	{
 		ModelLoader loader("/");
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, position);
-		model = glm::scale(model, glm::vec3(radius, radius, radius));
-		ModelDesc desc("Resources/planet/planet.obj", false, false, model);
-		m_lightVolume = loader.loadModel(desc); //use the planet as a sphere
-		m_lightVolume->getMeshes()[0]->setupMesh();
+		//glm::mat4 model = glm::mat4(1.0f);
+		//model = glm::translate(model, position);
+		//model = glm::scale(model, glm::vec3(radius, radius, radius));
+		m_lightVolume = loader.generateSphere(radius, 10, 10, position);
+		//m_lightVolume = loader.loadModel(desc); //use the planet as a sphere
+		//m_lightVolume->getMeshes()[0]->setupMesh();
 	}
 
 	const Array<glm::mat4, 6>& getViewMatricies()

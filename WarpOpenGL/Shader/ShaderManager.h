@@ -20,6 +20,8 @@ public:
 		using json = nlohmann::json;
 
 		std::ifstream file(m_filePath);
+		FATAL_ASSERT(file.is_open(), "File at path " + m_filePath + " failed to open!");
+
 		json jFile;
 
 		file >> jFile;

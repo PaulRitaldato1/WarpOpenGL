@@ -296,6 +296,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Final|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
+    <None Include="Resources\planet\planet.mtl" />
     <None Include="Resources\Shaders\gBufferGeometry.frag">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
@@ -387,12 +388,21 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Final|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </Image>
+    <Image Include="Resources\planet\mars.png" />
+    <Image Include="Resources\RandomTextures\awesomeface.png" />
+    <Image Include="Resources\RandomTextures\wood.png" />
+    <Image Include="Resources\RandomTextures\woodContainer.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Object Include="Resources\Backpack\backpack.obj">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Final|x64'">true</DeploymentContent>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Final|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+    </Object>
+    <Object Include="Resources\planet\planet.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
     </Object>
   </ItemGroup>
   <ItemGroup>
@@ -401,6 +411,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Final|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </Text>
+    <Text Include="Resources\planet\source.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\simpleDepthDebug.vert">

@@ -19,6 +19,7 @@ public:
 		m_vertices(vertices)
 		, m_indices(indices)
 		, m_isInstanced(false)
+		, m_textures(textures)
 	{
 		PROFILE_FUNCTION();
 

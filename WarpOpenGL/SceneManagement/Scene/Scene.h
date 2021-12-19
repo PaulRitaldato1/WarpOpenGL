@@ -1,4 +1,7 @@
 #pragma once
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 #include <Common/CommonTypes.h>
 #include <Lighting/Pointlight.h>
 #include <Lighting/Spotlight.h>
@@ -30,6 +33,33 @@ public:
 		}
 	}
 
+	void update(float delta)
+	{	
+
+		float baseRotAngle = 1.0f;
+		float adjustedRotAngle = baseRotAngle/(delta * 10000);
+		for (const auto& model : m_models)
+		{
+			if (!model->getIsInstanced())
+			{
+				//auto currentTransform = model->getTransform();
+				//model->setTransform(glm::rotate(currentTransform, adjustedRotAngle, glm::vec3(0.0f, 1.0f, 0.0f)));
+			}
+			else
+			{
+				auto instances = model->getInstances();
+				for (auto& instance : instances)
+				{
+					instance = glm::rotate(instance, adjustedRotAngle, glm::vec3(0.0f, 1.0f, 0.0f));
+				}
+
+				model->setInstances(instances);
+			}
+		}
+
+		m_pointlights[0].setPosition(glm::vec3(sin(glfwGetTime()) * 10, 0.0f, 0.0f));
+	}
+
 	void addPointlight(Pointlight light) { m_pointlights.push_back(light); }
 	void addSpotlight(Spotlight light) { m_spotlights.push_back(light); }
 	void addModel(Ref<Model> model) { m_models.push_back(model); }
@@ -38,7 +68,6 @@ public:
 	const Vector<Pointlight>& getPointlights() { return m_pointlights; }
 	const Vector<Spotlight>& getSpotlights() { return m_spotlights; }
 	const Vector<DirectionalLight>& getDirectionalLights() { return m_directionalLights; }
-
 	const Vector<Ref<Model>>& getModels() { return m_models; }
 
 	const Vector<FPCamera>& getCamera() { return m_cameras; }

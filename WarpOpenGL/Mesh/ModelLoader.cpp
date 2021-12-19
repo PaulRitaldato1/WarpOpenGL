@@ -1,4 +1,37 @@
 #include <Mesh/ModelLoader.h>
+#include <Mesh/GeoGen.h>
+
+Ref<Model> ModelLoader::generateGrid(int width, int depth, int m, int n, glm::vec3 pos)
+{
+	Vector<Ref<Mesh>> meshes;
+	meshes.push_back(std::make_shared<Mesh>(GeoGen::CreateGrid(width, depth, m, n)));
+
+	ModelDesc desc;
+	desc.isInstanced = false;
+	desc.gamma = false;
+	desc.hasShadow = false;
+
+	glm::mat4 modelMatrix(1.0f);
+	desc.transform = glm::translate(modelMatrix, pos);
+
+	return std::make_shared<Model>(meshes, desc);
+}
+
+Ref<Model> ModelLoader::generateSphere(float radius, uint sliceCount, uint stackCount, glm::vec3 pos)
+{
+	Vector<Ref<Mesh>> meshes;
+	meshes.push_back(GeoGen::CreateSphere(radius, sliceCount, stackCount));
+
+	ModelDesc desc;
+	desc.isInstanced = false;
+	desc.gamma = false;
+	desc.hasShadow = false;
+
+	glm::mat4 modelMatrix(1.0f);
+	desc.transform = glm::translate(modelMatrix, pos);
+
+	return std::make_shared<Model>(meshes, desc);
+}
 
 Vector<Ref<Model>> ModelLoader::loadModelsAsync(Vector<ModelDesc>& modelArgs)
 {

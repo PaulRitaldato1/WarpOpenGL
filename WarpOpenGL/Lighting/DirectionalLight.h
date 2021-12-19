@@ -7,9 +7,10 @@ class DirectionalLight : public ILight
 
 public:
 
-	DirectionalLight(glm::vec3 color, glm::vec3 direction, bool castsShadows)
+	DirectionalLight(glm::vec3 color, glm::vec3 direction, float intensity, bool castsShadows)
 		: m_color(color)
 		, m_direction(direction)
+		, m_intensity(intensity)
 		, m_isShadowCaster(castsShadows)
 	{
 		m_lightVolume = std::make_shared<Model>(GeoGen::CreateDefaultQuad());
@@ -39,6 +40,8 @@ public:
 		LightShaderParams params;
 		params.color = m_color;
 		params.direction = m_direction;
+		params.intensity = m_intensity;
+		params.type = LightType::DIRECTIONAL;
 		return params;
 	}
 
@@ -52,7 +55,8 @@ private:
 
 	glm::vec3 m_color;
 	glm::vec3 m_direction;
-	
+	float m_intensity;
+
 	Ref<Model> m_lightVolume;
 
 };

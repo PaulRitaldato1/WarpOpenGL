@@ -83,6 +83,17 @@ LightResult DoPointLight(Light light, Material mat, vec3 V, vec3 P, vec3 N, vec3
 	return lit;
 }
 
+LightResult DoDirectionalLight(Light light, Material mat, vec3 V, vec3 P, vec3 N, vec3 directionVS)
+{
+	LightResult result;
+	
+	vec3 L = normalize(-directionVS);
+	
+	result.Diffuse = DoDiffuse(light, L, N) * light.intensity;
+	result.Specular = DoSpecular(light, mat, V, L, N) * light.intensity;
+
+	return result;
+}
 
 out vec4 FragColor;
 
@@ -119,19 +130,6 @@ void main()
 	LightResult lit;
 	if(light.type == POINTLIGHT)
 	{
-//		vec3 lightDir = normalize(light.position - FragPos);
-//		vec3 diffuse = max(dot(Normal, lightDir), 0.0) * Diffuse * light.color;
-//
-//		vec3 halfwayDir = normalize(lightDir + viewDir);
-//		float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
-//		vec3 specular = light.color * spec * Specular;
-//
-////		attenuation
-//        float dist = distance(light.position, FragPos);
-//        float attenuation = 1.0 / (1.0 + light.linear * dist + light.quadratic * dist * dist);
-//        diffuse *= attenuation;
-//        specular *= attenuation;
-//		result += diffuse + specular;
 		lit = DoPointLight(light, mat, V.xyz, P.xyz, N.xyz, lightPosVS.xyz);
 	}
 	else if(light.type == SPOTLIGHT)
@@ -139,6 +137,8 @@ void main()
 	}
 	else if(light.type == DIRECTIONAL_LIGHT)
 	{
+		vec4 directionVS = View * Model * vec4(light.direction, 1.0);
+		lit = DoDirectionalLight(light, mat, V.xyz, P.xyz, N.xyz, directionVS.xyz);
 	}
 	else
 	{
@@ -146,5 +146,6 @@ void main()
 		lit.Specular = vec3(0.0, 1.0, 0.0);
 	}
 
-	FragColor = vec4((Diffuse * lit.Diffuse), 1.0) + vec4((Specular * lit.Specular), 1.0);
+	FragColor = vec4((Diffuse * lit.Diffuse), 1.0);// + vec4((Specular * lit.Specular), 1.0);
+
 }
