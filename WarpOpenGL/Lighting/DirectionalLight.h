@@ -46,7 +46,7 @@ public:
 		return params;
 	}
 
-	const Model& getLightVolume() const override
+	Model& getLightVolume() const override
 	{
 		return *m_lightVolume;
 	}

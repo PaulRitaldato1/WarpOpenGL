@@ -189,9 +189,9 @@ int main()
 
 	Vector<Pointlight> pointLights;
 	//pointLights.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f), 1.0f, 50.0f, glm::vec3(1.0f, 1.0f, 1.0f));
-	pointLights.emplace_back(glm::vec3(-15.0f, 0.0f, -15.0f), 1.5f, 25.0f, glm::vec3(.55f, 1.0f, 0.0f));
-	pointLights.emplace_back(glm::vec3(15.0f, 0.0f, -15.0f), 1.5f, 25.0f, glm::vec3(0.0f, 0.0f, 1.0f));
-	pointLights.emplace_back(glm::vec3(15.0f, 0.0f, 15.0f), 1.5f, 25.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+	//pointLights.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f), 1.5f, 25.0f, glm::vec3(.55f, 1.0f, 0.0f));
+	pointLights.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f), 1.5f, 25.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+	pointLights.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f), 1.5f, 25.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 
 	Vector<Spotlight> spotlights;
 

@@ -13,5 +13,5 @@ public:
 	virtual bool getIsShadowCaster() const = 0;
 	virtual glm::vec3 getColor() const = 0;
 	virtual LightShaderParams getShaderParams() const = 0;
-	virtual const Model& getLightVolume() const = 0;
+	virtual Model& getLightVolume() const = 0;
 };
