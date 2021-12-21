@@ -13,7 +13,8 @@ public:
 		, m_intensity(intensity)
 		, m_isShadowCaster(castsShadows)
 	{
-		m_lightVolume = std::make_shared<Model>(GeoGen::CreateDefaultQuad());
+		ModelLoader loader("/");
+		m_lightVolume = loader.generateQuad();
 	}
 
 	LightType getType() const override

@@ -23,19 +23,28 @@ uniform mat4 model;
 
 void main()
 {
+
+    vec4 worldPos = model * vec4(aPos, 1.0);
+    FragPos = worldPos.xyz;
     TexCoords = aTexCoords;
 
-    vec4 posVS = view * model * vec4(aPos, 1.0);
-    FragPos = posVS.xyz;
+    mat3 invTransposeNormal = transpose(inverse(mat3(model)));
+    Normal = invTransposeNormal * aNormal;
 
-//    mat3 invTranspose = transpose(inverse(mat3(model)));
-
-//    Normal = invTranspose * aNormal;
-//    Tangent = invTranspose * aTangent;
-//    Binormal = invTranspose * aBitangent;
-    Normal = (mat3(view * model) * aNormal).xyz;
-    Tangent = (mat3(view * model) * aTangent).xyz;
-    Binormal = (mat3(view * model) * aBitangent).xyz;
-
-    gl_Position = projection * view * model * vec4(aPos, 1.0);
+    gl_Position = projection * view * worldPos;
+//    TexCoords = aTexCoords;
+//
+//    vec4 posVS = view * model * vec4(aPos, 1.0);
+//    FragPos = posVS.xyz;
+//
+////    mat3 invTranspose = transpose(inverse(mat3(model)));
+//
+////    Normal = invTranspose * aNormal;
+////    Tangent = invTranspose * aTangent;
+////    Binormal = invTranspose * aBitangent;
+//    Normal = (mat3(view * model) * aNormal).xyz;
+//    Tangent = (mat3(view * model) * aTangent).xyz;
+//    Binormal = (mat3(view * model) * aBitangent).xyz;
+//
+//    gl_Position = projection * view * model * vec4(aPos, 1.0);
 }

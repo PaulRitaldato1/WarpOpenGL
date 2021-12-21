@@ -11,7 +11,12 @@ layout (std140, binding = 0) uniform Matrices
 
 uniform mat4 model;
 
+out mat4 Model;
+out mat4 View;
+
 void main()
 {
+    Model = model;
+    View = view;
 	gl_Position = vec4(aPos, 1.0);
 }

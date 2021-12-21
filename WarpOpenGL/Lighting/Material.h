@@ -27,6 +27,8 @@ struct Material
 
 	float SpecularScale;
 	float AlphaThreshold;
+
+	float shininess;
 };
 
 //set some good presets so we dont have to manually define everything
@@ -54,5 +56,6 @@ inline HashMap<MaterialPresets, Material> g_MaterialPresets =
 		, false
 		, true
 		, 1.0f
-		, 0.01f}}
+		, 0.01f
+		, 16.0f}}
 };

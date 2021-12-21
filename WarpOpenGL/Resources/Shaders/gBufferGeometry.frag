@@ -102,7 +102,8 @@ void main()
     if(mat.HasNormalTexture)
     {
         mat3 TBN = mat3(normalize(Tangent), normalize(Binormal), normalize(Normal));
-        N = calcNormalMapping(TBN, texture_normal0, TexCoords);
+//        N = calcNormalMapping(TBN, texture_normal0, TexCoords);
+        N = normalize(texture(texture_normal0, TexCoords).rgb);
     }
 
     gPos = FragPos;

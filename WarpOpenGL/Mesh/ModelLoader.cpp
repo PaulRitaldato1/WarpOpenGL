@@ -1,6 +1,20 @@
 #include <Mesh/ModelLoader.h>
 #include <Mesh/GeoGen.h>
 
+Ref<Model> ModelLoader::generateQuad()
+{
+	Vector<Ref<Mesh>> meshes;
+	meshes.push_back(GeoGen::CreateDefaultQuad());
+
+	ModelDesc desc;
+	desc.isInstanced = false;
+	desc.gamma = false;
+	desc.hasShadow = false;
+	desc.transform = glm::mat4(1.0f);
+
+	return std::make_shared<Model>(meshes, desc);
+}
+
 Ref<Model> ModelLoader::generateGrid(int width, int depth, int m, int n, glm::vec3 pos)
 {
 	Vector<Ref<Mesh>> meshes;

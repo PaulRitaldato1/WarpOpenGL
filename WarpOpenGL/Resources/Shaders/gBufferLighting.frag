@@ -41,6 +41,8 @@ struct Material
     
     float SpecularScale;
     float AlphaThreshold;
+
+	float shininess;
 };
 
 struct LightResult
@@ -103,6 +105,7 @@ uniform sampler2D gNormal;
 
 
 uniform Light light;
+uniform Material mat;
 uniform vec3 viewPos;
 
 in mat4 View;
@@ -124,21 +127,39 @@ void main()
 	vec4 eyePos = vec4(0.0, 0.0, 0.0, 1.0);
 	vec4 V = normalize(eyePos - P);
 	
-	Material mat;
-	mat.SpecularPower = Specular;
+	vec3 viewDir = normalize(viewPos - FragPos);
 
 	LightResult lit;
 	if(light.type == POINTLIGHT)
 	{
-		lit = DoPointLight(light, mat, V.xyz, P.xyz, N.xyz, lightPosVS.xyz);
+//		lit = DoPointLight(light, mat, V, P.xyz, N.xyz, lightPosVS.xyz);
+		vec3 lightDir = normalize(light.position - FragPos);
+		lit.Diffuse = max(dot(N, lightDir), 0.0) * light.color * light.intensity;
+		
+		vec3 halfwayDir = normalize(lightDir + viewDir);
+		float spec = pow(max(dot(N, halfwayDir), 0.0), mat.shininess);
+		lit.Specular = light.color * spec * Specular;
+
+		float distance = length(light.position - FragPos);
+		float attenuation = DoAttenuation(light, distance);
+//		float attenuation = 1.0 / (1.0 + light.linear * distance + light.quadratic * distance * distance);
+		lit.Diffuse *= attenuation;
+		lit.Specular *= attenuation;
 	}
 	else if(light.type == SPOTLIGHT)
 	{
 	}
 	else if(light.type == DIRECTIONAL_LIGHT)
 	{
-		vec4 directionVS = View * Model * vec4(light.direction, 1.0);
-		lit = DoDirectionalLight(light, mat, V.xyz, P.xyz, N.xyz, directionVS.xyz);
+		vec3 lightDir = normalize(-light.direction);
+		
+		float diff = max(dot(N, lightDir), 0.0);
+		lit.Diffuse = diff * light.color * light.intensity;
+
+		vec3 reflectDir = reflect(-lightDir, N);
+		float spec = pow(max(dot(viewDir, reflectDir), 0.0), mat.shininess);
+
+		lit.Specular = light.color * spec * Specular;
 	}
 	else
 	{
@@ -146,6 +167,6 @@ void main()
 		lit.Specular = vec3(0.0, 1.0, 0.0);
 	}
 
-	FragColor = vec4((Diffuse * lit.Diffuse), 1.0);// + vec4((Specular * lit.Specular), 1.0);
+	FragColor = vec4((Diffuse * lit.Diffuse), 1.0) + vec4((Specular * lit.Specular), 1.0);
 
 }

@@ -259,7 +259,15 @@ void RenderPassCollection::AddGBufferLightingPass(Scene& scene)
 			Ref<GBufferLightingData> lightingData = std::dynamic_pointer_cast<GBufferLightingData>(setupData);
 
 			auto& lightVolumeShader = m_shaderManager.getShaderById(lightingData->gBufferLightingShaderId);
+			auto& quadShader = m_shaderManager.getShaderById(lightingData->gBufferQuadLightingShaderId);
 			g_renderer.ClearBoundBufferBits();
+			g_renderer.Enable(GL_BLEND);
+			g_renderer.setBlendFunc(GL_ONE, GL_ONE);
+			g_renderer.setBlendEquation(GL_FUNC_ADD);
+
+
+			
+			g_renderer.setCullMode(GL_FRONT);
 			lightVolumeShader.Bind();
 
 			lightVolumeShader.setUniform("gPos", 0);
@@ -269,10 +277,6 @@ void RenderPassCollection::AddGBufferLightingPass(Scene& scene)
 			lightVolumeShader.setUniform("gNormal", 2);
 			gbuffer->normalBuffer->Bind(2);
 
-			g_renderer.Enable(GL_BLEND);
-			g_renderer.setBlendFunc(GL_ONE, GL_ONE);
-			g_renderer.setBlendEquation(GL_FUNC_ADD);
-			g_renderer.setCullMode(GL_FRONT);
 
 			for (const auto& light : scene.getPointlights())
 			{
@@ -294,9 +298,41 @@ void RenderPassCollection::AddGBufferLightingPass(Scene& scene)
 
 				light.getLightVolume().Draw(lightVolumeShader);
 			}
+			g_renderer.setCullMode(GL_BACK);
+
+			quadShader.Bind();
+			quadShader.setUniform("gPos", 0);
+			quadShader.setUniform("gDiffuseSpec", 1);
+			quadShader.setUniform("gNormal", 2);
+
+			gbuffer->positionBuffer->Bind(0);
+			gbuffer->diffuseSpec->Bind(1);
+			gbuffer->normalBuffer->Bind(2);
+
+
+
+			for (const auto& light : scene.getDirectionalLights())
+			{
+				auto shaderParams = light.getShaderParams();
+
+
+				lightVolumeShader.setUniform("viewPos", scene.getActiveCamera().getPosition());
+
+				lightVolumeShader.setUniform("light.position", shaderParams.position);
+				lightVolumeShader.setUniform("light.direction", shaderParams.direction);
+				lightVolumeShader.setUniform("light.color", shaderParams.color);
+				lightVolumeShader.setUniform("light.spotlightAngle", shaderParams.spotlightAngle);
+				lightVolumeShader.setUniform("light.radius", shaderParams.radius);
+				lightVolumeShader.setUniform("light.intensity", shaderParams.intensity);
+				lightVolumeShader.setUniform("light.enable", shaderParams.enable);
+				lightVolumeShader.setUniform("light.type", (uint)shaderParams.type);
+				lightVolumeShader.setUniform("light.linear", (float)0.7);
+				lightVolumeShader.setUniform("light.quadratic", (float)1.8);
+
+				light.getLightVolume().Draw(quadShader);
+			}
 
 			g_renderer.Disable(GL_BLEND);
-			g_renderer.setCullMode(GL_BACK);
 
 
 			return gbuffer;

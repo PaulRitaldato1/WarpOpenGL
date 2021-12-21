@@ -180,26 +180,23 @@ int main()
 
 	//load model
 	Vector<ModelDesc> modelDescs;
-	//modelDescs.push_back({"Resources/Backpack/backpack.obj", false, true, modelMatrices});
+	modelDescs.push_back({"Resources/Backpack/backpack.obj", false, true, modelMatrices});
 	//modelDescs.emplace_back("Resources/planet/planet.obj", false, true, glm::translate(base, glm::vec3(0,10000,0)));
 	//modelDescs.emplace_back("Resources/rock/rock.obj", false, true, modelMatrices);
-	Vector<Ref<Model>> models; //= loader.loadModelsAsync(modelDescs);
+	Vector<Ref<Model>> models = loader.loadModelsAsync(modelDescs);
 	models.push_back(loader.generateGrid(100, 100, 100, 100, glm::vec3(0.0f, -4.0f, 0.0f)));
 	models.back()->getMeshes()[0]->setTexture(loadGLTexture("RandomTextures/wood.png", "Resources", "Diffuse"));
 
 	Vector<Pointlight> pointLights;
-	//pointLights.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f), 2.0f, 50.0f, glm::vec3(1.0f, 1.0f, 1.0f));
-	pointLights.emplace_back(glm::vec3(-10.0f, 0.0f, -10.0f), 1.5f, 25.0f, glm::vec3(.55f, 1.0f, 0.0f));
-	pointLights.emplace_back(glm::vec3(10.0f, 0.0f, -10.0f), 1.5f, 25.0f, glm::vec3(0.0f, 0.0f, 1.0f));
-	pointLights.emplace_back(glm::vec3(10.0f, 0.0f, 10.0f), 1.5f, 25.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-	//pointLights.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f), 1.0f, 200.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+	//pointLights.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f), 1.0f, 50.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+	pointLights.emplace_back(glm::vec3(-15.0f, 0.0f, -15.0f), 1.5f, 25.0f, glm::vec3(.55f, 1.0f, 0.0f));
+	pointLights.emplace_back(glm::vec3(15.0f, 0.0f, -15.0f), 1.5f, 25.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+	pointLights.emplace_back(glm::vec3(15.0f, 0.0f, 15.0f), 1.5f, 25.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 
-	//pointLights.emplace_back(glm::vec3(1.0f, 0.0f, 5.0f), 10.0f, 10.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-	
 	Vector<Spotlight> spotlights;
 
 	Vector<DirectionalLight> directionalLights;
-	//directionalLights.emplace_back(glm::vec3(.33f, .50f, .33), glm::vec3(-0.2f, -1.0f, -0.3f), false);
+	directionalLights.emplace_back(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-0.2f, -1.0f, -0.3f), .15f, false);
 
 	Vector<FPCamera> cameras;
 	cameras.push_back(camera);

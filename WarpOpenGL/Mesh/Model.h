@@ -118,14 +118,14 @@ public:
 		shader.setUniform("mat.DiffuseColor", m_material.DiffuseColor);
 		//shader.setUniform("mat.SpecularColor", m_material.SpecularColor);
 
-		/*shader.setUniform("mat.Reflectance", m_material.Reflectance);
+		//shader.setUniform("mat.Reflectance", m_material.Reflectance);
 
-		shader.setUniform("mat.Opacity", m_material.Opacity);
-		shader.setUniform("mat.SpecularPower", m_material.SpecularPower);
-		shader.setUniform("mat.IndexOfRefraction", m_material.IndexOfRefraction);
+		//shader.setUniform("mat.Opacity", m_material.Opacity);
+		//shader.setUniform("mat.SpecularPower", m_material.SpecularPower);
+		//shader.setUniform("mat.IndexOfRefraction", m_material.IndexOfRefraction);
 
-		shader.setUniform("mat.HasAmbientTexture", m_material.HasAmbientTexture);
-		shader.setUniform("mat.HasEmissiveTexture", m_material.HasEmissiveTexture);*/
+		//shader.setUniform("mat.HasAmbientTexture", m_material.HasAmbientTexture);
+		//shader.setUniform("mat.HasEmissiveTexture", m_material.HasEmissiveTexture);
 		shader.setUniform("mat.HasDiffuseTexture", m_material.HasDiffuseTexture);
 		shader.setUniform("mat.HasSpecularTexture", m_material.HasSpecularTexture);
 		//shader.setUniform("mat.HasSpecularPowerTexture", m_material.HasSpecularPowerTexture);
@@ -133,6 +133,7 @@ public:
 
 		//shader.setUniform("mat.SpecularScale", m_material.SpecularScale);
 		//shader.setUniform("mat.AlphaThreshold", m_material.AlphaThreshold);
+		shader.setUniform("mat.shininess", m_material.shininess);
 
 		if (m_isInstanced && m_ssbo->isDirty())
 		{
