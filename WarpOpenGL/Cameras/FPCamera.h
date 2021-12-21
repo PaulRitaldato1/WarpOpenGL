@@ -45,7 +45,7 @@ public:
 		updateCameraVectors();
 	}
 
-	glm::mat4 getViewMatrix()
+	glm::mat4 getViewMatrix() const
 	{
 		return glm::lookAt(getPosition(), getPosition() + m_front, m_up);
 	}
@@ -61,6 +61,8 @@ public:
 			setPosition(getPosition() - m_right * velocity);
 		if (dir == RIGHT)
 			setPosition(getPosition() + m_right * velocity);
+
+		m_hasMoved = true;
 	}
 
 	void processMouseMovement(float offsetX, float offsetY, GLboolean constrainPitch = true)
@@ -118,6 +120,18 @@ public:
 	
 	glm::vec3 getPosition() const { return m_position; }
 	void setPosition(glm::vec3 val) { m_position = val; }
+
+	bool hasMoved()
+	{
+		if (m_hasMoved)
+		{
+			m_hasMoved = false;
+			return true;
+		}
+		else
+			return false;
+	}
+
 private:
 	
 	glm::vec3 m_position;
@@ -132,6 +146,7 @@ private:
 	float m_mouseSensitivity;
 	float m_zoom;
 
+	bool m_hasMoved;
 	void updateCameraVectors()
 	{
 		glm::vec3 front;

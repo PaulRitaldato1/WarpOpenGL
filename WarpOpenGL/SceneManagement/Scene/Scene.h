@@ -8,6 +8,15 @@
 #include <Lighting/DirectionalLight.h>
 #include <Mesh/Model.h>
 #include <Cameras/FPCamera.h>
+#include <algorithm>
+
+struct FarthestDistanceToCameraPointlight
+{
+	bool operator()(const Pointlight& l1, const Pointlight& l2)
+	{
+		return (l1.getDistanceToCamera() > l2.getDistanceToCamera());
+	}
+};
 
 class Scene
 {
@@ -57,7 +66,17 @@ public:
 			}
 		}
 
-		m_pointlights[0].setPosition(glm::vec3(sin(glfwGetTime()) * 10, 0.0f, 0.0f));
+		if (m_cameras[m_activeCameraIndex].hasMoved())
+		{
+
+			for (auto& light : m_pointlights)
+			{
+				light.setDistanceToCamera(glm::distance(m_cameras[m_activeCameraIndex].getPosition(), light.getPosition()));
+			}
+
+			std::sort(m_pointlights.begin(), m_pointlights.end(), FarthestDistanceToCameraPointlight());
+		}
+		//m_pointlights[0].setPosition(glm::vec3(sin(glfwGetTime()) * 10, 0.0f, 0.0f));
 	}
 
 	void addPointlight(Pointlight light) { m_pointlights.push_back(light); }
@@ -70,9 +89,9 @@ public:
 	const Vector<DirectionalLight>& getDirectionalLights() { return m_directionalLights; }
 	const Vector<Ref<Model>>& getModels() { return m_models; }
 
-	const Vector<FPCamera>& getCamera() { return m_cameras; }
+	const Vector<FPCamera>& getCameras() { return m_cameras; }
 
-	const FPCamera& getActiveCamera() { return m_cameras[m_activeCameraIndex]; }
+	FPCamera& getActiveCamera() { return m_cameras[m_activeCameraIndex]; }
 	
 	uint getSpotlightCount() { m_spotlights.size(); }
 	uint getPointlightCount() { m_pointlights.size(); }

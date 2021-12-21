@@ -44,6 +44,7 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 FPCamera camera(glm::vec3(0.0f, 0.0f, 10.0f));
+Ref<Scene> g_scene(nullptr);
 bool firstMouse = true;
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
@@ -187,10 +188,10 @@ int main()
 	models.back()->getMeshes()[0]->setTexture(loadGLTexture("RandomTextures/wood.png", "Resources", "Diffuse"));
 
 	Vector<Pointlight> pointLights;
-	pointLights.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f), 2.0f, 100.0f, glm::vec3(1.0f, 1.0f, 1.0f));
-	//pointLights.emplace_back(glm::vec3(-5.0f, 0.0f, -5.0f), 1.0f, 25.0f, glm::vec3(1.0f, 1.0f, 1.0f));
-	//pointLights.emplace_back(glm::vec3(50.0f, 0.0f, 50.0f), 1.0f, 25.0f, glm::vec3(1.0f, 1.0f, 1.0f));
-	//pointLights.emplace_back(glm::vec3(50.0f, 0.0f, -50.0f), 1.0f, 25.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+	//pointLights.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f), 2.0f, 50.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+	pointLights.emplace_back(glm::vec3(-10.0f, 0.0f, -10.0f), 1.5f, 25.0f, glm::vec3(.55f, 1.0f, 0.0f));
+	pointLights.emplace_back(glm::vec3(10.0f, 0.0f, -10.0f), 1.5f, 25.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+	pointLights.emplace_back(glm::vec3(10.0f, 0.0f, 10.0f), 1.5f, 25.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 	//pointLights.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f), 1.0f, 200.0f, glm::vec3(1.0f, 1.0f, 1.0f));
 
 	//pointLights.emplace_back(glm::vec3(1.0f, 0.0f, 5.0f), 10.0f, 10.0f, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -203,11 +204,11 @@ int main()
 	Vector<FPCamera> cameras;
 	cameras.push_back(camera);
 
-	Scene scene("BasicBackpack", spotlights, pointLights, directionalLights, models, cameras);
+	g_scene = std::make_shared<Scene>("BasicBackpack", spotlights, pointLights, directionalLights, models, cameras);
 
 	UniformBufferObject viewProjUBO(2*sizeof(glm::mat4), 0);
-	passCollection.AddGBufferPass(scene);
-	passCollection.AddGBufferLightingPass(scene);
+	passCollection.AddGBufferPass(*g_scene);
+	passCollection.AddGBufferLightingPass(*g_scene);
 
 	//auto textures = loader.getTextures();
 	//passCollection.AddDebugQuadDraw(textures);
@@ -246,13 +247,13 @@ int main()
 		processInput(window);
 
 		//update
-		glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
-		glm::mat4 view = camera.getViewMatrix();
+		glm::mat4 projection = glm::perspective(glm::radians(g_scene->getActiveCamera().getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
+		glm::mat4 view = g_scene->getActiveCamera().getViewMatrix();
 
 		viewProjUBO.BindSubdata(projection);
 		viewProjUBO.BindSubdata(view);
 
-		scene.update(deltaTime);
+		g_scene->update(deltaTime);
 		// render
 		// ------
 		g_renderPassManager.ExecutePasses();
@@ -284,13 +285,13 @@ void processInput(GLFWwindow* window)
 	if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED)
 	{
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-			camera.processKeyboard(FORWARD, deltaTime);
+			g_scene->getActiveCamera().processKeyboard(FORWARD, deltaTime);
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-			camera.processKeyboard(BACKWARD, deltaTime);
+			g_scene->getActiveCamera().processKeyboard(BACKWARD, deltaTime);
 		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-			camera.processKeyboard(LEFT, deltaTime);
+			g_scene->getActiveCamera().processKeyboard(LEFT, deltaTime);
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-			camera.processKeyboard(RIGHT, deltaTime);
+			g_scene->getActiveCamera().processKeyboard(RIGHT, deltaTime);
 	}
 	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
 	{
@@ -334,12 +335,12 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 	lastX = xpos;
 	lastY = ypos;
 
-	camera.processMouseMovement(xoffset, yoffset);
+	g_scene->getActiveCamera().processMouseMovement(xoffset, yoffset);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	camera.processMouseScroll(yoffset);
+	g_scene->getActiveCamera().processMouseScroll(yoffset);
 }
 
 #ifdef _DEBUG

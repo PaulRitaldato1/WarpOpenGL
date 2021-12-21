@@ -79,6 +79,8 @@ public:
 		return *m_lightVolume;
 	}
 
+	void setDistanceToCamera(float value) { m_distanceToCamera = value; }
+	float getDistanceToCamera() const { return m_distanceToCamera; }
 private:
 
 	bool m_shadowCaster;
@@ -90,4 +92,6 @@ private:
 	glm::vec3 m_color;
 	float m_intensity;
 	float m_radius;
+
+	float m_distanceToCamera;
 };
