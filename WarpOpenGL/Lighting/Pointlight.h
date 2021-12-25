@@ -18,7 +18,7 @@ public:
 		//glm::mat4 model = glm::mat4(1.0f);
 		//model = glm::translate(model, position);
 		//model = glm::scale(model, glm::vec3(radius, radius, radius));
-		m_lightVolume = loader.generateSphere(radius, 100, 100, position);
+		m_lightVolume = loader.generateSphere(radius, 10, 10, position);
 		//m_lightVolume = loader.loadModel(desc); //use the planet as a sphere
 		//m_lightVolume->getMeshes()[0]->setupMesh();
 	}

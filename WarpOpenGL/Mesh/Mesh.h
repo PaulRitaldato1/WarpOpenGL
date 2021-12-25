@@ -205,6 +205,11 @@ public:
 		return m_textures;
 	}
 
+	Ref<GLTexture> getTexture(uint index)
+	{
+		return m_textures[index];
+	}
+
 private:
 	//cpu copies
 	Vector<Vertex> m_vertices;

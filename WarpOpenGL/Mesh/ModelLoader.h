@@ -34,8 +34,9 @@ public:
 
 	Ref<Model> generateGrid(int width, int depth, int m, int n, glm::vec3 pos);
 
-	Ref<Model> generateSphere(float radius, uint sliceCount, uint stackCount, glm::vec3 pos);
+	Ref<Model> generateSphereInstanced(Vector<float>& radii, Vector<glm::mat4>& transforms, uint sliceCount, uint stackCount, Ref<GLTexParams> tex = nullptr);
 
+	Ref<Model> generateSphere(float radius, uint sliceCount, uint stackCount, glm::vec3 pos, Ref<GLTexParams> tex = nullptr);
 	Vector<Ref<GLTexture>> getTextures()
 	{
 		Vector<Ref<GLTexture>> textures;

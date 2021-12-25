@@ -192,6 +192,7 @@
     <Image Include="Resources\RandomTextures\awesomeface.png" />
     <Image Include="Resources\RandomTextures\wood.png" />
     <Image Include="Resources\RandomTextures\woodContainer.jpg" />
+    <Image Include="Resources\RandomTextures\StoneTexture.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Object Include="Resources\Backpack\backpack.obj" />

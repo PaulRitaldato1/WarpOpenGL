@@ -265,7 +265,7 @@ void RenderPassCollection::AddGBufferLightingPass(Scene& scene)
 			g_renderer.setBlendFunc(GL_ONE, GL_ONE);
 			g_renderer.setBlendEquation(GL_FUNC_ADD);
 
-
+			g_renderer.Disable(GL_DEPTH_TEST);
 			
 			g_renderer.setCullMode(GL_FRONT);
 			lightVolumeShader.Bind();
@@ -333,7 +333,7 @@ void RenderPassCollection::AddGBufferLightingPass(Scene& scene)
 			}
 
 			g_renderer.Disable(GL_BLEND);
-
+			g_renderer.Enable(GL_DEPTH_TEST);
 
 			return gbuffer;
 		});

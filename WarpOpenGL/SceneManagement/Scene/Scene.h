@@ -66,17 +66,14 @@ public:
 			}
 		}
 
-		if (m_cameras[m_activeCameraIndex].hasMoved())
-		{
-
-			for (auto& light : m_pointlights)
-			{
-				light.setDistanceToCamera(glm::distance(m_cameras[m_activeCameraIndex].getPosition(), light.getPosition()));
-			}
-
-			std::sort(m_pointlights.begin(), m_pointlights.end(), FarthestDistanceToCameraPointlight());
-		}
 		//m_pointlights[0].setPosition(glm::vec3(sin(glfwGetTime()) * 10, 0.0f, 0.0f));
+		//for (auto& light : m_pointlights)
+		//{
+		//	glm::vec3 newPos = glm::vec3(sin(glfwGetTime()), 0.0f, cos(glfwGetTime()));
+		//	light.setPosition(newPos);
+		//	glm::mat4 trans = glm::mat4(1.0f);
+		//	light.getLightVolume().setTransform(glm::translate(light.getLightVolume().getTransform(), newPos));
+		//}
 	}
 
 	void addPointlight(Pointlight light) { m_pointlights.push_back(light); }

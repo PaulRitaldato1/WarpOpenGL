@@ -138,7 +138,7 @@ void main()
 		
 		vec3 halfwayDir = normalize(lightDir + viewDir);
 		float spec = pow(max(dot(N, halfwayDir), 0.0), mat.shininess);
-		lit.Specular = light.color * spec * Specular;
+		lit.Specular = light.color * spec;
 
 		float distance = length(light.position - FragPos);
 		float attenuation = DoAttenuation(light, distance);
@@ -159,7 +159,7 @@ void main()
 		vec3 reflectDir = reflect(-lightDir, N);
 		float spec = pow(max(dot(viewDir, reflectDir), 0.0), mat.shininess);
 
-		lit.Specular = light.color * spec * Specular;
+		lit.Specular = light.color * spec;
 	}
 	else
 	{

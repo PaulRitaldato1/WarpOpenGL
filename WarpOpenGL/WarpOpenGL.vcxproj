@@ -390,6 +390,10 @@
     </Image>
     <Image Include="Resources\planet\mars.png" />
     <Image Include="Resources\RandomTextures\awesomeface.png" />
+    <Image Include="Resources\RandomTextures\StoneTexture.jpg">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+    </Image>
     <Image Include="Resources\RandomTextures\wood.png" />
     <Image Include="Resources\RandomTextures\woodContainer.jpg" />
   </ItemGroup>

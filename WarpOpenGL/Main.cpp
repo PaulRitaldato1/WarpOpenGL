@@ -21,6 +21,7 @@
 #include <SceneManagement/Scene/Scene.h>
 #include <texture/GLTexture/GLTexture.h>
 
+#include <random>
 /*TO DO spitballing goes here*/
 
 //TODO REGISTER SYSTEM FOR IMGUI. SORT OF LIKE VISITOR PATTERN BUT FOR ANY REGISTERED VAR
@@ -43,7 +44,7 @@ void MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLs
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-FPCamera camera(glm::vec3(0.0f, 0.0f, 10.0f));
+FPCamera camera(glm::vec3(0.0f, 25.0f, 100.0f));
 Ref<Scene> g_scene(nullptr);
 bool firstMouse = true;
 float lastX = SCR_WIDTH / 2.0f;
@@ -135,6 +136,77 @@ Vector<glm::mat4> generateAsteroidPositions(uint amount)
 	return modelMatrices;
 }
 
+float getRandFloat(float min, float max)
+{
+	std::random_device rd;
+	std::mt19937 engine(rd());
+	std::uniform_real_distribution<float> distribution(min, max);
+
+	return distribution(engine);
+}
+
+Vector<Pointlight> generatePointLightGrid(int width, int height)
+{
+	int startX = -width / 2;
+	int startZ = -height / 2;
+
+	uint rowColFactor = 20;
+	int numRows = height / rowColFactor;
+	int numCols = width / rowColFactor;
+
+	glm::vec3 basePos = glm::vec3(startX, 0.0f, startZ);
+	glm::vec3 tempPos = basePos;
+	Vector<Pointlight> lights;
+	for (uint row = 0; row <= numRows; row++)
+	{
+		for (uint col = 0; col <= numCols; col++)
+		{
+			float tempX = tempPos.x;// +getRandFloat(-5.0f, 5.0f);
+			float tempZ = tempPos.z;// +getRandFloat(-5.0f, 5.0f);
+			lights.emplace_back(glm::vec3(tempX, 0.0, tempZ), getRandFloat(1.0f, 2.0f), getRandFloat(25.0f, 50.0f), glm::vec3(getRandFloat(0.0f, 1.0f), getRandFloat(0.0f, 1.0f), getRandFloat(0.0f, 1.0f)));
+			tempPos.x += rowColFactor;
+		}
+		tempPos.x = basePos.x;
+		tempPos.z += rowColFactor;
+	}
+
+	return lights;
+}
+
+Ref<Model> generateSphereGrid(int width, int height)
+{
+	glm::mat4 baseTrans = glm::mat4(1.0);
+	Vector<glm::mat4> transforms;
+	Vector<float> radii;
+
+	int startX = -width / 2;
+	int startZ = -height / 2;
+
+	uint rowColFactor = 10;
+	int numRows = height / rowColFactor;
+	int numCols = width / rowColFactor;
+
+	glm::vec3 basePos = glm::vec3(startX, 0.0f, startZ);
+	glm::vec3 tempPos = basePos;
+	for (uint row = 0; row <= numRows; row++)
+	{
+		for (uint col = 0; col <= numCols; col++)
+		{
+			float tempX = tempPos.x;// +getRandFloat(-5.0f, 5.0f);
+			float tempZ = tempPos.z;// +getRandFloat(-5.0f, 5.0f);
+
+			transforms.push_back(glm::translate(baseTrans, glm::vec3(tempX, 0.0, tempZ)));
+			radii.push_back(getRandFloat(2.5, 5.0));
+			tempPos.x += rowColFactor;
+		}
+		tempPos.x = basePos.x;
+		tempPos.z += rowColFactor;
+	}
+
+	ModelLoader loader("/");
+	return loader.generateSphereInstanced(radii, transforms, 100, 100, loadGLTexture("RandomTextures/StoneTexture.jpg", "Resources", "Diffuse"));
+}
+
 int main()
 {
 	Instrumentor::Get().BeginSession("Renderer");
@@ -180,28 +252,28 @@ int main()
 
 	//load model
 	Vector<ModelDesc> modelDescs;
-	modelDescs.push_back({"Resources/Backpack/backpack.obj", false, true, modelMatrices});
+	//modelDescs.push_back({"Resources/Backpack/backpack.obj", false, true, modelMatrices});
 	//modelDescs.emplace_back("Resources/planet/planet.obj", false, true, glm::translate(base, glm::vec3(0,10000,0)));
 	//modelDescs.emplace_back("Resources/rock/rock.obj", false, true, modelMatrices);
-	Vector<Ref<Model>> models = loader.loadModelsAsync(modelDescs);
+	Vector<Ref<Model>> models;// = loader.loadModelsAsync(modelDescs);
+	models.push_back(generateSphereGrid(100, 100));
 	models.push_back(loader.generateGrid(100, 100, 100, 100, glm::vec3(0.0f, -4.0f, 0.0f)));
 	models.back()->getMeshes()[0]->setTexture(loadGLTexture("RandomTextures/wood.png", "Resources", "Diffuse"));
 
-	Vector<Pointlight> pointLights;
-	//pointLights.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f), 1.0f, 50.0f, glm::vec3(1.0f, 1.0f, 1.0f));
-	//pointLights.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f), 1.5f, 25.0f, glm::vec3(.55f, 1.0f, 0.0f));
-	pointLights.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f), 1.5f, 25.0f, glm::vec3(0.0f, 0.0f, 1.0f));
-	pointLights.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f), 1.5f, 25.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+
+	
+	
+	Vector<Pointlight> pointLights = generatePointLightGrid(100, 100);
 
 	Vector<Spotlight> spotlights;
 
 	Vector<DirectionalLight> directionalLights;
-	directionalLights.emplace_back(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-0.2f, -1.0f, -0.3f), .15f, false);
+	//directionalLights.emplace_back(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(-0.2f, -1.0f, -0.3f), .15f, false);
 
 	Vector<FPCamera> cameras;
 	cameras.push_back(camera);
 
-	g_scene = std::make_shared<Scene>("BasicBackpack", spotlights, pointLights, directionalLights, models, cameras);
+	g_scene = std::make_shared<Scene>("PointLightTest", spotlights, pointLights, directionalLights, models, cameras);
 
 	UniformBufferObject viewProjUBO(2*sizeof(glm::mat4), 0);
 	passCollection.AddGBufferPass(*g_scene);

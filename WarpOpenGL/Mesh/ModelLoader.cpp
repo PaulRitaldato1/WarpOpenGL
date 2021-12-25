@@ -31,7 +31,34 @@ Ref<Model> ModelLoader::generateGrid(int width, int depth, int m, int n, glm::ve
 	return std::make_shared<Model>(meshes, desc);
 }
 
-Ref<Model> ModelLoader::generateSphere(float radius, uint sliceCount, uint stackCount, glm::vec3 pos)
+Ref<Model> ModelLoader::generateSphereInstanced(Vector<float>& radii, Vector<glm::mat4>& transforms, uint sliceCount, uint stackCount, Ref<GLTexParams> tex /*= nullptr*/)
+{
+
+	DYNAMIC_ASSERT(radii.size() == transforms.size(), "These need to be the same size");
+
+	Vector<Ref<Mesh>> meshes;
+	meshes.push_back(GeoGen::CreateSphere(1.0f, sliceCount, stackCount));
+
+	for (uint i = 0; i < radii.size(); i++)
+	{
+		float radius = radii[i];
+		transforms[i] = glm::scale(transforms[i], glm::vec3(radius, radius, radius));
+	}
+	
+
+	ModelDesc desc;
+	desc.isInstanced = true;
+	desc.gamma = false;
+	desc.hasShadow = false;
+	desc.instances = transforms;
+
+	if (tex != nullptr)
+		meshes.back()->setTexture(tex);
+
+	return std::make_shared<Model>(meshes, desc);
+}
+
+Ref<Model> ModelLoader::generateSphere(float radius, uint sliceCount, uint stackCount, glm::vec3 pos, Ref<GLTexParams> tex)
 {
 	Vector<Ref<Mesh>> meshes;
 	meshes.push_back(GeoGen::CreateSphere(radius, sliceCount, stackCount));
@@ -43,6 +70,9 @@ Ref<Model> ModelLoader::generateSphere(float radius, uint sliceCount, uint stack
 
 	glm::mat4 modelMatrix(1.0f);
 	desc.transform = glm::translate(modelMatrix, pos);
+
+	if(tex != nullptr)
+		meshes.back()->setTexture(tex);
 
 	return std::make_shared<Model>(meshes, desc);
 }
