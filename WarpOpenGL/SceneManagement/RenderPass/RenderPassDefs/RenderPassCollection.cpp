@@ -160,21 +160,24 @@ void RenderPassCollection::AddGBufferPass(Scene& scene)
 			gbuffer->geometryShaderId = m_shaderManager.getShaderId("gBufferGeometry");
 			gbuffer->instancedGeometryShaderId = m_shaderManager.getShaderId("InstancedGBufferGeometry");
 
+			Tuple<int, int> windowSize = scene.getWindowSize();
+			int width = std::get<0>(windowSize);
+			int height = std::get<1>(windowSize);
 
 			//need a good way to get window current size instead of hard coding 
-			gbuffer->positionBuffer = std::make_shared<GLTexture>(GL_RGBA16F, GL_RGBA, GL_TEXTURE_2D, GL_FLOAT, 1920, 1080);
+			gbuffer->positionBuffer = std::make_shared<GLTexture>(GL_RGBA16F, GL_RGBA, GL_TEXTURE_2D, GL_FLOAT, width, height);
 			gbuffer->positionBuffer->setParameteri(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			gbuffer->positionBuffer->setParameteri(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-			gbuffer->normalBuffer = std::make_shared<GLTexture>(GL_RGBA16F, GL_RGBA, GL_TEXTURE_2D, GL_FLOAT, 1920, 1080);
+			gbuffer->normalBuffer = std::make_shared<GLTexture>(GL_RGBA16F, GL_RGBA, GL_TEXTURE_2D, GL_FLOAT, width, height);
 			gbuffer->normalBuffer->setParameteri(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			gbuffer->normalBuffer->setParameteri(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-			gbuffer->diffuseSpec = std::make_shared<GLTexture>(GL_RGBA, GL_RGBA, GL_TEXTURE_2D, GL_UNSIGNED_BYTE, 1920, 1080);
+			gbuffer->diffuseSpec = std::make_shared<GLTexture>(GL_RGBA, GL_RGBA, GL_TEXTURE_2D, GL_UNSIGNED_BYTE, width, height);
 			gbuffer->diffuseSpec->setParameteri(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			gbuffer->diffuseSpec->setParameteri(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-			gbuffer->rbo = std::make_shared<GLRenderBuffer>(1920, 1080, GL_DEPTH_COMPONENT, GL_DEPTH_ATTACHMENT);
+			gbuffer->rbo = std::make_shared<GLRenderBuffer>(width, height, GL_DEPTH_COMPONENT, GL_DEPTH_ATTACHMENT);
 
 			gbuffer->frameBuffer = std::make_shared<GLFramebuffer>();
 			gbuffer->frameBuffer->Bind();

@@ -150,7 +150,7 @@ Vector<Pointlight> generatePointLightGrid(int width, int height)
 	int startX = -width / 2;
 	int startZ = -height / 2;
 
-	uint rowColFactor = 20;
+	uint rowColFactor = 50;
 	int numRows = height / rowColFactor;
 	int numCols = width / rowColFactor;
 
@@ -182,7 +182,7 @@ Ref<Model> generateSphereGrid(int width, int height)
 	int startX = -width / 2;
 	int startZ = -height / 2;
 
-	uint rowColFactor = 10;
+	uint rowColFactor =20;
 	int numRows = height / rowColFactor;
 	int numCols = width / rowColFactor;
 
@@ -192,11 +192,11 @@ Ref<Model> generateSphereGrid(int width, int height)
 	{
 		for (uint col = 0; col <= numCols; col++)
 		{
-			float tempX = tempPos.x;// +getRandFloat(-5.0f, 5.0f);
-			float tempZ = tempPos.z;// +getRandFloat(-5.0f, 5.0f);
-
-			transforms.push_back(glm::translate(baseTrans, glm::vec3(tempX, 0.0, tempZ)));
-			radii.push_back(getRandFloat(2.5, 5.0));
+			float tempX = tempPos.x + getRandFloat(-3.0f, 3.0f);
+			float tempY = tempPos.y + getRandFloat(-2.0, 2.0);
+			float tempZ = tempPos.z + getRandFloat(-3.0f, 3.0f);
+			transforms.push_back(glm::translate(baseTrans, glm::vec3(tempX, tempY, tempZ)));
+			radii.push_back(getRandFloat(2, 5));
 			tempPos.x += rowColFactor;
 		}
 		tempPos.x = basePos.x;
@@ -256,14 +256,14 @@ int main()
 	//modelDescs.emplace_back("Resources/planet/planet.obj", false, true, glm::translate(base, glm::vec3(0,10000,0)));
 	//modelDescs.emplace_back("Resources/rock/rock.obj", false, true, modelMatrices);
 	Vector<Ref<Model>> models;// = loader.loadModelsAsync(modelDescs);
-	models.push_back(generateSphereGrid(100, 100));
-	models.push_back(loader.generateGrid(100, 100, 100, 100, glm::vec3(0.0f, -4.0f, 0.0f)));
+	models.push_back(generateSphereGrid(1000, 1000));
+	models.push_back(loader.generateGrid(1000, 1000, 100, 100, glm::vec3(0.0f, -4.0f, 0.0f)));
 	models.back()->getMeshes()[0]->setTexture(loadGLTexture("RandomTextures/wood.png", "Resources", "Diffuse"));
 
 
 	
 	
-	Vector<Pointlight> pointLights = generatePointLightGrid(100, 100);
+	Vector<Pointlight> pointLights = generatePointLightGrid(1000, 1000);
 
 	Vector<Spotlight> spotlights;
 
@@ -273,7 +273,7 @@ int main()
 	Vector<FPCamera> cameras;
 	cameras.push_back(camera);
 
-	g_scene = std::make_shared<Scene>("PointLightTest", spotlights, pointLights, directionalLights, models, cameras);
+	g_scene = std::make_shared<Scene>(window, "PointLightTest", spotlights, pointLights, directionalLights, models, cameras);
 
 	UniformBufferObject viewProjUBO(2*sizeof(glm::mat4), 0);
 	passCollection.AddGBufferPass(*g_scene);
@@ -293,9 +293,9 @@ int main()
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		imgui.newFrame();
-		ImGui::Begin("Performance Monitor");
-		ImGui::Text("Frame Time: %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		//imgui.newFrame();
+		//ImGui::Begin("Performance Monitor");
+		//ImGui::Text("Frame Time: %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		//for (uint i = 0; i < shaders.size(); ++i)
 		//{
 		//	auto& shader = shaders[i];
@@ -308,7 +308,7 @@ int main()
 		//	}
 		//	ImGui::PopID();
 		//}
-		ImGui::End();
+		//ImGui::End();
 
 
 		// input
@@ -316,7 +316,12 @@ int main()
 		processInput(window);
 
 		//update
-		glm::mat4 projection = glm::perspective(glm::radians(g_scene->getActiveCamera().getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
+		if (g_scene->hasWindowChanged())
+		{
+			g_renderPassManager.ExecuteSetups();
+		}
+
+		glm::mat4 projection = glm::perspective(glm::radians(g_scene->getActiveCamera().getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 5000.0f);
 		glm::mat4 view = g_scene->getActiveCamera().getViewMatrix();
 
 		viewProjUBO.BindSubdata(projection);
@@ -327,7 +332,7 @@ int main()
 		// ------
 		g_renderPassManager.ExecutePasses();
 
-		imgui.render();
+		//imgui.render();
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
 		{
@@ -387,6 +392,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	// make sure the viewport matches the new window dimensions; note that width and 
 	// height will be significantly larger than specified on retina displays.
 	glViewport(0, 0, width, height);
+	g_scene->setWindowChanged(true);
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)

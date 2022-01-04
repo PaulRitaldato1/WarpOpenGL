@@ -32,6 +32,11 @@ public:
 		m_passOrder.back()->ExecuteSetup(nullptr);
 	}
 
+	void ExecuteSetups()
+	{
+		for (auto& pass : m_passOrder)
+			pass->ExecuteSetup(nullptr);
+	}
 
 	void ExecutePasses()
 	{
