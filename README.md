@@ -20,5 +20,5 @@ Hobby renderer targeted for OpenGL. The goal of this project was to test ideas, 
 
 ![Deferred Rendering 500 Lights](https://github.com/PaulRitaldato1/WarpOpenGL/blob/master/500Lights.PNG)
 
-#Post Mortem
+# Post Mortem
 
