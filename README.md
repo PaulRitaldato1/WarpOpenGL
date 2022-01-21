@@ -18,7 +18,7 @@ Hobby renderer targeted for OpenGL. The goal of this project was to test ideas, 
 - openGL
 - glm
 
-![Deferred Rendering 500 Lights](https://github.com/PaulRitaldato1/WarpOpenGL/demo/500Lights.png)
+![Deferred Rendering 500 Lights](https://github.com/PaulRitaldato1/WarpOpenGL/500Lights.png)
 
 #Post Mortem
 
