@@ -33,4 +33,6 @@ The renderpass system was the big experiment of this project. I use it to create
 
 As for other general improvements, I would like too touch on how threading is used in this project. Frankly, its not. OpenGL is extremely limited with threading so the only real performance gains I could muster were from loading models/textures. Now, one use that was not used in this project was the concept of a render, update, and event thread. Currently, all of these things happen in the same thread. This will be addressed in future renderer projects but it is beyond the scope of this one. 
 
-The last architectural improvement I will touch on is allocators. I use the default C++ allocator only. In later projects I will try to define my own in the hopes of performance gains. This is by far not the only improvment that can be made but I would deem it a major upgrade. 
+The last architectural improvement I will touch on is allocators. I use the default C++ allocator only. In later projects I will try to define my own in the hopes of performance gains. This is by far not the only improvment that can be made but I would deem it a major upgrade.
+
+As for rendering techniques there are many that can be improved upon here. For the sake of this project they are out of scope, but in next projects I would like to address these: Better optimized deferred rendering using the stencil buffer, Forward+ rendering, GPU culling, Post processing effects, PBR. That is not an exhaustive list, just notable improvements over this project.
