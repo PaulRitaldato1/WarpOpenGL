@@ -159,6 +159,10 @@
     <ClInclude Include="Lighting\ILight.h" />
     <ClInclude Include="Lighting\LightShaderParams.h" />
     <ClInclude Include="Lighting\Material.h" />
+    <ClInclude Include="DemoCode\LightsOnPlane\LightsOnPlane.h" />
+    <ClInclude Include="Common\CommonMath.h" />
+    <ClInclude Include="DemoCode\Demo.h" />
+    <ClInclude Include="DemoCode\Asteroids\Asteroids.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\model.vert" />

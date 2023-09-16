@@ -77,10 +77,12 @@ Ref<Model> ModelLoader::generateSphere(float radius, uint sliceCount, uint stack
 	return std::make_shared<Model>(meshes, desc);
 }
 
-Vector<Ref<Model>> ModelLoader::loadModelsAsync(Vector<ModelDesc>& modelArgs)
+Vector<Ref<Model>> ModelLoader::loadModelsAsync(Vector<ModelDesc>& modelArgs, uint numThreads)
 {
 	PROFILE_SCOPE("ModelLoader::LoadModelAsync");
 	
+	ThreadPool m_pool(numThreads);
+
 	stbi_set_flip_vertically_on_load(true);
 
 	Vector<std::future<Ref<Model>>> futures;

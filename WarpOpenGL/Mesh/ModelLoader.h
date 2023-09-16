@@ -24,10 +24,9 @@ class ModelLoader
 public:
 	ModelLoader(string resourceDirectory)
 		: m_resourceDirectory(resourceDirectory)
-		, m_pool(4)
 	{}
 
-	Vector<Ref<Model>> loadModelsAsync(Vector<ModelDesc>& modelArgs);
+	Vector<Ref<Model>> loadModelsAsync(Vector<ModelDesc>& modelArgs, uint numThreads);
 	Ref<Model> loadModel(ModelDesc& desc);
 
 	Ref<Model> generateQuad();
@@ -62,6 +61,4 @@ private:
 	HashMap<string, Ref<Model>> m_modelsLoaded;
 
 	string m_resourceDirectory;
-
-	ThreadPool m_pool;
 };

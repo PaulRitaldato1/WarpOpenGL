@@ -256,9 +256,13 @@
     <ClInclude Include="Buffers\GLBuffers\GLVertexBuffer.h" />
     <ClInclude Include="Cameras\FPCamera.h" />
     <ClInclude Include="Common\Assert.h" />
+    <ClInclude Include="Common\CommonMath.h" />
     <ClInclude Include="Common\CommonTypes.h" />
     <ClInclude Include="Common\GPUMarker.h" />
     <ClInclude Include="Common\Profiler.h" />
+    <ClInclude Include="DemoCode\Asteroids\Asteroids.h" />
+    <ClInclude Include="DemoCode\Demo.h" />
+    <ClInclude Include="DemoCode\LightsOnPlane\LightsOnPlane.h" />
     <ClInclude Include="Includes\Imgui\imconfig.h" />
     <ClInclude Include="Includes\Imgui\imgui.h" />
     <ClInclude Include="Includes\Imgui\ImGuiWrapper.h" />

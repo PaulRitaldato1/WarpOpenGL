@@ -35,7 +35,7 @@ public:
 		, m_windowChanged(false)
 	{
 		DYNAMIC_ASSERT(m_cameras.size() > 0, "No Camera(s) provided to scene, creating a default one");
-		DYNAMIC_ASSERT(m_spotlights.size() > 0 || m_pointlights.size() > 0, "No lights provided to the scene. Render may be dark.");
+		DYNAMIC_ASSERT(m_spotlights.size() > 0 || m_pointlights.size() > 0 || m_directionalLights.size() > 0, "No lights provided to the scene. Render may be dark.");
 		DYNAMIC_ASSERT(m_models.size() > 0, "No models in the current scene");
 
 		if (cameras.size() == 0)
