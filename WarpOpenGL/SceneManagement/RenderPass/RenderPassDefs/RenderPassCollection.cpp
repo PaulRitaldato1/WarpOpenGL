@@ -88,7 +88,7 @@ void RenderPassCollection::AddZOnlyPass(uint width, uint height, Vector<Ref<Mode
 		});
 }
 
-void RenderPassCollection::RenderPassCollection::AddOpaquePass(Vector<Ref<Model>>& modelList)
+void RenderPassCollection::RenderPassCollection::AddOpaquePass(Scene& scene)
 {
 	struct OpaquePassData : public IPassData
 	{
@@ -111,7 +111,7 @@ void RenderPassCollection::RenderPassCollection::AddOpaquePass(Vector<Ref<Model>
 			data->shaderId = m_shaderManager.getShaderId("BasicModel");
 			data->instancedShaderId = m_shaderManager.getShaderId("InstancedBasicModel");
 
-			data->models = modelList;
+			data->models = scene.getModels();
 
 			return data;
 		},

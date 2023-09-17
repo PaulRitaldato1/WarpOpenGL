@@ -47,26 +47,26 @@ public:
 	void update(float delta)
 	{	
 
-		float baseRotAngle = 1.0f;
-		float adjustedRotAngle = baseRotAngle/(delta * 10000);
-		for (const auto& model : m_models)
-		{
-			if (!model->getIsInstanced())
-			{
-				//auto currentTransform = model->getTransform();
-				//model->setTransform(glm::rotate(currentTransform, adjustedRotAngle, glm::vec3(0.0f, 1.0f, 0.0f)));
-			}
-			else
-			{
-				auto instances = model->getInstances();
-				for (auto& instance : instances)
-				{
-					instance = glm::rotate(instance, adjustedRotAngle, glm::vec3(0.0f, 1.0f, 0.0f));
-				}
+		//float baseRotAngle = 1.0f;
+		//float adjustedRotAngle = baseRotAngle/(delta * 10000);
+		//for (const auto& model : m_models)
+		//{
+		//	if (!model->getIsInstanced())
+		//	{
+		//		//auto currentTransform = model->getTransform();
+		//		//model->setTransform(glm::rotate(currentTransform, adjustedRotAngle, glm::vec3(0.0f, 1.0f, 0.0f)));
+		//	}
+		//	else
+		//	{
+		//		auto instances = model->getInstances();
+		//		for (auto& instance : instances)
+		//		{
+		//			instance = glm::rotate(instance, adjustedRotAngle, glm::vec3(0.0f, 1.0f, 0.0f));
+		//		}
 
-				model->setInstances(instances);
-			}
-		}
+		//		model->setInstances(instances);
+		//	}
+		//}
 
 		//m_pointlights[0].setPosition(glm::vec3(sin(glfwGetTime()) * 10, 0.0f, 0.0f));
 		//for (auto& light : m_pointlights)

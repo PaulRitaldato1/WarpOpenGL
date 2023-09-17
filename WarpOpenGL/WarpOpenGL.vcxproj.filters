@@ -39,6 +39,9 @@
     <ClCompile Include="Buffers\GLBuffers\GLFramebuffer.cpp" />
     <ClCompile Include="Buffers\GLBuffers\GLRenderBuffer.cpp" />
     <ClCompile Include="SceneManagement\Scene\Scene.cpp" />
+    <ClCompile Include="DemoCode\Asteroids\Asteroids.cpp" />
+    <ClCompile Include="DemoCode\LightsOnPlane\LightsOnPlane.cpp" />
+    <ClCompile Include="Common\CommonMath.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="External">

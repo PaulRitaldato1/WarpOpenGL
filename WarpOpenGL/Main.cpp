@@ -152,14 +152,14 @@ int main()
 	g_scene = CurrentDemo->MakeScene(window);
 
 	UniformBufferObject viewProjUBO(2*sizeof(glm::mat4), 0);
-	//passCollection.AddGBufferPass(*g_scene);
-	//passCollection.AddGBufferLightingPass(*g_scene);
+	passCollection.AddGBufferPass(*g_scene);
+	passCollection.AddGBufferLightingPass(*g_scene);
 
 	//auto textures = loader.getTextures();
 	//passCollection.AddDebugQuadDraw(textures);
 	//auto& shaders = passCollection.getShaderManager().getShaders();
 	//passCollection.AddZOnlyPass(1024, 1024, models);
-	passCollection.AddOpaquePass(models);
+	//passCollection.AddOpaquePass(*g_scene);
 	// 
 	// render loop
 	// -----------
@@ -204,6 +204,7 @@ int main()
 		viewProjUBO.BindSubdata(view);
 
 		g_scene->update(deltaTime);
+		CurrentDemo->Update(deltaTime);
 		// render
 		// ------
 		g_renderPassManager.ExecutePasses();

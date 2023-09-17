@@ -39,7 +39,7 @@ public:
 
 	void AddDebugDepthPass(uint width, uint height);
 
-	void AddOpaquePass(Vector<Ref<Model>>& modelList);
+	void AddOpaquePass(Scene& scene);
 
 	void AddShadowPass();
 
