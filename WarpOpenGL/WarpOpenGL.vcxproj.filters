@@ -42,6 +42,7 @@
     <ClCompile Include="DemoCode\Asteroids\Asteroids.cpp" />
     <ClCompile Include="DemoCode\LightsOnPlane\LightsOnPlane.cpp" />
     <ClCompile Include="Common\CommonMath.cpp" />
+    <ClCompile Include="DemoCode\Backpacks\Backpacks.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="External">
@@ -166,6 +167,7 @@
     <ClInclude Include="Common\CommonMath.h" />
     <ClInclude Include="DemoCode\Demo.h" />
     <ClInclude Include="DemoCode\Asteroids\Asteroids.h" />
+    <ClInclude Include="DemoCode\Backpacks\Backpacks.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\model.vert" />

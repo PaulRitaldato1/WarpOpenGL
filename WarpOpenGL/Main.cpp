@@ -24,6 +24,7 @@
 //Demos
 #include <DemoCode/LightsOnPlane/LightsOnPlane.h>
 #include <DemoCode/Asteroids/Asteroids.h>
+#include <DemoCode/Backpacks/Backpacks.h>
 
 /*TO DO spitballing goes here*/
 
@@ -124,30 +125,7 @@ int main()
 	g_renderer.Enable(GL_MULTISAMPLE);
 	g_renderer.Enable(GL_CULL_FACE);
 
-	Ref<Demo> CurrentDemo = std::make_shared<Asteroids>();
-	
-	std::vector<glm::vec3> objectPositions;
-	objectPositions.push_back(glm::vec3(-3.0, -0.5, -3.0));
-	objectPositions.push_back(glm::vec3(0.0, -0.5, -3.0));
-	objectPositions.push_back(glm::vec3(3.0, -0.5, -3.0));
-	objectPositions.push_back(glm::vec3(-3.0, -0.5, 0.0));
-	objectPositions.push_back(glm::vec3(0.0, -0.5, 0.0));
-	objectPositions.push_back(glm::vec3(3.0, -0.5, 0.0));
-	objectPositions.push_back(glm::vec3(-3.0, -0.5, 3.0));
-	objectPositions.push_back(glm::vec3(0.0, -0.5, 3.0));
-	objectPositions.push_back(glm::vec3(3.0, -0.5, 3.0));
-
-	Vector<glm::mat4> modelMatrices;
-	glm::mat4 base = glm::mat4(1.0f);
-	base = glm::scale(base, glm::vec3(1.0f, 1.0f, 1.0f));
-
-	for (auto& pos : objectPositions)
-		modelMatrices.push_back(glm::translate(base, pos));
-
-	//load model
-	Vector<ModelDesc> modelDescs;
-	//modelDescs.push_back({"Resources/Backpack/backpack.obj", false, true, modelMatrices});
-	Vector<Ref<Model>> models;// = loader.loadModelsAsync(modelDescs);
+	Ref<Demo> CurrentDemo = std::make_shared<BackPacksDemo>();
 
 	g_scene = CurrentDemo->MakeScene(window);
 

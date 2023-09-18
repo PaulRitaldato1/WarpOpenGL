@@ -53,13 +53,7 @@ public:
 
 		compile();
 	}
-	//Shader(string vertexPath, string fragmentPath, string geometryPath = "") :
-	//	m_vertPath(vertexPath)
-	//	, m_fragPath(fragmentPath)
-	//	, m_geoPath(geometryPath)
-	//{
-	//	compile();
-	//}
+
 	Shader(string computePath) : m_computePath(computePath)
 	{
 		string cCode;
@@ -98,6 +92,7 @@ public:
 
 	void recompile()
 	{
+		Unbind();
 		glDeleteShader(m_id);
 		compile();
 	}
@@ -196,6 +191,7 @@ public:
 	{
 		glUseProgram(0);
 	}
+
 	template<typename T>
 	void setUniform(const std::string& name, const T& value)
 	{
@@ -264,6 +260,7 @@ public:
 
 	uint getId() const { return m_id; }
 	const string& getName() const { return m_name; }
+
 private:
 
 	HashMap<string, int> m_locationCache;

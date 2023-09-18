@@ -161,6 +161,11 @@ public:
 		m_instances.insert(m_instances.end(), std::make_move_iterator(instances.begin()), std::make_move_iterator(instances.end()));
 
 		m_ssbo = std::make_unique<GLSSBO>(instances.size() * sizeof(glm::mat4), 1);
+
+		for (auto& mesh : m_meshes)
+		{
+			mesh->setInstanced(true, m_instances.size());
+		}
 	}
 
 	Vector<glm::mat4> getInstances() { return m_instances; }

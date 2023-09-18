@@ -230,6 +230,7 @@
     <ClCompile Include="Buffers\GLBuffers\UniformBufferObject.cpp" />
     <ClCompile Include="Common\CommonMath.cpp" />
     <ClCompile Include="DemoCode\Asteroids\Asteroids.cpp" />
+    <ClCompile Include="DemoCode\Backpacks\Backpacks.cpp" />
     <ClCompile Include="DemoCode\LightsOnPlane\LightsOnPlane.cpp" />
     <ClCompile Include="External\glad.c" />
     <ClCompile Include="Includes\Imgui\imgui.cpp" />
@@ -264,6 +265,7 @@
     <ClInclude Include="Common\GPUMarker.h" />
     <ClInclude Include="Common\Profiler.h" />
     <ClInclude Include="DemoCode\Asteroids\Asteroids.h" />
+    <ClInclude Include="DemoCode\Backpacks\Backpacks.h" />
     <ClInclude Include="DemoCode\Demo.h" />
     <ClInclude Include="DemoCode\LightsOnPlane\LightsOnPlane.h" />
     <ClInclude Include="Includes\Imgui\imconfig.h" />
