@@ -188,6 +188,12 @@ void RenderPassCollection::AddGBufferPass(Scene& scene)
 			gbuffer->frameBuffer->AttachRenderBuffer(gbuffer->rbo);
 			gbuffer->frameBuffer->Unbind();
 			FATAL_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Frambuffer machine broke");
+			
+			//auto fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+			//if (fboStatus != GL_FRAMEBUFFER_COMPLETE)
+			//{
+			//	std::cout << "Framebuffer not complete " << fboStatus << std::endl;
+			//}
 
 			return gbuffer;
 		}, 
@@ -230,8 +236,6 @@ void RenderPassCollection::AddGBufferLightingPass(Scene& scene)
 		
 		uint gBufferLightingShaderId;
 		uint gBufferQuadLightingShaderId;
-
-
 	};
 	
 	g_renderPassManager.AddPass("GBufferLightingPass", "GBufferPass", 

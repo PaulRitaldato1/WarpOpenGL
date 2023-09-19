@@ -7,7 +7,7 @@
     do { \
         if(!(condition)){\
             std::cerr << "\033[1;33mDynamic Assert failure: `" #condition "` Failed in " << __FILE__  \
-                      << " line " << __LINE__ << " with message: " << message << ".\033[0m\n";\
+                      << " line " << __LINE__ << " with message: " << message << "\033[0m\n";\
         }\
     }while(false)
 
@@ -15,7 +15,7 @@
     do{ \
         if(!(condition)){\
             std::cerr << "\033[1;31mFATAL ASSERT FAILURE: `" #condition "` Failed in " << __FILE__ \
-                      << " line " << __LINE__ << " with message: " << message << ".\033[0m\n";\
+                      << " line " << __LINE__ << " with message: " << message << "\033[0m\n";\
             std::terminate();\
         }\
     }while(false)

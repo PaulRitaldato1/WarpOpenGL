@@ -28,14 +28,11 @@
 
 /*TO DO spitballing goes here*/
 
-//TODO REGISTER SYSTEM FOR IMGUI. SORT OF LIKE VISITOR PATTERN BUT FOR ANY REGISTERED VAR
-//TODO LIST OF RENDER ITEMS THAT CAN BE SORTED BY DISTANCE TO CAMERA
-//TODO SHOULD ALL BUFFER ALLOC GO THROUGH RENDERER? 
-//	1. COULD MAKE DRAW CALLS EASIER?
-//TODO create psuedo command lists. Render passes record commands into a vector
-// without making any GL calls. Then render thread executes these commands with the current context
-// this should allow asyn render passes
-//TODO materials and lighting. Already being worked on but needs a lot of work
+//TODO cleanup revisit
+// 1. Command recording is a priority.
+// 2. Render context that can then be optimized to reduce context switches
+// 3. Scene updating should have a function registry for elements in the scene that Tick
+// 4. PBR, IBL, Cube Maps, post process etc
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -80,6 +77,7 @@ GLFWwindow* initGLFW(const string title, const uint width, const uint height)
 	glfwWindowHint(GLFW_SAMPLES, 4);
 
 #ifdef _DEBUG
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 	loadRenderDoc();
 #endif
 
@@ -115,8 +113,9 @@ int main()
 	ImGuiWrapper imgui(window);
 	RenderPassCollection passCollection;
 #ifdef _DEBUG
-	g_renderer.Enable(GL_DEBUG_OUTPUT);
-	glDebugMessageCallback(MessageCallback, 0);
+	//g_renderer.Enable(GL_DEBUG_OUTPUT);
+	g_renderer.Enable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+	glDebugMessageCallback(&MessageCallback, 0);
 #endif
 	g_renderer.EnableBufferBits(GL_DEPTH_BUFFER_BIT);
 	g_renderer.EnableBufferBits(GL_COLOR_BUFFER_BIT);
@@ -147,6 +146,7 @@ int main()
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
+		//Vector<Ref<Shader>>& shaders = passCollection.getShaderManager().getShaders();
 		//imgui.newFrame();
 		//ImGui::Begin("Performance Monitor");
 		//ImGui::Text("Frame Time: %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
@@ -163,7 +163,6 @@ int main()
 		//	ImGui::PopID();
 		//}
 		//ImGui::End();
-
 
 		// input
 		// -----
@@ -274,7 +273,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 }
 
 #ifdef _DEBUG
-void MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
+void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
 {
 	fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n\n",
 		(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
