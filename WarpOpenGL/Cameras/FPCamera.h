@@ -5,12 +5,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <Common/CommonTypes.h>
 
-enum CameraMovement
+enum Controls
 {
 	FORWARD,
 	BACKWARD,
 	LEFT,
-	RIGHT
+	RIGHT,
+	SHIFT
 };
 
 const float YAW = -90.0f;
@@ -50,16 +51,22 @@ public:
 		return glm::lookAt(getPosition(), getPosition() + m_front, m_up);
 	}
 
-	void processKeyboard(CameraMovement dir, float deltaTime)
+	void processKeyboard(Controls key, float deltaTime)
 	{
 		float velocity = m_movementSpeed * deltaTime;
-		if (dir == FORWARD)
+
+		if (m_shiftToggle)
+			velocity *= 2;
+
+		if (key == SHIFT)
+			toggleShift();
+		if (key == FORWARD)
 			setPosition(getPosition() + m_front * velocity);
-		if (dir == BACKWARD)
+		if (key == BACKWARD)
 			setPosition(getPosition() - m_front * velocity);
-		if (dir == LEFT)
+		if (key == LEFT)
 			setPosition(getPosition() - m_right * velocity);
-		if (dir == RIGHT)
+		if (key == RIGHT)
 			setPosition(getPosition() + m_right * velocity);
 
 		m_hasMoved = true;
@@ -132,6 +139,11 @@ public:
 			return false;
 	}
 
+	void toggleShift()
+	{
+		m_shiftToggle = m_shiftToggle ? false : true;
+	}
+
 private:
 	
 	glm::vec3 m_position;
@@ -146,6 +158,7 @@ private:
 	float m_mouseSensitivity;
 	float m_zoom;
 
+	bool m_shiftToggle = false;
 	bool m_hasMoved;
 	void updateCameraVectors()
 	{

@@ -214,6 +214,8 @@ void processInput(GLFWwindow* window)
 		glfwSetWindowShouldClose(window, true);
 	if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED)
 	{
+		if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+			g_scene->getActiveCamera().processKeyboard(SHIFT, deltaTime);
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 			g_scene->getActiveCamera().processKeyboard(FORWARD, deltaTime);
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)

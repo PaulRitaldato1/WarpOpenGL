@@ -101,17 +101,22 @@ void Asteroids::Update(float DeltaTime)
 
 				float currentAngleDeg = glm::degrees(currentAngleRad);
 				
-				float newAngleRad = glm::radians(currentAngleDeg + m_planetRot);
-				float newAngleDeg = currentAngleDeg + m_planetRot;
+				float newAngleDeg = currentAngleDeg + adjustedLocalRotAngle / 100000.0f;
 
 				if (newAngleDeg > 360.0f)
 				{
 					newAngleDeg = 0;
 				}
 
-				glm::vec3 newPos = glm::vec3(sin(newAngleDeg) * m_radius, currentPos.y, cos(newAngleDeg) * m_radius);
+				float newAngleRad = glm::radians(newAngleDeg);
 
-				instance = glm::translate(instance, newPos);
+
+				float radius = glm::distance(currentPos, planetPos);
+
+				glm::vec3 newPos = glm::vec3(sin(newAngleDeg) * radius, currentPos.y, cos(newAngleDeg) * radius);
+
+				instance[3] = glm::vec4(newPos, 1.0);
+
 			}
 
 			model->setInstances(instances);

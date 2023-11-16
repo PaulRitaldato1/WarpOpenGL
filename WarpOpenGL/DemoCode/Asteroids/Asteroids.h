@@ -18,8 +18,6 @@ public:
 private:
 
 	float m_radius = 150.0f;
-	float m_orbitAngle = 0.0f;
-	float m_planetRot = 0.1f;
 	Ref<Model> m_planet;
 	Vector<glm::mat4> generateAsteroidPositions(uint amount);
 };
