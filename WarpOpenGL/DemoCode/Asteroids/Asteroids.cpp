@@ -17,6 +17,15 @@ Ref<Scene> Asteroids::MakeScene(GLFWwindow* window)
 
 	Vector<Ref<Model>> models = loader.loadModelsAsync(modelDescs, 2);
 
+	for (int i = 0; i < models.size(); i++)
+	{
+		if (!models[i]->getIsInstanced())
+		{
+			m_planet = models[i];
+			break;
+		}
+	}
+
 	Vector<Pointlight> pointLights;
 	Vector<Spotlight> spotlights;
 	Vector<DirectionalLight> directionalLights;
@@ -33,7 +42,6 @@ Vector<glm::mat4> Asteroids::generateAsteroidPositions(uint amount)
 {
 	Vector<glm::mat4> modelMatrices;
 
-	float radius = 150.0;
 	float offset = 25.0f;
 	for (unsigned int i = 0; i < amount; i++)
 	{
@@ -41,11 +49,11 @@ Vector<glm::mat4> Asteroids::generateAsteroidPositions(uint amount)
 		// 1. translation: displace along circle with 'radius' in range [-offset, offset]
 		float angle = (float)i / (float)amount * 360.0f;
 		float displacement = (GetRandFloat(0.0f, 2 * offset * 100)) / 100.0f - offset;
-		float x = sin(angle) * radius + displacement;
+		float x = sin(angle) * m_radius + displacement;
 		displacement = (GetRandFloat(0.0f, 2 * offset * 100)) / 100.0f - offset;
 		float y = displacement * 0.4f; // keep height of asteroid field smaller compared to width of x and z
 		displacement = (GetRandFloat(0.0f, 2 * offset * 100)) / 100.0f - offset;
-		float z = cos(angle) * radius + displacement;
+		float z = cos(angle) * m_radius + displacement;
 		model = glm::translate(model, glm::vec3(x, y, z));
 
 		// 2. scale: Scale between 0.05 and 0.25f
@@ -66,20 +74,44 @@ Vector<glm::mat4> Asteroids::generateAsteroidPositions(uint amount)
 void Asteroids::Update(float DeltaTime)
 {
 	float baseRotAngle = 1.0f;
-	float adjustedRotAngle = baseRotAngle / (DeltaTime * 10000);
+	float adjustedLocalRotAngle = baseRotAngle / (DeltaTime * 10000);
+
+	glm::vec3 planetPos = m_planet->getPosition();
+
 	for (const auto& model : m_scene->getModels())
 	{
 		if (!model->getIsInstanced())
 		{
-			//auto currentTransform = model->getTransform();
-			//model->setTransform(glm::rotate(currentTransform, adjustedRotAngle, glm::vec3(0.0f, 1.0f, 0.0f)));
+			auto currenttransform = model->getTransform();
+			model->setTransform(glm::rotate(currenttransform, adjustedLocalRotAngle / (DeltaTime * 1000), glm::vec3(0.0f, 1.0f, 0.0f)));
 		}
 		else
 		{
 			auto instances = model->getInstances();
 			for (auto& instance : instances)
 			{
-				instance = glm::rotate(instance, adjustedRotAngle, glm::vec3(0.0f, 1.0f, 0.0f));
+				instance = glm::rotate(instance, adjustedLocalRotAngle, glm::vec3(0.0f, 1.0f, 0.0f));
+				
+				glm::vec3 currentPos = glm::vec3(instance[3]);
+				
+				float deltaX = currentPos.x - planetPos.x;
+				float deltaZ = currentPos.z - planetPos.z;
+
+				float currentAngleRad = atan2(deltaZ, deltaX);
+
+				float currentAngleDeg = glm::degrees(currentAngleRad);
+				
+				float newAngleRad = glm::radians(currentAngleDeg + m_planetRot);
+				float newAngleDeg = currentAngleDeg + m_planetRot;
+
+				if (newAngleDeg > 360.0f)
+				{
+					newAngleDeg = 0;
+				}
+
+				glm::vec3 newPos = glm::vec3(sin(newAngleDeg) * m_radius, currentPos.y, cos(newAngleDeg) * m_radius);
+
+				instance = glm::translate(instance, newPos);
 			}
 
 			model->setInstances(instances);

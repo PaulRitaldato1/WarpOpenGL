@@ -152,6 +152,8 @@ public:
 	glm::mat4 getTransform() const { return m_modelTransform; }
 	void setTransform(glm::mat4 transform) { m_modelTransform = transform; }
 
+	glm::vec3 getPosition() const { return glm::vec3(m_modelTransform[3]); }
+
 	const Vector<Ref<Mesh>>& getMeshes() const { return m_meshes; }
 
 	void setInstances(Vector<glm::mat4>& instances)

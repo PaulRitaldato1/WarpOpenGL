@@ -124,7 +124,9 @@ int main()
 	g_renderer.Enable(GL_MULTISAMPLE);
 	g_renderer.Enable(GL_CULL_FACE);
 
-	Ref<Demo> CurrentDemo = std::make_shared<BackPacksDemo>();
+	//Ref<Demo> CurrentDemo = std::make_shared<BackPacksDemo>();
+	Ref<Demo> CurrentDemo = std::make_shared<Asteroids>();
+	//Ref<Demo> CurrentDemo = std::make_shared<LightOnPlaneDemo>();
 
 	g_scene = CurrentDemo->MakeScene(window);
 
