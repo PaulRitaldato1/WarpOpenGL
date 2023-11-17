@@ -289,23 +289,23 @@ void RenderPassCollection::AddGBufferLightingPass(Scene& scene)
 
 			for (const auto& PointLight : scene.GetPointlights())
 			{
-				auto ShaderParams = PointLight.getShaderParams();
+				auto ShaderParams = PointLight.GetShaderParams();
 
 
 				LightVolumeShader.SetUniform("viewPos", scene.GetActiveCamera().GetPosition());
 
-				LightVolumeShader.SetUniform("light.position", ShaderParams.position);
-				LightVolumeShader.SetUniform("light.direction", ShaderParams.direction);
-				LightVolumeShader.SetUniform("light.color", ShaderParams.color);
-				LightVolumeShader.SetUniform("light.spotlightAngle", ShaderParams.spotlightAngle);
-				LightVolumeShader.SetUniform("light.radius", ShaderParams.radius);
-				LightVolumeShader.SetUniform("light.intensity", ShaderParams.intensity);
-				LightVolumeShader.SetUniform("light.enable", ShaderParams.enable);
-				LightVolumeShader.SetUniform("light.type", (uint)ShaderParams.type);
+				LightVolumeShader.SetUniform("light.position", ShaderParams.Position);
+				LightVolumeShader.SetUniform("light.direction", ShaderParams.Direction);
+				LightVolumeShader.SetUniform("light.color", ShaderParams.Color);
+				LightVolumeShader.SetUniform("light.spotlightAngle", ShaderParams.SpotlightAngle);
+				LightVolumeShader.SetUniform("light.radius", ShaderParams.Radius);
+				LightVolumeShader.SetUniform("light.intensity", ShaderParams.Intensity);
+				LightVolumeShader.SetUniform("light.enable", ShaderParams.bEnable);
+				LightVolumeShader.SetUniform("light.type", (uint)ShaderParams.Type);
 				LightVolumeShader.SetUniform("light.linear", (float)0.7);
 				LightVolumeShader.SetUniform("light.quadratic", (float)1.8);
 
-				PointLight.getLightVolume().Draw(LightVolumeShader);
+				PointLight.GetLightVolume().Draw(LightVolumeShader);
 			}
 			g_renderer.SetCullMode(GL_BACK);
 
@@ -322,23 +322,23 @@ void RenderPassCollection::AddGBufferLightingPass(Scene& scene)
 
 			for (const auto& DirectionalLight : scene.GetDirectionalLights())
 			{
-				auto ShaderParams = DirectionalLight.getShaderParams();
+				auto ShaderParams = DirectionalLight.GetShaderParams();
 
 
 				LightVolumeShader.SetUniform("viewPos", scene.GetActiveCamera().GetPosition());
 
-				LightVolumeShader.SetUniform("light.position", ShaderParams.position);
-				LightVolumeShader.SetUniform("light.direction", ShaderParams.direction);
-				LightVolumeShader.SetUniform("light.color", ShaderParams.color);
-				LightVolumeShader.SetUniform("light.spotlightAngle", ShaderParams.spotlightAngle);
-				LightVolumeShader.SetUniform("light.radius", ShaderParams.radius);
-				LightVolumeShader.SetUniform("light.intensity", ShaderParams.intensity);
-				LightVolumeShader.SetUniform("light.enable", ShaderParams.enable);
-				LightVolumeShader.SetUniform("light.type", (uint)ShaderParams.type);
+				LightVolumeShader.SetUniform("light.position", ShaderParams.Position);
+				LightVolumeShader.SetUniform("light.direction", ShaderParams.Direction);
+				LightVolumeShader.SetUniform("light.color", ShaderParams.Color);
+				LightVolumeShader.SetUniform("light.spotlightAngle", ShaderParams.SpotlightAngle);
+				LightVolumeShader.SetUniform("light.radius", ShaderParams.Radius);
+				LightVolumeShader.SetUniform("light.intensity", ShaderParams.Intensity);
+				LightVolumeShader.SetUniform("light.enable", ShaderParams.bEnable);
+				LightVolumeShader.SetUniform("light.type", (uint)ShaderParams.Type);
 				LightVolumeShader.SetUniform("light.linear", (float)0.7);
 				LightVolumeShader.SetUniform("light.quadratic", (float)1.8);
 
-				DirectionalLight.getLightVolume().Draw(QuadShader);
+				DirectionalLight.GetLightVolume().Draw(QuadShader);
 			}
 
 			g_renderer.Disable(GL_BLEND);

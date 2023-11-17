@@ -14,7 +14,7 @@ struct FarthestDistanceToCameraPointlight
 {
 	bool operator()(const Pointlight& l1, const Pointlight& l2)
 	{
-		return (l1.getDistanceToCamera() > l2.getDistanceToCamera());
+		return (l1.GetDistanceToCamera() > l2.GetDistanceToCamera());
 	}
 };
 

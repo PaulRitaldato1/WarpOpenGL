@@ -126,16 +126,16 @@ public:
 
 		//shader.setUniform("mat.HasAmbientTexture", m_material.HasAmbientTexture);
 		//shader.setUniform("mat.HasEmissiveTexture", m_material.HasEmissiveTexture);
-		Shader.SetUniform("mat.HasDiffuseTexture", Material.HasDiffuseTexture);
-		Shader.SetUniform("mat.HasSpecularTexture", Material.HasSpecularTexture);
+		Shader.SetUniform("mat.HasDiffuseTexture", Material.bHasDiffuseTexture);
+		Shader.SetUniform("mat.HasSpecularTexture", Material.bHasSpecularTexture);
 		//shader.setUniform("mat.HasSpecularPowerTexture", m_material.HasSpecularPowerTexture);
 		//shader.setUniform("mat.HasNormalTexture", m_material.HasNormalTexture);
 
 		//shader.setUniform("mat.SpecularScale", m_material.SpecularScale);
 		//shader.setUniform("mat.AlphaThreshold", m_material.AlphaThreshold);
-		Shader.SetUniform("mat.shininess", Material.shininess);
+		Shader.SetUniform("mat.shininess", Material.Shininess);
 
-		if (bIsInstanced && SSBO->isDirty())
+		if (bIsInstanced && SSBO->IsDirty())
 		{
 			SSBO->BindSubdata<Vector<glm::mat4>> (Instances);
 		}

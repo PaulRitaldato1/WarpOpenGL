@@ -1,6 +1,6 @@
 #include <Buffers/GLBuffers/GLFramebuffer.h>
 
-GLFramebuffer::GLFramebuffer() : m_numColorAttachments(0)
+GLFramebuffer::GLFramebuffer() : NumColorAttachments(0)
 {
 	glGenFramebuffers(1, &Id);
 }
