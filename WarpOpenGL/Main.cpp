@@ -144,9 +144,9 @@ int main()
 	// -----------
 	while (!glfwWindowShouldClose(Window))
 	{
-		float currentFrame = glfwGetTime();
-		DeltaTime = currentFrame - LastFrame;
-		LastFrame = currentFrame;
+		float CurrentFrame = glfwGetTime();
+		DeltaTime = CurrentFrame - LastFrame;
+		LastFrame = CurrentFrame;
 
 		//Vector<Ref<Shader>>& shaders = passCollection.getShaderManager().getShaders();
 		//imgui.newFrame();
