@@ -9,223 +9,223 @@
 #include <Buffers/GLBuffers/GLVertexArray.h>
 #include <Renderer/GLRenderer/GLRenderer.h>
 
-class Mesh
+class WarpMesh
 {
 public:
 
-	Mesh() = default;
+	WarpMesh() = default;
 
-	Mesh(Vector<Vertex> vertices, Vector<uint> indices, Vector<Ref<GLTexture>> textures) : 
-		m_vertices(vertices)
-		, m_indices(indices)
-		, m_isInstanced(false)
-		, m_textures(textures)
+	WarpMesh(Vector<Vertex> Vertices, Vector<uint> Indices, Vector<Ref<GLTexture>> Textures) : 
+		Vertices(Vertices)
+		, Inidices(Indices)
+		, bIsInstanced(false)
+		, Textures(Textures)
 	{
 		PROFILE_FUNCTION();
 
-		for (Ref<GLTexture>& tex : textures)
+		for (Ref<GLTexture>& Tex : Textures)
 		{
-			if (m_textureNameCount.find(tex->Type) != m_textureNameCount.end())
+			if (TextureNameCount.find(Tex->Type) != TextureNameCount.end())
 			{
-				m_textureNameCount[tex->Type]++;
+				TextureNameCount[Tex->Type]++;
 			}
 			else
 			{
-				m_textureNameCount[tex->Type] = 0;
-				m_textures.push_back(tex);
+				TextureNameCount[Tex->Type] = 0;
+				Textures.push_back(Tex);
 			}
 		}
 
-		setupMesh();
+		SetupMesh();
 	}
 
-	Mesh(Vector<Vertex> vertices, Vector<uint> indices) : 
-		m_vertices(vertices)
-		, m_indices(indices)
+	WarpMesh(Vector<Vertex> Vertices, Vector<uint> Indices) : 
+		Vertices(Vertices)
+		, Inidices(Indices)
 	{
-		setupMesh();
+		SetupMesh();
 	}
 
-	Mesh(Vector<Vertex> vertices, Vector<uint> indices, Vector<Ref<GLTexParams>> textures) :
-		m_vertices(vertices)
-		, m_indices(indices)
-		, m_texturesToInit(textures)
+	WarpMesh(Vector<Vertex> Vertices, Vector<uint> Indices, Vector<Ref<GLTexParams>> Textures) :
+		Vertices(Vertices)
+		, Inidices(Indices)
+		, TexturesToInit(Textures)
 	{
 
-		for (auto& tex : m_texturesToInit)
+		for (auto& Tex : TexturesToInit)
 		{
-			if (m_textureNameCount.find(tex->Type) != m_textureNameCount.end())
+			if (TextureNameCount.find(Tex->Type) != TextureNameCount.end())
 			{
-				m_textureNameCount[tex->Type]++;
+				TextureNameCount[Tex->Type]++;
 			}
 			else
 			{
-				m_textureNameCount[tex->Type] = 0;
+				TextureNameCount[Tex->Type] = 0;
 			}
 		}
 	}
 
-	Mesh(const Mesh& copy)
+	WarpMesh(const WarpMesh& Copy)
 	{
-		m_vertices = copy.m_vertices;
-		m_indices = copy.m_indices;
-		m_textures = copy.m_textures;
-		m_vao = copy.m_vao;
-		m_vbo = copy.m_vbo;
-		m_ibo = copy.m_ibo;
+		Vertices = Copy.Vertices;
+		Inidices = Copy.Inidices;
+		Textures = Copy.Textures;
+		VAO = Copy.VAO;
+		VBO = Copy.VBO;
+		IBO = Copy.IBO;
 		//m_texturesToInit = copy.m_texturesToInit;
 
-		m_indexedDraw = copy.m_indexedDraw;
-		m_instancedDraw = copy.m_instancedDraw;
-		m_isInstanced = copy.m_isInstanced;
+		IndexedDraw = Copy.IndexedDraw;
+		InstancedDraw = Copy.InstancedDraw;
+		bIsInstanced = Copy.bIsInstanced;
 		//m_layout = copy.m_layout;
 	}
 
-	void setTextures(Vector<Ref<GLTexture>>& textures)
+	void SetTextures(Vector<Ref<GLTexture>>& InTextures)
 	{
-		m_textures.insert(m_textures.end(), std::make_move_iterator(textures.begin()), std::make_move_iterator(textures.end()));
+		Textures.insert(Textures.end(), std::make_move_iterator(InTextures.begin()), std::make_move_iterator(InTextures.end()));
 	}
 
-	void setTexture(Ref<GLTexParams> texture)
+	void SetTexture(Ref<GLTexParams> Texture)
 	{
 		/*m_textures.emplace_back(texture);*/
-		m_textures.emplace_back(std::make_shared<GLTexture>(texture));
+		Textures.emplace_back(std::make_shared<GLTexture>(Texture));
 	}
 
-	void setTexture(Ref<GLTexture> texture)
+	void SetTexture(Ref<GLTexture> Texture)
 	{
-		m_textures.push_back(texture);
+		Textures.push_back(Texture);
 	}
 
-	void Draw(Shader& shader)
+	void Draw(GLSLShader& Shader)
 	{
 		PROFILE_SCOPE("MeshDraw");
 
 		//DYNAMIC_ASSERT(m_textures.size() > 0, "No textures attached to mesh");
 
 		//needs to be an int because it is used to set the shader param and textures are ints
-		int totalTexCount = 0;
-		for (auto& texture : m_textures)
+		int TotalTexCount = 0;
+		for (auto& Texture : Textures)
 		{
-			for (uint i = 0; i <= m_textureNameCount[texture->Type]; ++i)
+			for (uint i = 0; i <= TextureNameCount[Texture->Type]; ++i)
 			{
-				shader.setUniform(texture->Type + std::to_string(i), totalTexCount);
-				texture->Bind(totalTexCount);
-				++totalTexCount;
+				Shader.SetUniform(Texture->Type + std::to_string(i), TotalTexCount);
+				Texture->Bind(TotalTexCount);
+				++TotalTexCount;
 			}
 		}
 
-		if (m_isInstanced)
+		if (bIsInstanced)
 		{
-			g_renderer.DrawInstanced(m_instancedDraw);
+			g_renderer.DrawInstanced(InstancedDraw);
 		}
 		else
 		{
-			g_renderer.DrawIndexed(m_indexedDraw);
+			g_renderer.DrawIndexed(IndexedDraw);
 		}
 
 		//for (Ref<GLTexture>& tex : m_textures)
 		//	tex->Unbind();
 	}
 
-	void setVertices(Vector<Vertex>& vertices)
+	void SetVertices(Vector<Vertex>& Vertices)
 	{
-		m_vertices = vertices;
+		Vertices = Vertices;
 	}
 
-	void setIndices(Vector<uint>& indices)
+	void SetIndices(Vector<uint>& Indices)
 	{
-		m_indices = indices;
+		Inidices = Indices;
 	}
 
-	void initTextures()
+	void InitTextures()
 	{
-		for (Ref<GLTexParams>& params : m_texturesToInit)
+		for (Ref<GLTexParams>& params : TexturesToInit)
 		{
-			m_textures.push_back(std::make_shared<GLTexture>(params));
+			Textures.push_back(std::make_shared<GLTexture>(params));
 		}
 
-		m_texturesToInit.clear();
+		TexturesToInit.clear();
 	}
 
-	void clearInitTextures()
+	void ClearInitTextures()
 	{
-		m_texturesToInit.clear();
+		TexturesToInit.clear();
 	}
 
-	const Vector<Ref<GLTexParams>>& getTextureRequests() { return m_texturesToInit; }
-	Vector<uint> getIndices() const { return m_indices; }
-	Vector<Vertex> getVertices() const { return m_vertices; }
+	const Vector<Ref<GLTexParams>>& GetTextureRequests() { return TexturesToInit; }
+	Vector<uint> GetIndices() const { return Inidices; }
+	Vector<Vertex> GetVertices() const { return Vertices; }
 
-	void setInstanced(bool instanced, uint numInstances = 0) 
+	void SetInstanced(bool bInstanced, uint NumInstances = 0) 
 	{ 
-		m_isInstanced = instanced; 
-		if(instanced)
+		bIsInstanced = bInstanced; 
+		if(bInstanced)
 		{ 
-			m_instancedDraw.instanceCount = numInstances;
-			m_instancedDraw.indexBuffer = m_ibo;
-			m_instancedDraw.vertexArrayBuffer = m_vao;
-			m_instancedDraw.indexCount = m_indices.size();
+			InstancedDraw.instanceCount = NumInstances;
+			InstancedDraw.IndexBuffer = IBO;
+			InstancedDraw.VertexArrayBuffer = VAO;
+			InstancedDraw.IndexCount = Inidices.size();
 		}
 	}
-	bool getIsInstanced() { return m_isInstanced; }
+	bool GetIsInstanced() { return bIsInstanced; }
 
-	void setupMesh()
+	void SetupMesh()
 	{
 		PROFILE_FUNCTION();
 
-		FATAL_ASSERT(m_indices.size() > 0 && m_vertices.size() > 0, "Attempting to create a mesh with no indices and vertices not set!");
-		m_vao = std::make_shared<GLVertexArray>();
-		m_vao->Bind();
-		m_vbo = std::make_shared<GLVertexBuffer>(m_vertices.data(), m_vertices.size() * sizeof(Vertex));
-		m_ibo = std::make_shared<GLIndexBuffer>(m_indices.data(), m_indices.size());
+		FATAL_ASSERT(Inidices.size() > 0 && Vertices.size() > 0, "Attempting to create a mesh with no indices and vertices not set!");
+		VAO = std::make_shared<GLVertexArray>();
+		VAO->Bind();
+		VBO = std::make_shared<GLVertexBuffer>(Vertices.data(), Vertices.size() * sizeof(Vertex));
+		IBO = std::make_shared<GLIndexBuffer>(Inidices.data(), Inidices.size());
 
 		GLVertexBufferLayout layout;
 		layout.Push<Vertex>(1);
 
-		m_vao->AddBuffer(*m_vbo, layout);
+		VAO->AddBuffer(*VBO, layout);
 
 		//setup Draws. Kinda wasteful but whatever
 
-		m_instancedDraw.indexBuffer = m_ibo;
-		m_instancedDraw.vertexArrayBuffer = m_vao;
-		m_instancedDraw.indexCount = m_indices.size();
+		InstancedDraw.IndexBuffer = IBO;
+		InstancedDraw.VertexArrayBuffer = VAO;
+		InstancedDraw.IndexCount = Inidices.size();
 
-		m_indexedDraw.primitiveCount = m_indices.size();
-		m_indexedDraw.vertexArrayBuffer = m_vao;
-		m_indexedDraw.indexBuffer = m_ibo;
+		IndexedDraw.PrimitiveCount = Inidices.size();
+		IndexedDraw.VertexArrayBuffer = VAO;
+		IndexedDraw.IndexBuffer = IBO;
 
 		
 	}
 
-	const GLIndexedDrawCall& getIndexedDrawCall() const { return m_indexedDraw; }
+	const GLIndexedDrawCall& GetIndexedDrawCall() const { return IndexedDraw; }
 
-	Vector<Ref<GLTexture>> getTextures()
+	Vector<Ref<GLTexture>> GetTextures()
 	{
-		return m_textures;
+		return Textures;
 	}
 
-	Ref<GLTexture> getTexture(uint index)
+	Ref<GLTexture> GetTexture(uint index)
 	{
-		return m_textures[index];
+		return Textures[index];
 	}
 
 private:
 	//cpu copies
-	Vector<Vertex> m_vertices;
-	Vector<uint> m_indices;
-	Vector<Ref<GLTexture>> m_textures;
-	Vector<Ref<GLTexParams>> m_texturesToInit;
-	bool m_isInstanced = false;
+	Vector<Vertex> Vertices;
+	Vector<uint> Inidices;
+	Vector<Ref<GLTexture>> Textures;
+	Vector<Ref<GLTexParams>> TexturesToInit;
+	bool bIsInstanced = false;
 	//incase of multiple textures
-	HashMap<string, uint> m_textureNameCount;
+	HashMap<string, uint> TextureNameCount;
 	
-	GLIndexedDrawCall m_indexedDraw;
-	GLInstancedDrawCall m_instancedDraw;
+	GLIndexedDrawCall IndexedDraw;
+	GLInstancedDrawCall InstancedDraw;
 
-	Ref<GLVertexArray> m_vao;
-	Ref<GLVertexBuffer> m_vbo;
-	Ref<GLIndexBuffer> m_ibo;
+	Ref<GLVertexArray> VAO;
+	Ref<GLVertexBuffer> VBO;
+	Ref<GLIndexBuffer> IBO;
 
 };
 

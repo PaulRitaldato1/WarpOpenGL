@@ -16,18 +16,18 @@ struct IDrawCall
 
 struct GLIndexedDrawCall : public IDrawCall
 {
-	uint primitiveCount = 0;
+	uint PrimitiveCount = 0;
 
-	Ref<GLVertexArray> vertexArrayBuffer;
-	Ref<GLIndexBuffer> indexBuffer;
+	Ref<GLVertexArray> VertexArrayBuffer;
+	Ref<GLIndexBuffer> IndexBuffer;
 };
 
 struct GLInstancedDrawCall : public IDrawCall
 {
 	uint instanceCount = 0;
-	uint indexCount = 0;
-	Ref<GLVertexArray> vertexArrayBuffer;
-	Ref<GLIndexBuffer> indexBuffer;
+	uint IndexCount = 0;
+	Ref<GLVertexArray> VertexArrayBuffer;
+	Ref<GLIndexBuffer> IndexBuffer;
 };
 
 ///////////////////////////////////////////////////////////
@@ -43,26 +43,26 @@ public:
 	void Enable(uint toEnable);
 	void Disable(uint toDisable);
 
-	void setBlendFunc(uint sFactor, uint blendFunc);
-	void setBlendEquation(GLenum mode);
+	void SetBlendFunc(uint sFactor, uint blendFunc);
+	void SetBlendEquation(GLenum mode);
 
 	void ClearColor(float r, float g, float b, float a);
 	void ClearColor(glm::vec4 color);
 
-	void setViewport(uint width, uint height);
+	void SetViewport(uint width, uint height);
 
-	void setCullMode(GLenum mode);
+	void SetCullMode(GLenum mode);
 
-	void setDrawBuffer(GLenum setting);
-	void setReadBuffer(GLenum setting);
+	void SetDrawBuffer(GLenum setting);
+	void SetReadBuffer(GLenum setting);
 
 	void DrawIndexed(const GLIndexedDrawCall& args);
 	void DrawInstanced(GLInstancedDrawCall& args);
 	void DrawArrays(uint topology, uint first, uint count, GLVertexArray& vao);
 
-	void setDrawWireFrame(GLenum mode);
+	void SetDrawWireFrame(GLenum mode);
 private:
-	uint m_boundBufferbits = 0;
+	uint BoundBufferbits = 0;
 };
 
 extern GLRenderer g_renderer;

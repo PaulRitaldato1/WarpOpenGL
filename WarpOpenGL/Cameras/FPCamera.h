@@ -25,150 +25,150 @@ class FPCamera
 public:
 	
 	FPCamera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) 
-		: m_front(glm::vec3(0.0f, 0.0f, -1.0f))
-		, m_movementSpeed(SPEED)
-		, m_mouseSensitivity(SENSITIVITY)
-		, m_zoom(ZOOM)
+		: Front(glm::vec3(0.0f, 0.0f, -1.0f))
+		, MovementSpeed(SPEED)
+		, MouseSensitivity(SENSITIVITY)
+		, Zoom(ZOOM)
 	{
-		setPosition(position);
-		m_worldUp = up;
-		m_yaw = yaw;
-		m_pitch = pitch;
-		updateCameraVectors();
+		SetPosition(position);
+		WorldUp = up;
+		Yaw = yaw;
+		Pitch = pitch;
+		UpdateCameraVectors();
 	}
 
-	FPCamera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) : m_front(glm::vec3(0.0f, 0.0f, -1.0f)), m_movementSpeed(SPEED), m_mouseSensitivity(SENSITIVITY), m_zoom(ZOOM)
+	FPCamera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) : Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
 	{
-		setPosition(glm::vec3(posX, posY, posZ));
-		m_worldUp = glm::vec3(upX, upY, upZ);
-		m_yaw = yaw;
-		m_pitch = pitch;
-		updateCameraVectors();
+		SetPosition(glm::vec3(posX, posY, posZ));
+		WorldUp = glm::vec3(upX, upY, upZ);
+		Yaw = yaw;
+		Pitch = pitch;
+		UpdateCameraVectors();
 	}
 
-	glm::mat4 getViewMatrix() const
+	glm::mat4 GetViewMatrix() const
 	{
-		return glm::lookAt(getPosition(), getPosition() + m_front, m_up);
+		return glm::lookAt(GetPosition(), GetPosition() + Front, Up);
 	}
 
-	void processKeyboard(Controls key, float deltaTime)
+	void ProcessKeyboard(Controls key, float deltaTime)
 	{
-		float velocity = m_movementSpeed * deltaTime;
+		float velocity = MovementSpeed * deltaTime;
 
-		if (m_shiftToggle)
+		if (bShiftToggle)
 			velocity *= 2;
 
 		if (key == SHIFT)
-			toggleShift();
+			ToggleShift();
 		if (key == FORWARD)
-			setPosition(getPosition() + m_front * velocity);
+			SetPosition(GetPosition() + Front * velocity);
 		if (key == BACKWARD)
-			setPosition(getPosition() - m_front * velocity);
+			SetPosition(GetPosition() - Front * velocity);
 		if (key == LEFT)
-			setPosition(getPosition() - m_right * velocity);
+			SetPosition(GetPosition() - Right * velocity);
 		if (key == RIGHT)
-			setPosition(getPosition() + m_right * velocity);
+			SetPosition(GetPosition() + Right * velocity);
 
-		m_hasMoved = true;
+		bHasMoved = true;
 	}
 
-	void processMouseMovement(float offsetX, float offsetY, GLboolean constrainPitch = true)
+	void ProcessMouseMovement(float offsetX, float offsetY, GLboolean constrainPitch = true)
 	{
-		offsetX *= m_mouseSensitivity;
-		offsetY *= m_mouseSensitivity;
+		offsetX *= MouseSensitivity;
+		offsetY *= MouseSensitivity;
 		
-		m_yaw += offsetX;
-		m_pitch += offsetY;
+		Yaw += offsetX;
+		Pitch += offsetY;
 
 		if (constrainPitch)
 		{
-			if (m_pitch > 89.0f)
-				m_pitch = 89.0f;
-			if (m_pitch < -89.0f)
-				m_pitch = -89.0f;
+			if (Pitch > 89.0f)
+				Pitch = 89.0f;
+			if (Pitch < -89.0f)
+				Pitch = -89.0f;
 		}
 
-		updateCameraVectors();
+		UpdateCameraVectors();
 	}
 
-	void processMouseScroll(float offsetY)
+	void ProcessMouseScroll(float offsetY)
 	{
-		m_zoom -= offsetY;
-		if (m_zoom < 1.0f)
-			m_zoom = 1.0f;
-		if (m_zoom > 45.0f)
-			m_zoom = 45.0f;
+		Zoom -= offsetY;
+		if (Zoom < 1.0f)
+			Zoom = 1.0f;
+		if (Zoom > 45.0f)
+			Zoom = 45.0f;
 	}
 
-	float getZoom() const
+	float GetZoom() const
 	{
-		return m_zoom;
+		return Zoom;
 	}
 
-	float getPitch() const
+	float GetPitch() const
 	{
-		return m_pitch;
+		return Pitch;
 	}
 
-	float getYaw() const
+	float GetYaw() const
 	{
-		return m_yaw;
+		return Yaw;
 	}
 
-	float getMovementSpeed() const
+	float GetMovementSpeed() const
 	{
-		return m_movementSpeed;
+		return MovementSpeed;
 	}
 
-	float getMouseSensitivity() const
+	float GetMouseSensitivity() const
 	{
-		return m_mouseSensitivity;
+		return MouseSensitivity;
 	}
 	
-	glm::vec3 getPosition() const { return m_position; }
-	void setPosition(glm::vec3 val) { m_position = val; }
+	glm::vec3 GetPosition() const { return Position; }
+	void SetPosition(glm::vec3 val) { Position = val; }
 
-	bool hasMoved()
+	bool HasMoved()
 	{
-		if (m_hasMoved)
+		if (bHasMoved)
 		{
-			m_hasMoved = false;
+			bHasMoved = false;
 			return true;
 		}
 		else
 			return false;
 	}
 
-	void toggleShift()
+	void ToggleShift()
 	{
-		m_shiftToggle = m_shiftToggle ? false : true;
+		bShiftToggle = bShiftToggle ? false : true;
 	}
 
 private:
 	
-	glm::vec3 m_position;
-	glm::vec3 m_front;
-	glm::vec3 m_up;
-	glm::vec3 m_right;
-	glm::vec3 m_worldUp;
+	glm::vec3 Position;
+	glm::vec3 Front;
+	glm::vec3 Up;
+	glm::vec3 Right;
+	glm::vec3 WorldUp;
 
-	float m_yaw;
-	float m_pitch;
-	float m_movementSpeed;
-	float m_mouseSensitivity;
-	float m_zoom;
+	float Yaw;
+	float Pitch;
+	float MovementSpeed;
+	float MouseSensitivity;
+	float Zoom;
 
-	bool m_shiftToggle = false;
-	bool m_hasMoved;
-	void updateCameraVectors()
+	bool bShiftToggle = false;
+	bool bHasMoved;
+	void UpdateCameraVectors()
 	{
-		glm::vec3 front;
-		front.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
-		front.y = sin(glm::radians(m_pitch));
-		front.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+		glm::vec3 Front;
+		Front.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+		Front.y = sin(glm::radians(Pitch));
+		Front.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
 
-		m_front = glm::normalize(front);
-		m_right = glm::normalize(glm::cross(m_front, m_worldUp));
-		m_up = glm::normalize(glm::cross(m_right, m_front));
+		Front = glm::normalize(Front);
+		Right = glm::normalize(glm::cross(Front, WorldUp));
+		Up = glm::normalize(glm::cross(Right, Front));
 	}
 };

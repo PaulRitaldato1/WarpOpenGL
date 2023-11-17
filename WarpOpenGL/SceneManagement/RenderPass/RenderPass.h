@@ -9,7 +9,7 @@
 //Empty struct all pass data should inherit from. Generic data blah blah
 struct IPassData
 {
-	bool isValid = false;
+	bool bIsValid = false;
 	virtual ~IPassData() {}
 };
 
@@ -34,60 +34,60 @@ class RenderPass
 {
 public:
 	RenderPass(string passName, string dependency, std::function<Ref<IPassData>(Ref<IPassData>)> setup, std::function<Ref<IPassData>(Ref<IPassData>, Ref<IPassData>)> execute)
-		: m_setup(setup)
-		, m_execute(execute)
-		, m_name(passName)
-		, m_currentState(PassState::PassState_NotStarted)
-		, m_dependencyPass(dependency)
+		: SetupFunc(setup)
+		, ExecuteFunc(execute)
+		, PassName(passName)
+		, CurrentState(PassState::PassState_NotStarted)
+		, DependencyPass(dependency)
 	{
 	}
 
 	RenderPass(string passName, std::function<Ref<IPassData>(Ref<IPassData>)> setup, std::function<Ref<IPassData>(Ref<IPassData>, Ref<IPassData>)> execute)
-		: m_setup(setup)
-		, m_execute(execute)
-		, m_name(passName)
-		, m_currentState(PassState::PassState_NotStarted)
+		: SetupFunc(setup)
+		, ExecuteFunc(execute)
+		, PassName(passName)
+		, CurrentState(PassState::PassState_NotStarted)
 	{
 	}
 
 	void ExecutePass(Ref<IPassData> data)
 	{
-		GPUMarker(m_name + " Execute");
-		PROFILE_SCOPE(string(m_name + " Execute").c_str());
+		GPUMarker(PassName + " Execute");
+		PROFILE_SCOPE(string(PassName + " Execute").c_str());
 
-		m_output = m_execute(data, m_setupOutput);
-		m_currentState = PassState::PassState_ExecuteComplete;
+		PassOutput = ExecuteFunc(data, SetupOutput);
+		CurrentState = PassState::PassState_ExecuteComplete;
 	}
 
 	void ExecuteSetup(Ref<IPassData> data)
 	{
-		GPUMarker(m_name + " Setup");
-		PROFILE_SCOPE(string(m_name + " Setup").c_str());
+		GPUMarker(PassName + " Setup");
+		PROFILE_SCOPE(string(PassName + " Setup").c_str());
 
-		m_setupOutput = m_setup(data);
-		m_currentState = PassState::PassState_SetupComplete;
+		SetupOutput = SetupFunc(data);
+		CurrentState = PassState::PassState_SetupComplete;
 	}
 
-	const string& getName() const { return m_name; }
+	const string& GetName() const { return PassName; }
 
-	void resetState() { m_currentState = PassState::PassState_NotStarted; }
+	void ResetState() { CurrentState = PassState::PassState_NotStarted; }
 
-	PassState getState() const { return m_currentState; }
+	PassState GetState() const { return CurrentState; }
 
-	string getDependency() const { return m_dependencyPass; }
+	string GetDependency() const { return DependencyPass; }
 
-	Ref<IPassData> getOutput() { return m_output; }
-	Ref<IPassData> getSetupOutput() { return m_setupOutput; }
+	Ref<IPassData> GetOutput() { return PassOutput; }
+	Ref<IPassData> GetSetupOutput() { return SetupOutput; }
 
 private:
-	string m_name;
+	string PassName;
 
-	std::function<Ref<IPassData>(Ref<IPassData>)> m_setup;
-	std::function<Ref<IPassData>(Ref<IPassData>, Ref<IPassData>)> m_execute;
+	std::function<Ref<IPassData>(Ref<IPassData>)> SetupFunc;
+	std::function<Ref<IPassData>(Ref<IPassData>, Ref<IPassData>)> ExecuteFunc;
 	
-	Ref<IPassData> m_output;
-	Ref<IPassData> m_setupOutput;
+	Ref<IPassData> PassOutput;
+	Ref<IPassData> SetupOutput;
 
-	PassState m_currentState;
-	string m_dependencyPass; //rough but this is the name of the pass this pass gets input from
+	PassState CurrentState;
+	string DependencyPass; //rough but this is the name of the pass this pass gets input from
 };

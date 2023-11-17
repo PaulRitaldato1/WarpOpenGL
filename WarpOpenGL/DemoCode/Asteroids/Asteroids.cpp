@@ -3,123 +3,123 @@
 #include <Common/CommonTypes.h>
 #include <Common/CommonMath.h>
 
-Ref<Scene> Asteroids::MakeScene(GLFWwindow* window)
+Ref<Scene> Asteroids::MakeScene(GLFWwindow* Window)
 {
-	ModelLoader loader("Resources/");
+	ModelLoader Loader("Resources/");
 	FPCamera camera(glm::vec3(0.0f, 25.0f, 250.0f), glm::vec3(0.0, 1.0, 0.0), -90.0, 0);
 
-	Vector<glm::mat4> modelMatrices = generateAsteroidPositions(10000);
-	glm::mat4 base = glm::mat4(1.0f);
+	Vector<glm::mat4> ModelMatrices = GenerateAsteroidPositions(10000);
+	glm::mat4 Base = glm::mat4(1.0f);
 
-	Vector<ModelDesc> modelDescs;
-	modelDescs.emplace_back("Resources/planet/planet.obj", false, true, glm::scale(base, glm::vec3(10, 10, 10)));
-	modelDescs.emplace_back("Resources/rock/rock.obj", false, true, modelMatrices);
+	Vector<ModelDesc> ModelDescs;
+	ModelDescs.emplace_back("Resources/planet/planet.obj", false, true, glm::scale(Base, glm::vec3(10, 10, 10)));
+	ModelDescs.emplace_back("Resources/rock/rock.obj", false, true, ModelMatrices);
 
-	Vector<Ref<Model>> models = loader.loadModelsAsync(modelDescs, 2);
+	Vector<Ref<Model>> Models = Loader.LoadModelsAsync(ModelDescs, 2);
 
-	for (int i = 0; i < models.size(); i++)
+	for (int i = 0; i < Models.size(); i++)
 	{
-		if (!models[i]->getIsInstanced())
+		if (!Models[i]->GetIsInstanced())
 		{
-			m_planet = models[i];
+			Planet = Models[i];
 			break;
 		}
 	}
 
-	Vector<Pointlight> pointLights;
-	Vector<Spotlight> spotlights;
-	Vector<DirectionalLight> directionalLights;
-	directionalLights.emplace_back(glm::vec3(1.0, 1.0, 1.0), glm::vec3(0.0, -1.0, 0.0), .75, false);
+	Vector<Pointlight> PointLights;
+	Vector<Spotlight> Spotlights;
+	Vector<DirectionalLight> DirectionalLights;
+	DirectionalLights.emplace_back(glm::vec3(1.0, 1.0, 1.0), glm::vec3(0.0, -1.0, 0.0), .75, false);
 
-	Vector<FPCamera> cameras;
-	cameras.push_back(camera);
+	Vector<FPCamera> Cameras;
+	Cameras.push_back(camera);
 
-	m_scene = std::make_shared<Scene>(window, "Asteroids Test", spotlights, pointLights, directionalLights, models, cameras);
-	return m_scene;
+	DemoScene = std::make_shared<Scene>(Window, "Asteroids Test", Spotlights, PointLights, DirectionalLights, Models, Cameras);
+	return DemoScene;
 }
 
-Vector<glm::mat4> Asteroids::generateAsteroidPositions(uint amount)
+Vector<glm::mat4> Asteroids::GenerateAsteroidPositions(uint Amount)
 {
-	Vector<glm::mat4> modelMatrices;
+	Vector<glm::mat4> ModelMatrices;
 
-	float offset = 25.0f;
-	for (unsigned int i = 0; i < amount; i++)
+	float Offset = 25.0f;
+	for (unsigned int i = 0; i < Amount; i++)
 	{
-		glm::mat4 model = glm::mat4(1.0f);
+		glm::mat4 ModelMatrix = glm::mat4(1.0f);
 		// 1. translation: displace along circle with 'radius' in range [-offset, offset]
-		float angle = (float)i / (float)amount * 360.0f;
-		float displacement = (GetRandFloat(0.0f, 2 * offset * 100)) / 100.0f - offset;
-		float x = sin(angle) * m_radius + displacement;
-		displacement = (GetRandFloat(0.0f, 2 * offset * 100)) / 100.0f - offset;
-		float y = displacement * 0.4f; // keep height of asteroid field smaller compared to width of x and z
-		displacement = (GetRandFloat(0.0f, 2 * offset * 100)) / 100.0f - offset;
-		float z = cos(angle) * m_radius + displacement;
-		model = glm::translate(model, glm::vec3(x, y, z));
+		float Angle = (float)i / (float)Amount * 360.0f;
+		float Displacement = (GetRandFloat(0.0f, 2 * Offset * 100)) / 100.0f - Offset;
+		float x = sin(Angle) * Radius + Displacement;
+		Displacement = (GetRandFloat(0.0f, 2 * Offset * 100)) / 100.0f - Offset;
+		float y = Displacement * 0.4f; // keep height of asteroid field smaller compared to width of x and z
+		Displacement = (GetRandFloat(0.0f, 2 * Offset * 100)) / 100.0f - Offset;
+		float z = cos(Angle) * Radius + Displacement;
+		ModelMatrix = glm::translate(ModelMatrix, glm::vec3(x, y, z));
 
 		// 2. scale: Scale between 0.05 and 0.25f
-		float scale = (GetRandFloat(0.0f, 20.0f)) / 100.0f + 0.05;
-		model = glm::scale(model, glm::vec3(scale));
+		float Scale = (GetRandFloat(0.0f, 20.0f)) / 100.0f + 0.05;
+		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(Scale));
 
 		// 3. rotation: add random rotation around a (semi)randomly picked rotation axis vector
-		float rotAngle = (GetRandFloat(0.0f, 360.0f));
-		model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
+		float RotAngle = (GetRandFloat(0.0f, 360.0f));
+		ModelMatrix = glm::rotate(ModelMatrix, RotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
 
 		// 4. now add to list of matrices
-		modelMatrices.push_back(model);
+		ModelMatrices.push_back(ModelMatrix);
 	}
 
-	return modelMatrices;
+	return ModelMatrices;
 }
 
 void Asteroids::Update(float DeltaTime)
 {
-	float baseRotAngle = 1.0f;
-	float adjustedLocalRotAngle = baseRotAngle / (DeltaTime * 10000);
+	float BaseRotAngle = 1.0f;
+	float AdjustedLocalRotAngle = BaseRotAngle / (DeltaTime * 10000);
 
-	glm::vec3 planetPos = m_planet->getPosition();
+	glm::vec3 PlanetPos = Planet->GetPosition();
 
-	for (const auto& model : m_scene->getModels())
+	for (const auto& Model : DemoScene->GetModels())
 	{
-		if (!model->getIsInstanced())
+		if (!Model->GetIsInstanced())
 		{
-			auto currenttransform = model->getTransform();
-			model->setTransform(glm::rotate(currenttransform, adjustedLocalRotAngle / (DeltaTime * 1000), glm::vec3(0.0f, 1.0f, 0.0f)));
+			auto CurrentTransform = Model->GetTransform();
+			Model->SetTransform(glm::rotate(CurrentTransform, AdjustedLocalRotAngle / (DeltaTime * 1000), glm::vec3(0.0f, 1.0f, 0.0f)));
 		}
 		else
 		{
-			auto instances = model->getInstances();
-			for (auto& instance : instances)
+			auto Instances = Model->GetInstances();
+			for (auto& Instance : Instances)
 			{
-				instance = glm::rotate(instance, adjustedLocalRotAngle, glm::vec3(0.0f, 1.0f, 0.0f));
+				Instance = glm::rotate(Instance, AdjustedLocalRotAngle, glm::vec3(0.0f, 1.0f, 0.0f));
 				
-				glm::vec3 currentPos = glm::vec3(instance[3]);
+				glm::vec3 CurrentPos = glm::vec3(Instance[3]);
 				
-				float deltaX = currentPos.x - planetPos.x;
-				float deltaZ = currentPos.z - planetPos.z;
+				float deltaX = CurrentPos.x - PlanetPos.x;
+				float deltaZ = CurrentPos.z - PlanetPos.z;
 
-				float currentAngleRad = atan2(deltaZ, deltaX);
+				float CurrentAngleRad = atan2(deltaZ, deltaX);
 
-				float currentAngleDeg = glm::degrees(currentAngleRad);
+				float CurrentAngleDeg = glm::degrees(CurrentAngleRad);
 				
-				float newAngleDeg = currentAngleDeg + adjustedLocalRotAngle / 100000.0f;
+				float NewAngleDeg = CurrentAngleDeg + AdjustedLocalRotAngle / 100000.0f;
 
-				if (newAngleDeg > 360.0f)
+				if (NewAngleDeg > 360.0f)
 				{
-					newAngleDeg = 0;
+					NewAngleDeg = 0;
 				}
 
-				float newAngleRad = glm::radians(newAngleDeg);
+				float NewAngleRad = glm::radians(NewAngleDeg);
 
 
-				float radius = glm::distance(currentPos, planetPos);
+				float InstanceRadius = glm::distance(CurrentPos, PlanetPos);
 
-				glm::vec3 newPos = glm::vec3(sin(newAngleDeg) * radius, currentPos.y, cos(newAngleDeg) * radius);
+				glm::vec3 NewPos = glm::vec3(sin(NewAngleDeg) * InstanceRadius, CurrentPos.y, cos(NewAngleDeg) * InstanceRadius);
 
-				instance[3] = glm::vec4(newPos, 1.0);
+				Instance[3] = glm::vec4(NewPos, 1.0);
 
 			}
 
-			model->setInstances(instances);
+			Model->SetInstances(Instances);
 		}
 	}
 }

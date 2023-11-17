@@ -4,7 +4,7 @@
 
 #define PI 3.141592654
 
-Mesh GeoGen::CreateBox(float width, float height, float depth, uint numSubdivisions)
+WarpMesh GeoGen::CreateBox(float width, float height, float depth, uint numSubdivisions)
 {
 	PROFILE_FUNCTION();
 
@@ -84,106 +84,106 @@ Mesh GeoGen::CreateBox(float width, float height, float depth, uint numSubdivisi
 	//for (uint i = 0; i < numSubdivisions; ++i)
 	//	Subdivide(mesh);
 
-	return Mesh(v,i);
+	return WarpMesh(v,i);
 }
 
-Ref<Mesh> GeoGen::CreateSphere(float radius, uint sliceCount, uint stackCount)
+Ref<WarpMesh> GeoGen::CreateSphere(float radius, uint sliceCount, uint stackCount)
 {
 	PROFILE_FUNCTION();
 
-	Vector<Vertex> verts;
-	Vertex topVertex(glm::vec3(0.0f, +radius, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-	Vertex botVertex(glm::vec3(0.0f, -radius, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	Vector<Vertex> Verts;
+	Vertex TopVertex(glm::vec3(0.0f, +radius, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	Vertex BotVertex(glm::vec3(0.0f, -radius, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec2(), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
-	verts.push_back(topVertex);
+	Verts.push_back(TopVertex);
 
-	float phiStep = PI / stackCount;
-	float thetaStep = 2.0f * PI / sliceCount;
+	float PhiStep = PI / stackCount;
+	float ThetaStep = 2.0f * PI / sliceCount;
 
 	for (uint i = 1; i <= stackCount - 1; ++i)
 	{
-		float phi = i * phiStep;
+		float Phi = i * PhiStep;
 		for (uint j = 0; j <= sliceCount; ++j)
 		{
-			float theta = j * thetaStep;
+			float Theta = j * ThetaStep;
 
 			Vertex v;
-			v.Position.x = radius * sin(phi) * cos(theta);
-			v.Position.y = radius * cos(phi);
-			v.Position.z = radius * sin(phi) * sin(theta);
+			v.Position.x = radius * sin(Phi) * cos(Theta);
+			v.Position.y = radius * cos(Phi);
+			v.Position.z = radius * sin(Phi) * sin(Theta);
 
-			v.Tangent.x = -radius * sin(phi) * sin(theta);
+			v.Tangent.x = -radius * sin(Phi) * sin(Theta);
 			v.Tangent.y = 0.0f;
-			v.Tangent.z = radius * sin(phi) * cos(theta);
+			v.Tangent.z = radius * sin(Phi) * cos(Theta);
 
 			v.Tangent = glm::normalize(v.Tangent);
 			v.Normal = glm::normalize(v.Position);
 			
-			v.TexCoords.x = theta / (2*PI);
-			v.TexCoords.y = phi / PI;
-			verts.push_back(v);
+			v.TexCoords.x = Theta / (2*PI);
+			v.TexCoords.y = Phi / PI;
+			Verts.push_back(v);
 		}
 	}
 
-	verts.push_back(botVertex);
+	Verts.push_back(BotVertex);
 
-	Vector<uint> indices;
+	Vector<uint> Indices;
 	for (uint i = 1; i <= sliceCount; ++i)
 	{
-		indices.push_back(0);
-		indices.push_back(i + 1);
-		indices.push_back(i);
+		Indices.push_back(0);
+		Indices.push_back(i + 1);
+		Indices.push_back(i);
 	}
 
-	uint baseIndex = 1;
-	uint ringVertexCount = sliceCount + 1;
+	uint BaseIndex = 1;
+	uint RingVertexCount = sliceCount + 1;
 	for (uint i = 0; i < stackCount - 2; ++i)
 	{
 		for (uint j = 0; j < sliceCount; ++j)
 		{
-			indices.push_back(baseIndex + i * ringVertexCount + j);
-			indices.push_back(baseIndex + i * ringVertexCount + j + 1);
-			indices.push_back(baseIndex + (i + 1) * ringVertexCount + j);
+			Indices.push_back(BaseIndex + i * RingVertexCount + j);
+			Indices.push_back(BaseIndex + i * RingVertexCount + j + 1);
+			Indices.push_back(BaseIndex + (i + 1) * RingVertexCount + j);
 
-			indices.push_back(baseIndex + (i + 1) * ringVertexCount + j);
-			indices.push_back(baseIndex + i * ringVertexCount + j + 1);
-			indices.push_back(baseIndex + (i + 1) * ringVertexCount + j + 1);
+			Indices.push_back(BaseIndex + (i + 1) * RingVertexCount + j);
+			Indices.push_back(BaseIndex + i * RingVertexCount + j + 1);
+			Indices.push_back(BaseIndex + (i + 1) * RingVertexCount + j + 1);
 
 		}
 	}
 
-	uint southPoleIndex = (uint)verts.size() - 1;
-	baseIndex = southPoleIndex - ringVertexCount;
+	uint SouthPoleIndex = (uint)Verts.size() - 1;
+	BaseIndex = SouthPoleIndex - RingVertexCount;
 
 	for (uint i = 0; i < sliceCount; ++i)
 	{
-		indices.push_back(southPoleIndex);
-		indices.push_back(baseIndex + i);
-		indices.push_back(baseIndex + i + 1);
+		Indices.push_back(SouthPoleIndex);
+		Indices.push_back(BaseIndex + i);
+		Indices.push_back(BaseIndex + i + 1);
 	}
 
-	return std::make_shared<Mesh>(verts, indices);
+	return std::make_shared<WarpMesh>(Verts, Indices);
 }
 
-Mesh GeoGen::CreateGeoSphere(float radius, uint numSubdivisions)
+WarpMesh GeoGen::CreateGeoSphere(float radius, uint numSubdivisions)
 {
-	return Mesh();
+	return WarpMesh();
 }
 
-Mesh GeoGen::CreateCylinder(float bottomRadius, float topRadius, float height, uint sliceCount, uint stackCount)
+WarpMesh GeoGen::CreateCylinder(float bottomRadius, float topRadius, float height, uint sliceCount, uint stackCount)
 {
-	return Mesh();
+	return WarpMesh();
 }
 
-Mesh GeoGen::CreateGrid(float width, float depth, uint m, uint n)
+WarpMesh GeoGen::CreateGrid(float width, float depth, uint m, uint n)
 {
 	PROFILE_FUNCTION();
 
-	uint vertCount = m * n;
-	uint faceCount = (m - 1) * (n - 1) * 2;
+	uint VertCount = m * n;
+	uint FaceCount = (m - 1) * (n - 1) * 2;
 
 	float halfWidth = 0.5f * width;
-	float halfDepth = 0.5 * depth;
+	float HalfDepth = 0.5 * depth;
 
 	float dx = width / (n - 1);
 	float dz = depth / (m - 1);
@@ -191,190 +191,190 @@ Mesh GeoGen::CreateGrid(float width, float depth, uint m, uint n)
 	float du = 1.0f / (n - 1);
 	float dv = 1.0f / (m - 1);
 
-	Vector<Vertex> verts;
-	verts.resize(vertCount);
+	Vector<Vertex> Verts;
+	Verts.resize(VertCount);
 
 	for (uint i = 0; i < m; ++i)
 	{
-		float z = halfDepth - i * dz;
+		float z = HalfDepth - i * dz;
 		for (uint j = 0; j < n; ++j)
 		{
 			float x = -halfWidth + j * dx;
 
-			verts[i * n + j].Position = glm::vec3(x, 0.0f, z);
-			verts[i * n + j].Normal = glm::vec3(0.0f, 1.0f, 0.0f);
-			verts[i * n + j].Tangent = glm::vec3(1.0f, 0.0f, 0.0f);
+			Verts[i * n + j].Position = glm::vec3(x, 0.0f, z);
+			Verts[i * n + j].Normal = glm::vec3(0.0f, 1.0f, 0.0f);
+			Verts[i * n + j].Tangent = glm::vec3(1.0f, 0.0f, 0.0f);
 
-			verts[i * n + j].TexCoords.x = j * du;
-			verts[i * n + j].TexCoords.y = j * dv;
+			Verts[i * n + j].TexCoords.x = j * du;
+			Verts[i * n + j].TexCoords.y = j * dv;
 		}
 	}
 
-	Vector<uint> indices;
-	indices.resize(faceCount * 3);
+	Vector<uint> Indices;
+	Indices.resize(FaceCount * 3);
 	uint k = 0;
 	for (uint i = 0; i < m - 1; ++i)
 	{
 		for (uint j = 0; j < n - 1; j++)
 		{
-			indices[k] = i * n + j;
-			indices[k + 1] = i * n + j + 1;
-			indices[k + 2] = (i + 1) * n + j;
+			Indices[k] = i * n + j;
+			Indices[k + 1] = i * n + j + 1;
+			Indices[k + 2] = (i + 1) * n + j;
 
-			indices[k + 3] = (i + 1) * n + j;
-			indices[k + 4] = i * n + j + 1;
-			indices[k + 5] = (i + 1) * n + j + 1;
+			Indices[k + 3] = (i + 1) * n + j;
+			Indices[k + 4] = i * n + j + 1;
+			Indices[k + 5] = (i + 1) * n + j + 1;
 
 			k += 6;
 		}
 	}
 
-	return Mesh(verts, indices);
+	return WarpMesh(Verts, Indices);
 }
 
-Ref<Mesh> GeoGen::CreateQuad(float x, float y, float w, float h, float depth)
+Ref<WarpMesh> GeoGen::CreateQuad(float x, float y, float w, float h, float depth)
 {
 	PROFILE_FUNCTION();
 
-	Vector<Vertex> verts;
-	Vector<uint> indices;
+	Vector<Vertex> Verts;
+	Vector<uint> Indices;
 
-	verts.resize(4);
-	indices.resize(6);
+	Verts.resize(4);
+	Indices.resize(6);
 
-	verts[0] = Vertex(
+	Verts[0] = Vertex(
 	glm::vec3(x, y - h, depth)
 	, glm::vec3(0.0f, 0.0f, -1.0f)
 	, glm::vec2(0.0f, 1.0f)
 	, glm::vec3(1.0f, 0.0f, 0.0f)
 	, glm::vec3(0.0f, 0.0f, 0.0f));
 
-	verts[1] = Vertex(
+	Verts[1] = Vertex(
 		glm::vec3(x, y, depth)
 		, glm::vec3(0.0f, 0.0f, -1.0f)
 		, glm::vec2(0.0f, 0.0f)
 		, glm::vec3(1.0f, 0.0f, 0.0f)
 		, glm::vec3(0.0f, 0.0f, 0.0f));
 
-	verts[2] = Vertex(
+	Verts[2] = Vertex(
 		glm::vec3(x+w, y, depth)
 		, glm::vec3(0.0f, 0.0f, -1.0f)
 		, glm::vec2(1.0f, 0.0f)
 		, glm::vec3(1.0f, 0.0f, 0.0f)
 		, glm::vec3(0.0f, 0.0f, 0.0f));
 
-	verts[3] = Vertex(
+	Verts[3] = Vertex(
 		glm::vec3(x, y - h, depth)
 		, glm::vec3(0.0f, 0.0f, -1.0f)
 		, glm::vec2(1.0f, 1.0f)
 		, glm::vec3(1.0f, 0.0f, 0.0f)
 		, glm::vec3(0.0f, 0.0f, 0.0f));
 
-	indices[0] = 0;
-	indices[1] = 1;
-	indices[2] = 2;
+	Indices[0] = 0;
+	Indices[1] = 1;
+	Indices[2] = 2;
 
-	indices[3] = 0;
-	indices[4] = 2;
-	indices[5] = 3;
+	Indices[3] = 0;
+	Indices[4] = 2;
+	Indices[5] = 3;
 
-	return std::make_shared<Mesh>(verts, indices);
+	return std::make_shared<WarpMesh>(Verts, Indices);
 }
 
-Ref<Mesh> GeoGen::CreateDefaultQuad()
+Ref<WarpMesh> GeoGen::CreateDefaultQuad()
 {
-	Vector<Vertex> verts;
-	Vector<uint> indices;
-	verts.resize(4);
-	indices.resize(6);
+	Vector<Vertex> Verts;
+	Vector<uint> Indices;
+	Verts.resize(4);
+	Indices.resize(6);
 
-	verts[0] = Vertex(
+	Verts[0] = Vertex(
 		glm::vec3(-1.0f, 1.0f, 0.0f)
 		, glm::vec3(0.0f, 0.0f, 0.0f)
 		, glm::vec2(0.0f, 1.0f)
 		, glm::vec3(0.0f, 0.0f, 0.0f)
 		, glm::vec3(0.0f, 0.0f, 0.0f));
 
-	verts[1] = Vertex(
+	Verts[1] = Vertex(
 		glm::vec3(-1.0f, -1.0f, 0.0f)
 		, glm::vec3(0.0f, 0.0f, 0.0f)
 		, glm::vec2(0.0f, 0.0f)
 		, glm::vec3(0.0f, 0.0f, 0.0f)
 		, glm::vec3(0.0f, 0.0f, 0.0f));
 
-	verts[2] = Vertex(
+	Verts[2] = Vertex(
 		glm::vec3(1.0f, 1.0f, 0.0f)
 		, glm::vec3(0.0f, 0.0f, 0.0f)
 		, glm::vec2(1.0f, 1.0f)
 		, glm::vec3(0.0f, 0.0f, 0.0f)
 		, glm::vec3(0.0f, 0.0f, 0.0f));
 
-	verts[3] = Vertex(
+	Verts[3] = Vertex(
 		glm::vec3(1.0f, -1.0f, 0.0f)
 		, glm::vec3(0.0f, 0.0f, 0.0f)
 		, glm::vec2(1.0f, 0.0f)
 		, glm::vec3(0.0f, 0.0f, 0.0f)
 		, glm::vec3(0.0f, 0.0f, 0.0f));
 
-	indices[0] = 0;
-	indices[1] = 1;
-	indices[2] = 2;
+	Indices[0] = 0;
+	Indices[1] = 1;
+	Indices[2] = 2;
 
-	indices[3] = 1;
-	indices[4] = 3;
-	indices[5] = 2;
+	Indices[3] = 1;
+	Indices[4] = 3;
+	Indices[5] = 2;
 
-	return std::make_shared<Mesh>(verts, indices);
+	return std::make_shared<WarpMesh>(Verts, Indices);
 }
 
-void GeoGen::Subdivide(Mesh& mesh)
+void GeoGen::Subdivide(WarpMesh& Mesh)
 {
 	PROFILE_FUNCTION();
 
-	Vector<Vertex> vertCopy = mesh.getVertices();
-	Vector<uint> indCopy = mesh.getIndices();
+	Vector<Vertex> VertCopy = Mesh.GetVertices();
+	Vector<uint> IndCopy = Mesh.GetIndices();
 
-	Vector<Vertex> newVert;
-	Vector<uint> newInd;
+	Vector<Vertex> NewVert;
+	Vector<uint> NewInd;
 
-	uint numTris = (uint)indCopy.size()/3;
-	for (uint i = 0; i < numTris; ++i)
+	uint NumTris = (uint)IndCopy.size()/3;
+	for (uint i = 0; i < NumTris; ++i)
 	{
-		Vertex v0 = vertCopy[indCopy[i * 3 + 0]];
-		Vertex v1 = vertCopy[indCopy[i * 3 + 1]];
-		Vertex v2 = vertCopy[indCopy[i * 3 + 2]];
+		Vertex v0 = VertCopy[IndCopy[i * 3 + 0]];
+		Vertex v1 = VertCopy[IndCopy[i * 3 + 1]];
+		Vertex v2 = VertCopy[IndCopy[i * 3 + 2]];
 
 		//get midpoints
 		Vertex m0 = MidPoint(v0, v1);
 		Vertex m1 = MidPoint(v1, v2);
 		Vertex m2 = MidPoint(v0, v2);
 
-		newVert.push_back(v0);
-		newVert.push_back(v1);
-		newVert.push_back(v2);
-		newVert.push_back(m0);
-		newVert.push_back(m1);
-		newVert.push_back(m2);
+		NewVert.push_back(v0);
+		NewVert.push_back(v1);
+		NewVert.push_back(v2);
+		NewVert.push_back(m0);
+		NewVert.push_back(m1);
+		NewVert.push_back(m2);
 
-		newInd.push_back(i * 6 + 0);
-		newInd.push_back(i * 6 + 3);
-		newInd.push_back(i * 6 + 5);
+		NewInd.push_back(i * 6 + 0);
+		NewInd.push_back(i * 6 + 3);
+		NewInd.push_back(i * 6 + 5);
 
-		newInd.push_back(i * 6 + 3);
-		newInd.push_back(i * 6 + 4);
-		newInd.push_back(i * 6 + 5);
+		NewInd.push_back(i * 6 + 3);
+		NewInd.push_back(i * 6 + 4);
+		NewInd.push_back(i * 6 + 5);
 
-		newInd.push_back(i * 6 + 5);
-		newInd.push_back(i * 6 + 4);
-		newInd.push_back(i * 6 + 2);
+		NewInd.push_back(i * 6 + 5);
+		NewInd.push_back(i * 6 + 4);
+		NewInd.push_back(i * 6 + 2);
 
-		newInd.push_back(i * 6 + 3);
-		newInd.push_back(i * 6 + 1);
-		newInd.push_back(i * 6 + 4);
+		NewInd.push_back(i * 6 + 3);
+		NewInd.push_back(i * 6 + 1);
+		NewInd.push_back(i * 6 + 4);
 	}
 
-	mesh.setVertices(newVert);
-	mesh.setIndices(newInd);
+	Mesh.SetVertices(NewVert);
+	Mesh.SetIndices(NewInd);
 }
 
 Vertex GeoGen::MidPoint(const Vertex& v0, const Vertex& v1)
@@ -389,12 +389,12 @@ Vertex GeoGen::MidPoint(const Vertex& v0, const Vertex& v1)
 	return Vertex(pos, normal, tex, tan, glm::vec3(0.0f, 0.0f, 0.0f));
 }
 
-void GeoGen::BuildCylinderTop(float bottomRadius, float topRadius, float height, uint sliceCount, uint stackCount, Mesh& mesh)
+void GeoGen::BuildCylinderTop(float bottomRadius, float topRadius, float height, uint sliceCount, uint stackCount, WarpMesh& mesh)
 {
 
 }
 
-void GeoGen::BuildCylinderBottomCap(float bottomRadius, float topRadius, float height, uint sliceCount, uint stackCount, Mesh& mesh)
+void GeoGen::BuildCylinderBottomCap(float bottomRadius, float topRadius, float height, uint sliceCount, uint stackCount, WarpMesh& mesh)
 {
 
 }

@@ -26,20 +26,20 @@ public:
 		: m_resourceDirectory(resourceDirectory)
 	{}
 
-	Vector<Ref<Model>> loadModelsAsync(Vector<ModelDesc>& modelArgs, uint numThreads);
-	Ref<Model> loadModel(ModelDesc& desc);
+	Vector<Ref<Model>> LoadModelsAsync(Vector<ModelDesc>& modelArgs, uint numThreads);
+	Ref<Model> LoadModel(ModelDesc& desc);
 
-	Ref<Model> generateQuad();
+	Ref<Model> GenerateQuad();
 
-	Ref<Model> generateGrid(int width, int depth, int m, int n, glm::vec3 pos);
+	Ref<Model> GenerateGrid(int width, int depth, int m, int n, glm::vec3 pos);
 
-	Ref<Model> generateSphereInstanced(Vector<float>& radii, Vector<glm::mat4>& transforms, uint sliceCount, uint stackCount, Ref<GLTexParams> tex = nullptr);
+	Ref<Model> GenerateSphereInstanced(Vector<float>& radii, Vector<glm::mat4>& transforms, uint sliceCount, uint stackCount, Ref<GLTexParams> tex = nullptr);
 
-	Ref<Model> generateSphere(float radius, uint sliceCount, uint stackCount, glm::vec3 pos, Ref<GLTexParams> tex = nullptr);
+	Ref<Model> GenerateSphere(float radius, uint sliceCount, uint stackCount, glm::vec3 pos, Ref<GLTexParams> tex = nullptr);
 	Vector<Ref<GLTexture>> getTextures()
 	{
 		Vector<Ref<GLTexture>> textures;
-		for (auto& [name, texture] : m_textures)
+		for (auto& [name, texture] : Textures)
 		{
 			textures.push_back(texture);
 		}
@@ -49,15 +49,15 @@ public:
 
 private:
 
-	void traverseSceneGraph(aiNode* node, string& directory, Vector<Ref<Mesh>>& meshList, const aiScene* scene);
+	void TraverseSceneGraph(aiNode* node, string& directory, Vector<Ref<WarpMesh>>& meshList, const aiScene* scene);
 
-	Ref<Mesh> loadMesh(aiMesh* mesh, string& directory, const aiScene* scene);
+	Ref<WarpMesh> LoadMesh(aiMesh* mesh, string& directory, const aiScene* scene);
 
-	Vector<Ref<GLTexParams>> loadTextures(aiMaterial* mat, aiTextureType type, string typeName, string& directory);
+	Vector<Ref<GLTexParams>> LoadTextures(aiMaterial* mat, aiTextureType type, string typeName, string& directory);
 
 	//maybe use a uint hash instead of string, hash func would need to be faster than std::hash
-	HashMap<string, Ref<GLTexParams>> m_loadedTextures;
-	HashMap<string, Ref<GLTexture>> m_textures;
+	HashMap<string, Ref<GLTexParams>> LoadedTextures;
+	HashMap<string, Ref<GLTexture>> Textures;
 	HashMap<string, Ref<Model>> m_modelsLoaded;
 
 	string m_resourceDirectory;

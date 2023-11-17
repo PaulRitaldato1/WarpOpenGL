@@ -5,8 +5,8 @@ GLIndexBuffer::GLIndexBuffer(const uint* data, uint count)
 {
 	PROFILE_FUNCTION();
 
-	glGenBuffers(1, &m_id);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id);
+	glGenBuffers(1, &Id);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Id);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint), data, GL_STATIC_DRAW);
 }
 
@@ -14,14 +14,14 @@ GLIndexBuffer::~GLIndexBuffer()
 {
 	PROFILE_FUNCTION();
 
-	glDeleteBuffers(1, &m_id);
+	glDeleteBuffers(1, &Id);
 }
 
 void GLIndexBuffer::Bind() const
 {
 	PROFILE_FUNCTION();
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Id);
 }
 
 void GLIndexBuffer::Unbind() const

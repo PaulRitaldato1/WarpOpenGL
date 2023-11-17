@@ -45,16 +45,16 @@ void MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLs
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-FPCamera camera(glm::vec3(0.0f, 25.0f, 100.0f));
+FPCamera Camera(glm::vec3(0.0f, 25.0f, 100.0f));
 Ref<Scene> g_scene(nullptr);
-bool firstMouse = true;
-float lastX = SCR_WIDTH / 2.0f;
-float lastY = SCR_HEIGHT / 2.0f;
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
+bool bFirstMouse = true;
+float LastX = SCR_WIDTH / 2.0f;
+float LastY = SCR_HEIGHT / 2.0f;
+float DeltaTime = 0.0f;
+float LastFrame = 0.0f;
 
 #ifdef _DEBUG
-void loadRenderDoc()
+void LoadRenderDoc()
 {
 	RENDERDOC_API_1_1_2* rdoc_api = NULL;
 	HINSTANCE hLib = LoadLibraryA("Lib\\renderdoc.dll");
@@ -68,7 +68,7 @@ void loadRenderDoc()
 }
 #endif
 
-GLFWwindow* initGLFW(const string title, const uint width, const uint height)
+GLFWwindow* InitGLFW(const string title, const uint width, const uint height)
 {
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -78,7 +78,7 @@ GLFWwindow* initGLFW(const string title, const uint width, const uint height)
 
 #ifdef _DEBUG
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-	loadRenderDoc();
+	LoadRenderDoc();
 #endif
 
 	GLFWwindow* window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
@@ -95,7 +95,7 @@ GLFWwindow* initGLFW(const string title, const uint width, const uint height)
 	return window;
 }
 
-void initGLAD()
+void InitGLAD()
 {
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
@@ -108,10 +108,10 @@ int main()
 	Instrumentor::Get().BeginSession("Renderer");
 
 	//init libraries
-	GLFWwindow* window = initGLFW("Testing OpenGL", 1920, 1080);
-	initGLAD();
-	ImGuiWrapper imgui(window);
-	RenderPassCollection passCollection;
+	GLFWwindow* Window = InitGLFW("Testing OpenGL", 1920, 1080);
+	InitGLAD();
+	ImGuiWrapper Imgui(Window);
+	RenderPassCollection PassCollection;
 #ifdef _DEBUG
 	//g_renderer.Enable(GL_DEBUG_OUTPUT);
 	g_renderer.Enable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -124,15 +124,15 @@ int main()
 	g_renderer.Enable(GL_MULTISAMPLE);
 	g_renderer.Enable(GL_CULL_FACE);
 
-	//Ref<Demo> CurrentDemo = std::make_shared<BackPacksDemo>();
-	Ref<Demo> CurrentDemo = std::make_shared<Asteroids>();
+	Ref<Demo> CurrentDemo = std::make_shared<BackPacksDemo>();
+	//Ref<Demo> CurrentDemo = std::make_shared<Asteroids>();
 	//Ref<Demo> CurrentDemo = std::make_shared<LightOnPlaneDemo>();
 
-	g_scene = CurrentDemo->MakeScene(window);
+	g_scene = CurrentDemo->MakeScene(Window);
 
-	UniformBufferObject viewProjUBO(2*sizeof(glm::mat4), 0);
-	passCollection.AddGBufferPass(*g_scene);
-	passCollection.AddGBufferLightingPass(*g_scene);
+	UniformBufferObject ViewProjUBO(2*sizeof(glm::mat4), 0);
+	PassCollection.AddGBufferPass(*g_scene);
+	PassCollection.AddGBufferLightingPass(*g_scene);
 
 	//auto textures = loader.getTextures();
 	//passCollection.AddDebugQuadDraw(textures);
@@ -142,11 +142,11 @@ int main()
 	// 
 	// render loop
 	// -----------
-	while (!glfwWindowShouldClose(window))
+	while (!glfwWindowShouldClose(Window))
 	{
 		float currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
+		DeltaTime = currentFrame - LastFrame;
+		LastFrame = currentFrame;
 
 		//Vector<Ref<Shader>>& shaders = passCollection.getShaderManager().getShaders();
 		//imgui.newFrame();
@@ -168,22 +168,22 @@ int main()
 
 		// input
 		// -----
-		processInput(window);
+		processInput(Window);
 
 		//update
-		if (g_scene->hasWindowChanged())
+		if (g_scene->HasWindowChanged())
 		{
 			g_renderPassManager.ExecuteSetups();
 		}
 
-		glm::mat4 projection = glm::perspective(glm::radians(g_scene->getActiveCamera().getZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 5000.0f);
-		glm::mat4 view = g_scene->getActiveCamera().getViewMatrix();
+		glm::mat4 Projection = glm::perspective(glm::radians(g_scene->GetActiveCamera().GetZoom()), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 5000.0f);
+		glm::mat4 View = g_scene->GetActiveCamera().GetViewMatrix();
 
-		viewProjUBO.BindSubdata(projection);
-		viewProjUBO.BindSubdata(view);
+		ViewProjUBO.BindSubdata(Projection);
+		ViewProjUBO.BindSubdata(View);
 
-		g_scene->update(deltaTime);
-		CurrentDemo->Update(deltaTime);
+		g_scene->Update(DeltaTime);
+		CurrentDemo->Update(DeltaTime);
 		// render
 		// ------
 		g_renderPassManager.ExecutePasses();
@@ -193,7 +193,7 @@ int main()
 		// -------------------------------------------------------------------------------
 		{
 			PROFILE_SCOPE("Swap Buffers");
-			glfwSwapBuffers(window);
+			glfwSwapBuffers(Window);
 			glfwPollEvents();
 		}
 	}
@@ -215,15 +215,15 @@ void processInput(GLFWwindow* window)
 	if (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED)
 	{
 		if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-			g_scene->getActiveCamera().processKeyboard(SHIFT, deltaTime);
+			g_scene->GetActiveCamera().ProcessKeyboard(SHIFT, DeltaTime);
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-			g_scene->getActiveCamera().processKeyboard(FORWARD, deltaTime);
+			g_scene->GetActiveCamera().ProcessKeyboard(FORWARD, DeltaTime);
 		if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-			g_scene->getActiveCamera().processKeyboard(BACKWARD, deltaTime);
+			g_scene->GetActiveCamera().ProcessKeyboard(BACKWARD, DeltaTime);
 		if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-			g_scene->getActiveCamera().processKeyboard(LEFT, deltaTime);
+			g_scene->GetActiveCamera().ProcessKeyboard(LEFT, DeltaTime);
 		if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-			g_scene->getActiveCamera().processKeyboard(RIGHT, deltaTime);
+			g_scene->GetActiveCamera().ProcessKeyboard(RIGHT, DeltaTime);
 	}
 	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
 	{
@@ -235,7 +235,7 @@ void processInput(GLFWwindow* window)
 		}
 		else
 		{
-			firstMouse = true;
+			bFirstMouse = true;
 			glfwSetCursorPosCallback(window, mouse_callback);
 			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		}
@@ -250,30 +250,30 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	// make sure the viewport matches the new window dimensions; note that width and 
 	// height will be significantly larger than specified on retina displays.
 	glViewport(0, 0, width, height);
-	g_scene->setWindowChanged(true);
+	g_scene->SetWindowChanged(true);
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
-	if (firstMouse)
+	if (bFirstMouse)
 	{
-		lastX = xpos;
-		lastY = ypos;
-		firstMouse = false;
+		LastX = xpos;
+		LastY = ypos;
+		bFirstMouse = false;
 	}
 
-	float xoffset = xpos - lastX;
-	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+	float xoffset = xpos - LastX;
+	float yoffset = LastY - ypos; // reversed since y-coordinates go from bottom to top
 
-	lastX = xpos;
-	lastY = ypos;
+	LastX = xpos;
+	LastY = ypos;
 
-	g_scene->getActiveCamera().processMouseMovement(xoffset, yoffset);
+	g_scene->GetActiveCamera().ProcessMouseMovement(xoffset, yoffset);
 }
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-	g_scene->getActiveCamera().processMouseScroll(yoffset);
+	g_scene->GetActiveCamera().ProcessMouseScroll(yoffset);
 }
 
 #ifdef _DEBUG

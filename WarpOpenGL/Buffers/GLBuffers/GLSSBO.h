@@ -19,8 +19,8 @@ public:
 	void BindSubdata(const T& data)
 	{
 		Bind();
-		glBufferSubData(GL_SHADER_STORAGE_BUFFER, m_currentOffset, sizeof(T), &data);
-		updateOffset(sizeof(T));
+		glBufferSubData(GL_SHADER_STORAGE_BUFFER, CurrentOffset, sizeof(T), &data);
+		UpdateOffset(sizeof(T));
 		Unbind();
 	}
 
@@ -29,32 +29,36 @@ public:
 	void BindSubdata<Vector<glm::mat4>>(const Vector<glm::mat4>& data)
 	{
 		Bind();
-		glBufferSubData(GL_SHADER_STORAGE_BUFFER, m_currentOffset, data.size() * sizeof(glm::mat4), data.data());
-		updateOffset(data.size() * sizeof(glm::mat4));
+		glBufferSubData(GL_SHADER_STORAGE_BUFFER, CurrentOffset, data.size() * sizeof(glm::mat4), data.data());
+		UpdateOffset(data.size() * sizeof(glm::mat4));
 		Unbind();
-		m_isDirty = false;
+		bIsDirty = false;
 	}
 	void BindRange(uint begin, uint end);
 
-	bool isDirty()
+	bool IsDirty()
 	{
-		return m_isDirty;
+		return bIsDirty;
 	}
 
 private:
 
-	void updateOffset(uint size)
+	void UpdateOffset(uint size)
 	{
-		FATAL_ASSERT(m_currentOffset + size <= m_size, "Attemping to bind more memory than buffer contains!");
+		FATAL_ASSERT(CurrentOffset + size <= Size, "Attemping to bind more memory than buffer contains!");
 
-		if (m_currentOffset + size == m_size)
-			m_currentOffset = 0;
+		if (CurrentOffset + size == Size)
+		{
+			CurrentOffset = 0;
+		}
 		else
-			m_currentOffset += size;
+		{
+			CurrentOffset += size;
+		}
 	}
 
-	uint m_currentOffset;
-	uint m_size;
-	uint m_bindingPoint;
-	bool m_isDirty;
+	uint CurrentOffset;
+	uint Size;
+	uint BindingPoint;
+	bool bIsDirty;
 };

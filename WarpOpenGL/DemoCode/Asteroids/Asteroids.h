@@ -17,7 +17,7 @@ public:
 	virtual void Update(float DeltaTime) override;
 private:
 
-	float m_radius = 150.0f;
-	Ref<Model> m_planet;
-	Vector<glm::mat4> generateAsteroidPositions(uint amount);
+	float Radius = 150.0f;
+	Ref<Model> Planet;
+	Vector<glm::mat4> GenerateAsteroidPositions(uint amount);
 };

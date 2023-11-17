@@ -25,10 +25,10 @@ public:
 
 	void AttachTexture(GLenum attachmentType, Ref<GLTexture> texture);
 	
-	void setDrawBuffers();
+	void SetDrawBuffers();
 	void AttachRenderBuffer(Ref<GLRenderBuffer> rbo);
 
 private:
-	uint m_numColorAttachments;
-	Vector<uint> m_colorAttachments;
+	uint NumColorAttachments;
+	Vector<uint> ColorAttachments;
 };

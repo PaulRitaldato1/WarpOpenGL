@@ -5,36 +5,36 @@
 class RenderPassManager 
 {
 public:
-	RenderPassManager() : m_isFirstExecute(true)
+	RenderPassManager() : bIsFirstExecute(true)
 	{}
 
 	void AddPass(Ref<RenderPass> pass)
 	{
-		m_passOrder.push_back(pass);
-		m_passLookup[m_passOrder.back()->getName()] = m_passOrder.back();
+		PassOrder.push_back(pass);
+		PassLookup[PassOrder.back()->GetName()] = PassOrder.back();
 
-		m_passOrder.back()->ExecuteSetup(nullptr);
+		PassOrder.back()->ExecuteSetup(nullptr);
 	}
 
 	void AddPass(string passName, string dependency, std::function<Ref<IPassData>(Ref<IPassData>)> setup, std::function<Ref<IPassData>(Ref<IPassData>, Ref<IPassData>)> execute)
 	{
-		m_passOrder.push_back(std::make_shared<RenderPass>(passName, dependency, setup, execute));
-		m_passLookup[m_passOrder.back()->getName()] = m_passOrder.back();
+		PassOrder.push_back(std::make_shared<RenderPass>(passName, dependency, setup, execute));
+		PassLookup[PassOrder.back()->GetName()] = PassOrder.back();
 
-		m_passOrder.back()->ExecuteSetup(nullptr);
+		PassOrder.back()->ExecuteSetup(nullptr);
 	}
 
 	void AddPass(string passName, std::function<Ref<IPassData>(Ref<IPassData>)> setup, std::function<Ref<IPassData>(Ref<IPassData>, Ref<IPassData>)> execute)
 	{
-		m_passOrder.push_back(std::make_shared<RenderPass>(passName, setup, execute));
-		m_passLookup[m_passOrder.back()->getName()] = m_passOrder.back();
+		PassOrder.push_back(std::make_shared<RenderPass>(passName, setup, execute));
+		PassLookup[PassOrder.back()->GetName()] = PassOrder.back();
 
-		m_passOrder.back()->ExecuteSetup(nullptr);
+		PassOrder.back()->ExecuteSetup(nullptr);
 	}
 
 	void ExecuteSetups()
 	{
-		for (auto& pass : m_passOrder)
+		for (auto& pass : PassOrder)
 			pass->ExecuteSetup(nullptr);
 	}
 
@@ -42,48 +42,48 @@ public:
 	{
 		PROFILE_SCOPE("Frame Start");
 
-		if (m_isFirstExecute)
+		if (bIsFirstExecute)
 		{
-			resolveDependencies();
-			m_isFirstExecute = false;
+			ResolveDependencies();
+			bIsFirstExecute = false;
 		}
 
-		for (Ref<RenderPass>& pass : m_passOrder)
+		for (Ref<RenderPass>& PassItem : PassOrder)
 		{
-			if (m_dependencies.find(pass->getName()) == m_dependencies.end())
+			if (Dependencies.find(PassItem->GetName()) == Dependencies.end())
 			{
-				pass->ExecutePass(nullptr);
+				PassItem->ExecutePass(nullptr);
 			}
 			else
 			{
-				pass->ExecutePass(m_dependencies[pass->getName()]->getOutput());
+				PassItem->ExecutePass(Dependencies[PassItem->GetName()]->GetOutput());
 			}
 		}
 	}
 
-	Ref<IPassData> getPassOutput(string passName)
+	Ref<IPassData> GetPassOutput(string passName)
 	{
-		return m_passLookup[passName]->getOutput();
+		return PassLookup[passName]->GetOutput();
 	}
 
 private:
 
-	void resolveDependencies()
+	void ResolveDependencies()
 	{
-		for (auto& pass : m_passOrder)
+		for (auto& PassItem : PassOrder)
 		{
-			string dependency = pass->getDependency();
-			if (dependency.size() > 0)
+			string Dependency = PassItem->GetDependency();
+			if (Dependency.size() > 0)
 			{
-				m_dependencies[pass->getName()] = m_passLookup[dependency];
+				Dependencies[PassItem->GetName()] = PassLookup[Dependency];
 			}
 		}
 	}
 
-	bool m_isFirstExecute;
-	Vector<Ref<RenderPass>> m_passOrder;
-	HashMap<string, Ref<RenderPass>> m_passLookup;
-	HashMap<string, Ref<RenderPass>> m_dependencies;
+	bool bIsFirstExecute;
+	Vector<Ref<RenderPass>> PassOrder;
+	HashMap<string, Ref<RenderPass>> PassLookup;
+	HashMap<string, Ref<RenderPass>> Dependencies;
 };
 
 extern RenderPassManager g_renderPassManager;

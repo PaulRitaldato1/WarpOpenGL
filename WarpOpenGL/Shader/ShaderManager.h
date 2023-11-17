@@ -13,59 +13,59 @@ class ShaderManager
 public:
 
 	//compiles all shaders in specified json file
-	ShaderManager(string&& filePath) : m_filePath(std::move(filePath))
+	ShaderManager(string&& filePath) : FilePath(std::move(filePath))
 	{
 		PROFILE_SCOPE("ShaderCompile");
 
 		using json = nlohmann::json;
 
-		std::ifstream file(m_filePath);
-		FATAL_ASSERT(file.is_open(), "File at path " + m_filePath + " failed to open!");
+		std::ifstream File(FilePath);
+		FATAL_ASSERT(File.is_open(), "File at path " + FilePath + " failed to open!");
 
 		json jFile;
 
-		file >> jFile;
+		File >> jFile;
 
-		for (const auto& item : jFile.items())
+		for (const auto& FileToken : jFile.items())
 		{
-			string shaderName = item.key();
-			ShaderParams params;
+			string ShaderName = FileToken.key();
+			ShaderParams Params;
 
-			for (const auto& path : item.value().items())
+			for (const auto& Path : FileToken.value().items())
 			{
-				string key = path.key();
-				if (key == "vertPath")
+				string Key = Path.key();
+				if (Key == "vertPath")
 				{
-					params.vertPath = path.value();
+					Params.VertPath = Path.value();
 				}
-				else if (key == "fragPath")
+				else if (Key == "fragPath")
 				{
-					params.fragPath = path.value();
+					Params.FragPath = Path.value();
 				}
-				else if (key == "geoPath")
+				else if (Key == "geoPath")
 				{
-					params.geoPath = item.value();
+					Params.GeoPath = FileToken.value();
 				}
-				else if (key == "computePath")
+				else if (Key == "computePath")
 				{
-					params.computePath = item.value();
+					Params.ComputePath = FileToken.value();
 				}
 			}
 			
-			params.name = shaderName;
-			m_shaders.push_back(std::make_shared<Shader>(params));
+			Params.Name = ShaderName;
+			Shaders.push_back(std::make_shared<GLSLShader>(Params));
 			//map shader names to an index
-			m_shaderIndexMap[shaderName] = m_shaders.size() - 1;
+			ShaderIndexMap[ShaderName] = Shaders.size() - 1;
 		}
 	}
 
-	Shader& getShader(string& name) { return *m_shaders[getShaderId(name)]; }
-	uint getShaderId(string&& name) { return m_shaderIndexMap[name]; }
-	uint getShaderId(string& name) { return m_shaderIndexMap[name]; }
-	Shader& getShaderById(uint id) { return *m_shaders[id]; }
-	Vector<Ref<Shader>>& getShaders() { return m_shaders; }
+	GLSLShader& GetShader(string& name) { return *Shaders[GetShaderId(name)]; }
+	uint GetShaderId(string&& name) { return ShaderIndexMap[name]; }
+	uint GetShaderId(string& name) { return ShaderIndexMap[name]; }
+	GLSLShader& GetShaderById(uint id) { return *Shaders[id]; }
+	Vector<Ref<GLSLShader>>& GetShaders() { return Shaders; }
 private:
-	Vector<Ref<Shader>> m_shaders;
-	HashMap<string, uint> m_shaderIndexMap;
-	string m_filePath;
+	Vector<Ref<GLSLShader>> Shaders;
+	HashMap<string, uint> ShaderIndexMap;
+	string FilePath;
 };

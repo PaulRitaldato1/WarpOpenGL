@@ -4,7 +4,7 @@
 class GLIndexBuffer : public GenericBuffer
 {
 private:
-	uint m_count;
+	uint Count;
 public:
 	GLIndexBuffer(const uint* data, uint count);
 	~GLIndexBuffer();
@@ -12,5 +12,5 @@ public:
 	void Bind() const override;
 	void Unbind() const override;
 
-	uint getCount() { return m_count; }
+	uint getCount() { return Count; }
 };

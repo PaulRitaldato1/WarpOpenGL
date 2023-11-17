@@ -6,11 +6,11 @@
 
 struct GLVertexBufferElement
 {
-	uint type;
-	uint count;
-	unsigned char normalized;
-	uint offset;
-	static uint getSizeOfType(uint type)
+	uint Type;
+	uint Count;
+	unsigned char Normalized;
+	uint Offset;
+	static uint GetSizeOfType(uint type)
 	{
 		switch (type)
 		{
@@ -26,12 +26,12 @@ struct GLVertexBufferElement
 class GLVertexBufferLayout
 {
 private:
-	Vector<GLVertexBufferElement> m_elements;
-	uint m_stride;
+	Vector<GLVertexBufferElement> Elements;
+	uint Stride;
 public:
 
 	GLVertexBufferLayout()
-		: m_stride(0) {}
+		: Stride(0) {}
 
 	template<typename T>
 	void Push(uint count)
@@ -42,22 +42,22 @@ public:
 	template<>
 	void Push<float>(uint count)
 	{
-		m_elements.push_back({ GL_FLOAT, count, GL_FALSE, m_stride });
-		m_stride += count * GLVertexBufferElement::getSizeOfType(GL_FLOAT);
+		Elements.push_back({ GL_FLOAT, count, GL_FALSE, Stride });
+		Stride += count * GLVertexBufferElement::GetSizeOfType(GL_FLOAT);
 	}
 
 	template<>
 	void Push<uint>(uint count)
 	{
-		m_elements.push_back({GL_UNSIGNED_INT, count, GL_FALSE, m_stride });
-		m_stride += count * GLVertexBufferElement::getSizeOfType(GL_UNSIGNED_INT);
+		Elements.push_back({GL_UNSIGNED_INT, count, GL_FALSE, Stride });
+		Stride += count * GLVertexBufferElement::GetSizeOfType(GL_UNSIGNED_INT);
 	}
 
 	template<>
 	void Push<unsigned char>(uint count)
 	{
-		m_elements.push_back({ GL_UNSIGNED_BYTE, count, GL_TRUE, m_stride });
-		m_stride += count * GLVertexBufferElement::getSizeOfType(GL_UNSIGNED_BYTE);
+		Elements.push_back({ GL_UNSIGNED_BYTE, count, GL_TRUE, Stride });
+		Stride += count * GLVertexBufferElement::GetSizeOfType(GL_UNSIGNED_BYTE);
 	}
 
 	template<>
@@ -76,6 +76,6 @@ public:
 		}
 	}
 
-	const Vector<GLVertexBufferElement>& getElements() const { return m_elements; }
-	uint getStride() const { return m_stride; }
+	const Vector<GLVertexBufferElement>& GetElements() const { return Elements; }
+	uint GetStride() const { return Stride; }
 };

@@ -9,89 +9,89 @@ class Pointlight : public ILight
 
 public:
 	Pointlight(glm::vec3 position, float intensity, float radius, glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f))
-		: m_position(position)
-		, m_color(color)
-		, m_intensity(intensity)
-		, m_radius(radius)
+		: Position(position)
+		, Color(color)
+		, Intensity(intensity)
+		, Radius(radius)
 	{
-		ModelLoader loader("/");
+		ModelLoader Loader("/");
 		//glm::mat4 model = glm::mat4(1.0f);
 		//model = glm::translate(model, position);
 		//model = glm::scale(model, glm::vec3(radius, radius, radius));
-		m_lightVolume = loader.generateSphere(radius, 10, 10, position);
+		LightVolume = Loader.GenerateSphere(radius, 10, 10, position);
 		//m_lightVolume = loader.loadModel(desc); //use the planet as a sphere
 		//m_lightVolume->getMeshes()[0]->setupMesh();
 	}
 
-	const Array<glm::mat4, 6>& getViewMatricies()
+	const Array<glm::mat4, 6>& GetViewMatricies()
 	{
 		
 	}
 
-	void setColor(glm::vec3 color) { m_color = color; }
+	void SetColor(glm::vec3 color) { Color = color; }
 
 
-	glm::vec3 getPosition() const { return m_position; }
-	void setPosition(glm::vec3 val) { m_position = val; }
+	glm::vec3 GetPosition() const { return Position; }
+	void SetPosition(glm::vec3 val) { Position = val; }
 
-	void setIsShadowCaster(bool val) { m_shadowCaster = val; }
+	void SetIsShadowCaster(bool val) { bIsShadowCaster = val; }
 
 
-	LightType getType() const override
+	LightType GetType() const override
 	{
 		return LightType::POINTLIGHT;
 	}
 
 
-	bool getIsShadowCaster() const override
+	bool GetIsShadowCaster() const override
 	{
-		return m_shadowCaster;
+		return bIsShadowCaster;
 	}
 
 
-	glm::vec3 getColor() const override
+	glm::vec3 GetColor() const override
 	{
-		return m_color;
+		return Color;
 	}
 
 
-	LightShaderParams getShaderParams() const override
+	LightShaderParams GetShaderParams() const override
 	{
-		LightShaderParams params;
-		params.color = m_color;
-		params.enable = true;
-		params.intensity = m_intensity;
-		params.position = m_position;
-		params.radius = m_radius;
-		params.type = LightType::POINTLIGHT;
+		LightShaderParams Params;
+		Params.Color = Color;
+		Params.bEnable = true;
+		Params.Intensity = Intensity;
+		Params.Position = Position;
+		Params.Radius = Radius;
+		Params.Type = LightType::POINTLIGHT;
 
-		return params;
+		return Params;
 	}
 
-	float getIntensity() const { return m_intensity; }
-	void setIntensity(float val) { m_intensity = val; }
+	float GetIntensity() const { return Intensity; }
+	void SetIntensity(float val) { Intensity = val; }
 
-	float getRange() const { return m_radius; }
-	void setRange(float val) { m_radius = val; }
+	float GetRange() const { return Radius; }
+	void SetRange(float val) { Radius = val; }
 
-	Model& getLightVolume() const override
+	Model& GetLightVolume() const override
 	{
-		return *m_lightVolume;
+		return *LightVolume;
 	}
 
-	void setDistanceToCamera(float value) { m_distanceToCamera = value; }
-	float getDistanceToCamera() const { return m_distanceToCamera; }
+	void SetDistanceToCamera(float value) { DistanceToCamera = value; }
+	float GetDistanceToCamera() const { return DistanceToCamera; }
 private:
 
-	bool m_shadowCaster;
+	bool bIsShadowCaster;
 	//optinal mesh in case the light can be draw (i.e lightbulb or spotlight mesh)
-	Ref<Mesh> m_mesh;
-	Ref<Model> m_lightVolume;
+	Ref<WarpMesh> Mesh;
+	Ref<Model> LightVolume;
 
-	glm::vec3 m_position;
-	glm::vec3 m_color;
-	float m_intensity;
-	float m_radius;
+	glm::vec3 Position;
+	glm::vec3 Color;
+	float Intensity;
+	float Radius;
 
-	float m_distanceToCamera;
+	float DistanceToCamera;
 };

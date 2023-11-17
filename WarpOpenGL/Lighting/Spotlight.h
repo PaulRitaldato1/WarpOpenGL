@@ -7,105 +7,105 @@ class Spotlight : public ILight
 public:
 
 	Spotlight(glm::vec3 position, glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f), float radius = 10.0f, float yaw = 0.0f, float pitch = 0.0f) :
-		m_position(position)
-		, m_worldUp(up)
-		, m_color(color)
-		, m_radius(radius)
-		, m_yaw(yaw)
-		, m_pitch(pitch)
+		Position(position)
+		, WorldUp(up)
+		, Color(color)
+		, Radius(radius)
+		, Yaw(yaw)
+		, Pitch(pitch)
 	{
 		// TODO set light volume as cone
-		updateVectors();
+		UpdateVectors();
 	}
 
 	glm::mat4 getViewMatrix()
 	{
-		return glm::lookAt(m_position, m_position + m_front, m_up);
+		return glm::lookAt(Position, Position + Front, Up);
 	}
 
-	glm::vec3 getPosition() const { return m_position; }
-	void setPosition(glm::vec3 val) { m_position = val; }
+	glm::vec3 GetPosition() const { return Position; }
+	void SetPosition(glm::vec3 val) { Position = val; }
 	
-	glm::vec3 getFront() const { return m_front; }
-	void setFront(glm::vec3 val) { m_front = val; }
+	glm::vec3 GetFront() const { return Front; }
+	void SetFront(glm::vec3 val) { Front = val; }
 	
-	glm::vec3 getUp() const { return m_up; }
-	void setUp(glm::vec3 val) { m_up = val; }
+	glm::vec3 GetUp() const { return Up; }
+	void SetUp(glm::vec3 val) { Up = val; }
 	
-	glm::vec3 getRight() const { return m_right; }
-	void setRight(glm::vec3 val) { m_right = val; }
+	glm::vec3 GetRight() const { return Right; }
+	void SetRight(glm::vec3 val) { Right = val; }
 	
-	glm::vec3 getWorldUp() const { return m_worldUp; }
-	void setWorldUp(glm::vec3 val) { m_worldUp = val; }
+	glm::vec3 GetWorldUp() const { return WorldUp; }
+	void SetWorldUp(glm::vec3 val) { WorldUp = val; }
 	
-	glm::vec3 getColor() const override { return m_color; }
-	void setColor(glm::vec3 val) { m_color = val; }
+	glm::vec3 GetColor() const override { return Color; }
+	void SetColor(glm::vec3 val) { Color = val; }
 	
-	float getYaw() const { return m_yaw; }
-	void setYaw(float val) { m_yaw = val; }
+	float GetYaw() const { return Yaw; }
+	void SetYaw(float val) { Yaw = val; }
 	
-	float getPitch() const { return m_pitch; }
-	void setPitch(float val) { m_pitch = val; }
+	float GetPitch() const { return Pitch; }
+	void SetPitch(float val) { Pitch = val; }
 
-	void setShadowCaster(bool val) { m_shadowCaster = val; }
+	void SetShadowCaster(bool val) { bIsShadowCaster = val; }
 
-	LightType getType() const override { return LightType::SPOTLIGHT; }
+	LightType GetType() const override { return LightType::SPOTLIGHT; }
 
-	bool getIsShadowCaster() const override
+	bool GetIsShadowCaster() const override
 	{
-		return m_shadowCaster;
+		return bIsShadowCaster;
 	}
 
 
-	LightShaderParams getShaderParams() const override
+	LightShaderParams GetShaderParams() const override
 	{
-		LightShaderParams params;
-		params.color = m_color;
-		params.direction = m_position + m_front;
-		params.enable = true;
-		params.intensity = m_intensity;
-		params.position = m_position;
-		params.radius = m_range;
-		params.spotlightAngle = m_angle;
-		params.type = LightType::SPOTLIGHT;
+		LightShaderParams Params;
+		Params.Color = Color;
+		Params.Direction = Position + Front;
+		Params.bEnable = true;
+		Params.Intensity = Intensity;
+		Params.Position = Position;
+		Params.Radius = Range;
+		Params.SpotlightAngle = Angle;
+		Params.Type = LightType::SPOTLIGHT;
 
-		return params;
+		return Params;
 	}
 
-	Model& getLightVolume() const override { return *m_lightVolume; }
+	Model& GetLightVolume() const override { return *LightVolume; }
 private:
 
-	void updateVectors()
+	void UpdateVectors()
 	{
-		glm::vec3 front;
-		front.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
-		front.y = sin(glm::radians(m_pitch));
-		front.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+		glm::vec3 FrontCalc;
+		FrontCalc.x = cos(glm::radians(Yaw)) * cos(glm::radians(Pitch));
+		FrontCalc.y = sin(glm::radians(Pitch));
+		FrontCalc.z = sin(glm::radians(Yaw)) * cos(glm::radians(Pitch));
 
-		m_front = glm::normalize(front);
-		m_right = glm::normalize(glm::cross(m_front, m_worldUp));
-		m_up = glm::normalize(glm::cross(m_right, m_front));
+		Front = glm::normalize(FrontCalc);
+		Right = glm::normalize(glm::cross(Front, WorldUp));
+		Up = glm::normalize(glm::cross(Right, Front));
 	}
 
-	bool m_shadowCaster;
+	bool bIsShadowCaster;
 
 	//optional mesh in case the light can be draw (i.e lightbulb or spotlight mesh)
-	Ref<Mesh> m_mesh;
-	Ref<Model> m_lightVolume;
+	Ref<WarpMesh> Mesh;
+	Ref<Model> LightVolume;
 
-	glm::vec3 m_position;
-	glm::vec3 m_front;
-	glm::vec3 m_up;
-	glm::vec3 m_right;
-	glm::vec3 m_worldUp;
+	glm::vec3 Position;
+	glm::vec3 Front;
+	glm::vec3 Up;
+	glm::vec3 Right;
+	glm::vec3 WorldUp;
 
-	glm::vec3 m_color;
-	float m_range;
-	float m_intensity;
-	float m_angle;
+	glm::vec3 Color;
+	float Range;
+	float Intensity;
+	float Angle;
 
-	bool m_enabled;
-	float m_yaw;
-	float m_pitch;
-	float m_radius;
+	bool bEnabled;
+	float Yaw;
+	float Pitch;
+	float Radius;
 };

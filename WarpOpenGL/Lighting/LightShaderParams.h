@@ -7,15 +7,15 @@
 //this should mirror the light struct on the shader side.
 struct LightShaderParams
 {
-	glm::vec3 positionVS;
-	glm::vec3 position;
-	glm::vec3 direction;
+	glm::vec3 PositionVS;
+	glm::vec3 Position;
+	glm::vec3 Direction;
 
-	glm::vec3 color;
+	glm::vec3 Color;
 
-	float spotlightAngle;
-	float radius;
-	float intensity;
-	bool enable;
-	LightType type;
+	float SpotlightAngle;
+	float Radius;
+	float Intensity;
+	bool bEnable;
+	LightType Type;
 };

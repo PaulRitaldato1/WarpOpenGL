@@ -10,51 +10,51 @@
 
 struct ShaderParams
 {
-	string name;
-	string vertPath;
-	string fragPath;
-	string geoPath;
-	string computePath;
+	string Name;
+	string VertPath;
+	string FragPath;
+	string GeoPath;
+	string ComputePath;
 };
 
-class Shader
+class GLSLShader
 {
 public:
 
 
-	Shader(string vertexPath, string fragmentPath, string geometryPath = "") :
-		m_vertPath(vertexPath)
-		, m_fragPath(fragmentPath)
-		, m_geoPath(geometryPath)
+	GLSLShader(string vertexPath, string fragmentPath, string geometryPath = "") :
+		VertPath(vertexPath)
+		, FragPath(fragmentPath)
+		, GeoPath(geometryPath)
 	{
-		compile();
+		Compile();
 	}
 
-	Shader(ShaderParams& params) : m_name(params.name)
+	GLSLShader(ShaderParams& params) : Name(params.Name)
 	{
 
 		//might not need this since string will be "" and ignored during compile anyway
-		if (params.vertPath.size() > 0)
+		if (params.VertPath.size() > 0)
 		{
-			m_vertPath = params.vertPath;
+			VertPath = params.VertPath;
 		}
-		if (params.fragPath.size() > 0)
+		if (params.FragPath.size() > 0)
 		{
-			m_fragPath = params.fragPath;
+			FragPath = params.FragPath;
 		}
-		if (params.geoPath.size() > 0)
+		if (params.GeoPath.size() > 0)
 		{
-			m_geoPath = params.geoPath;
+			GeoPath = params.GeoPath;
 		}
-		if (params.computePath.size() > 0)
+		if (params.ComputePath.size() > 0)
 		{
-			m_computePath = params.computePath;
+			ComputePath = params.ComputePath;
 		}
 
-		compile();
+		Compile();
 	}
 
-	Shader(string computePath) : m_computePath(computePath)
+	GLSLShader(string computePath) : ComputePath(computePath)
 	{
 		string cCode;
 
@@ -64,7 +64,7 @@ public:
 
 		try
 		{
-			cFile.open(m_computePath);
+			cFile.open(ComputePath);
 			std::stringstream cStream;
 			cStream << cFile.rdbuf();
 			cFile.close();
@@ -80,25 +80,25 @@ public:
 		uint computeId = glCreateShader(GL_COMPUTE_SHADER);
 		glShaderSource(computeId, 1, &cShaderCode, NULL);
 		glCompileShader(computeId);
-		checkCompileErrors(computeId, shaderType::COMPUTE);
+		CheckCompileErrors(computeId, ShaderType::COMPUTE);
 
-		m_id = glCreateProgram();
-		glAttachShader(m_id, computeId);
-		glLinkProgram(m_id);
-		checkCompileErrors(m_id, shaderType::PROGRAM);
+		Id = glCreateProgram();
+		glAttachShader(Id, computeId);
+		glLinkProgram(Id);
+		CheckCompileErrors(Id, ShaderType::PROGRAM);
 
 		glDeleteShader(computeId);
 	}
 
-	void recompile()
+	void Recompile()
 	{
 		Unbind();
-		glDeleteShader(m_id);
-		compile();
+		glDeleteShader(Id);
+		Compile();
 	}
 
 	//separate gl calls into their own function
-	void compile()
+	void Compile()
 	{
 		string vCode;
 		string fCode;
@@ -115,8 +115,8 @@ public:
 
 		try
 		{
-			vFile.open(m_vertPath);
-			fFile.open(m_fragPath);
+			vFile.open(VertPath);
+			fFile.open(FragPath);
 
 			std::stringstream vStream;
 			std::stringstream fStream;
@@ -129,9 +129,9 @@ public:
 			vCode = vStream.str();
 			fCode = fStream.str();
 
-			if (m_geoPath != "")
+			if (GeoPath != "")
 			{
-				gFile.open(m_geoPath);
+				gFile.open(GeoPath);
 				std::stringstream gStream;
 				gStream << gFile.rdbuf();
 				gFile.close();
@@ -141,50 +141,50 @@ public:
 		}
 		catch (std::ifstream::failure& e)
 		{
-			std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ for shader " << m_name << ": "<<  e.what() << std::endl;
+			std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ for shader " << Name << ": "<<  e.what() << std::endl;
 		}
 
 		const char* vShaderCode = vCode.c_str();
 		const char* fShaderCode = fCode.c_str();
 
-		uint vertId = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(vertId, 1, &vShaderCode, NULL);
-		glCompileShader(vertId);
-		checkCompileErrors(vertId, shaderType::VERTEX);
+		uint VertId = glCreateShader(GL_VERTEX_SHADER);
+		glShaderSource(VertId, 1, &vShaderCode, NULL);
+		glCompileShader(VertId);
+		CheckCompileErrors(VertId, ShaderType::VERTEX);
 
-		uint fragId = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(fragId, 1, &fShaderCode, NULL);
-		glCompileShader(fragId);
-		checkCompileErrors(fragId, shaderType::FRAGMENT);
+		uint FragId = glCreateShader(GL_FRAGMENT_SHADER);
+		glShaderSource(FragId, 1, &fShaderCode, NULL);
+		glCompileShader(FragId);
+		CheckCompileErrors(FragId, ShaderType::FRAGMENT);
 
-		uint geoId;
-		if (m_geoPath != "")
+		uint GeoId;
+		if (GeoPath != "")
 		{
 			const char* gShaderCode = gCode.c_str();
-			geoId = glCreateShader(GL_GEOMETRY_SHADER);
-			glShaderSource(geoId, 1, &gShaderCode, NULL);
-			glCompileShader(geoId);
-			checkCompileErrors(geoId, shaderType::GEOMETRY);
+			GeoId = glCreateShader(GL_GEOMETRY_SHADER);
+			glShaderSource(GeoId, 1, &gShaderCode, NULL);
+			glCompileShader(GeoId);
+			CheckCompileErrors(GeoId, ShaderType::GEOMETRY);
 		}
 
-		m_id = glCreateProgram();
-		glAttachShader(m_id, vertId);
-		glAttachShader(m_id, fragId);
-		if (m_geoPath != "")
-			glAttachShader(m_id, geoId);
-		glLinkProgram(m_id);
-		checkCompileErrors(m_id, shaderType::PROGRAM);
+		Id = glCreateProgram();
+		glAttachShader(Id, VertId);
+		glAttachShader(Id, FragId);
+		if (GeoPath != "")
+			glAttachShader(Id, GeoId);
+		glLinkProgram(Id);
+		CheckCompileErrors(Id, ShaderType::PROGRAM);
 
-		glDeleteShader(vertId);
-		glDeleteShader(fragId);
-		if (m_geoPath != "")
-			glDeleteShader(geoId);
+		glDeleteShader(VertId);
+		glDeleteShader(FragId);
+		if (GeoPath != "")
+			glDeleteShader(GeoId);
 
 	}
 
 	void Bind()
 	{
-		glUseProgram(m_id);
+		glUseProgram(Id);
 	}
 
 	void Unbind()
@@ -193,111 +193,111 @@ public:
 	}
 
 	template<typename T>
-	void setUniform(const std::string& name, const T& value)
+	void SetUniform(const std::string& name, const T& value)
 	{
 		string error = "Specialization of type `" + string(typeid(T).name()) + "` should not be generated. Please implement a manual specialization to resolve this error";
 		FATAL_ASSERT(false, error);
 	}
 
 	template<>
-	void setUniform<bool>(const std::string& name, const bool& value)
+	void SetUniform<bool>(const std::string& name, const bool& value)
 	{
-		glUniform1i(getUniformLocation(name), (int)value);
+		glUniform1i(GetUniformLocation(name), (int)value);
 	}
 	// ------------------------------------------------------------------------
 	template<>
-	void setUniform<int>(const std::string& name, const int& value)
+	void SetUniform<int>(const std::string& name, const int& value)
 	{
 		glUniform1i(getUniformLocation(name), value);
 	}
 	template<>
-	void setUniform<uint>(const std::string& name, const uint& value)
+	void SetUniform<uint>(const std::string& name, const uint& value)
 	{
-		glUniform1ui(getUniformLocation(name), value);
+		glUniform1ui(GetUniformLocation(name), value);
 	}
 	// ------------------------------------------------------------------------
 	template<>
-	void setUniform<float>(const std::string& name, const float& value)
+	void SetUniform<float>(const std::string& name, const float& value)
 	{
-		glUniform1f(getUniformLocation(name), value);
+		glUniform1f(GetUniformLocation(name), value);
 	}
 	// ------------------------------------------------------------------------
 	template<>
-	void setUniform<glm::vec2>(const std::string& name, const glm::vec2& value)
+	void SetUniform<glm::vec2>(const std::string& name, const glm::vec2& value)
 	{
-		glUniform2fv(getUniformLocation(name), 1, &value[0]);
+		glUniform2fv(GetUniformLocation(name), 1, &value[0]);
 	}
 	// ------------------------------------------------------------------------
 	template<>
-	void setUniform<glm::vec3>(const std::string& name, const glm::vec3& value)
+	void SetUniform<glm::vec3>(const std::string& name, const glm::vec3& value)
 	{
-		glUniform3fv(getUniformLocation(name), 1, &value[0]);
+		glUniform3fv(GetUniformLocation(name), 1, &value[0]);
 	}
 	// ------------------------------------------------------------------------
 	template<>
-	void setUniform<glm::vec4>(const std::string& name, const glm::vec4& value)
+	void SetUniform<glm::vec4>(const std::string& name, const glm::vec4& value)
 	{
-		glUniform4fv(getUniformLocation(name), 1, &value[0]);
+		glUniform4fv(GetUniformLocation(name), 1, &value[0]);
 	}
 	// ------------------------------------------------------------------------
 	template<>
-	void setUniform<glm::mat2>(const std::string& name, const glm::mat2& mat)
+	void SetUniform<glm::mat2>(const std::string& name, const glm::mat2& mat)
 	{
-		glUniformMatrix2fv(getUniformLocation(name), 1, GL_FALSE, &mat[0][0]);
+		glUniformMatrix2fv(GetUniformLocation(name), 1, GL_FALSE, &mat[0][0]);
 	}
 	// ------------------------------------------------------------------------
 	template<>
-	void setUniform<glm::mat3>(const std::string& name, const glm::mat3& mat)
+	void SetUniform<glm::mat3>(const std::string& name, const glm::mat3& mat)
 	{
-		glUniformMatrix3fv(getUniformLocation(name), 1, GL_FALSE, &mat[0][0]);
+		glUniformMatrix3fv(GetUniformLocation(name), 1, GL_FALSE, &mat[0][0]);
 	}
 	// ------------------------------------------------------------------------
 	template<>
-	void setUniform<glm::mat4>(const std::string& name, const glm::mat4& mat)
+	void SetUniform<glm::mat4>(const std::string& name, const glm::mat4& mat)
 	{
-		glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, &mat[0][0]);
+		glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &mat[0][0]);
 	}
 
-	uint getId() const { return m_id; }
-	const string& getName() const { return m_name; }
+	uint GetId() const { return Id; }
+	const string& GetName() const { return Name; }
 
 private:
 
-	HashMap<string, int> m_locationCache;
-	string m_vertPath;
-	string m_fragPath;
-	string m_geoPath;
-	string m_computePath;
-	uint m_id;
-	string m_name;
-	enum shaderType { VERTEX = 0, FRAGMENT, GEOMETRY, COMPUTE,PROGRAM };
+	HashMap<string, int> LocationCache;
+	string VertPath;
+	string FragPath;
+	string GeoPath;
+	string ComputePath;
+	uint Id;
+	string Name;
+	enum ShaderType { VERTEX = 0, FRAGMENT, GEOMETRY, COMPUTE,PROGRAM };
 
-	int getUniformLocation(const string& name)
+	int GetUniformLocation(const string& name)
 	{
-		if (m_locationCache.find(name) != m_locationCache.end())
-			return m_locationCache[name];
+		if (LocationCache.find(name) != LocationCache.end())
+			return LocationCache[name];
 		else
 		{
-			int location = glGetUniformLocation(m_id, name.c_str());
+			int Location = glGetUniformLocation(Id, name.c_str());
 
-			DYNAMIC_ASSERT(location != -1, "WARNING: uniform " + name + " does not exist\n");
+			DYNAMIC_ASSERT(Location != -1, "WARNING: uniform " + name + " does not exist\n");
 
-			m_locationCache[name] = location;
-			return location;
+			LocationCache[name] = Location;
+			return Location;
 		}
 	}
-	void checkCompileErrors(uint shader, shaderType type)
+	void CheckCompileErrors(uint shader, ShaderType type)
 	{
 		int success;
 		char infoLog[1024];
-		if (type != shaderType::PROGRAM)
+		if (type != ShaderType::PROGRAM)
 		{
 			glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 			if (!success)
 			{
 				Array<string, 2> converter = { "VERTEX", "FRAGMENT" };
 				glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-				std::cout << "ERROR Shader: " << m_name << "\n" << "ERROR::SHADER_COMPILATION_ERROR of type: " << converter[type] << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+				std::cout << "ERROR Shader: " << Name << "\n" << "ERROR::SHADER_COMPILATION_ERROR of type: " << converter[type] << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
 			}
 		}
 		else
@@ -306,7 +306,7 @@ private:
 			if (!success)
 			{
 				glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-				std::cout << "ERROR Shader: " << m_name << "\n" << "ERROR::PROGRAM_LINKING_ERROR of type: PROGRAM" << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+				std::cout << "ERROR Shader: " << Name << "\n" << "ERROR::PROGRAM_LINKING_ERROR of type: PROGRAM" << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
 			}
 		}
 	}

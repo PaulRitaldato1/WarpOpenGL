@@ -8,7 +8,7 @@ public:
 	virtual void Bind() const = 0;
 	virtual void Unbind() const = 0;
 
-	uint getId() { return m_id; }
+	uint getId() { return Id; }
 protected:
-	uint m_id;
+	uint Id;
 };

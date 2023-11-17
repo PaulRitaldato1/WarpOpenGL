@@ -18,17 +18,17 @@ struct Material
 	float SpecularPower;
 	float IndexOfRefraction;
 	
-	bool HasAmbientTexture;
-	bool HasEmissiveTexture;
-	bool HasDiffuseTexture;
-	bool HasSpecularTexture;
-	bool HasSpecularPowerTexture;
-	bool HasNormalTexture;
+	bool bHasAmbientTexture;
+	bool bHasEmissiveTexture;
+	bool bHasDiffuseTexture;
+	bool bHasSpecularTexture;
+	bool bHasSpecularPowerTexture;
+	bool bHasNormalTexture;
 
 	float SpecularScale;
 	float AlphaThreshold;
 
-	float shininess;
+	float Shininess;
 };
 
 //set some good presets so we dont have to manually define everything

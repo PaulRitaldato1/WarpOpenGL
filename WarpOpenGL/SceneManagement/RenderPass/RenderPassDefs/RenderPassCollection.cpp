@@ -12,45 +12,45 @@
 RenderPassManager g_renderPassManager;
 
 
-void RenderPassCollection::AddZOnlyPass(uint width, uint height, Vector<Ref<Model>>& models)
+void RenderPassCollection::AddZOnlyPass(uint width, uint height, Vector<Ref<Model>>& Models)
 {
 	struct ZOnlyPassData : public IPassData
 	{
 		ZOnlyPassData()
 		{
-			isValid = true;
+			bIsValid = true;
 		}
 
-		Ref<GLTexture> depthTexture;
-		Ref<GLFramebuffer> frameBuffer;
-		uint shaderId;
-		uint instancedShaderId;
+		Ref<GLTexture> DepthTexture;
+		Ref<GLFramebuffer> FrameBuffer;
+		uint ShaderId;
+		uint InstancedShaderId;
 	};
 
 	g_renderPassManager.AddPass("ZOnlyPass",
 		[&](Ref<IPassData> passData) 
 		{
 			Ref<ZOnlyPassData> zPassData = std::make_shared<ZOnlyPassData>();
-			zPassData->frameBuffer = std::make_shared<GLFramebuffer>();
+			zPassData->FrameBuffer = std::make_shared<GLFramebuffer>();
 
-			zPassData->depthTexture = std::make_shared<GLTexture>(GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_TEXTURE_2D, GL_FLOAT, width, height);
-			zPassData->depthTexture->setParameteri(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			zPassData->depthTexture->setParameteri(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			zPassData->depthTexture->setParameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-			zPassData->depthTexture->setParameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+			zPassData->DepthTexture = std::make_shared<GLTexture>(GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_TEXTURE_2D, GL_FLOAT, width, height);
+			zPassData->DepthTexture->SetParameteri(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			zPassData->DepthTexture->SetParameteri(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			zPassData->DepthTexture->SetParameteri(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+			zPassData->DepthTexture->SetParameteri(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 			float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-			zPassData->depthTexture->setParameterfv(GL_TEXTURE_BORDER_COLOR, borderColor);
+			zPassData->DepthTexture->SetParameterfv(GL_TEXTURE_BORDER_COLOR, borderColor);
 
-			zPassData->frameBuffer->Bind();
-			zPassData->frameBuffer->AttachTexture(AttachmentType::DEPTH, zPassData->depthTexture);
-			g_renderer.setReadBuffer(GL_NONE);
-			g_renderer.setDrawBuffer(GL_NONE);
+			zPassData->FrameBuffer->Bind();
+			zPassData->FrameBuffer->AttachTexture(AttachmentType::DEPTH, zPassData->DepthTexture);
+			g_renderer.SetReadBuffer(GL_NONE);
+			g_renderer.SetDrawBuffer(GL_NONE);
 			
 			DYNAMIC_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Frambuffer machine broke");
 
-			zPassData->frameBuffer->Unbind();
-			zPassData->shaderId = m_shaderManager.getShaderId("ZOnly");
-			zPassData->instancedShaderId = m_shaderManager.getShaderId("ZOnlyInstanced");
+			zPassData->FrameBuffer->Unbind();
+			zPassData->ShaderId = RenderPassShaderManager.GetShaderId("ZOnly");
+			zPassData->InstancedShaderId = RenderPassShaderManager.GetShaderId("ZOnlyInstanced");
 
 			return zPassData;
 		},
@@ -60,30 +60,32 @@ void RenderPassCollection::AddZOnlyPass(uint width, uint height, Vector<Ref<Mode
 
 
 			//render to depth map
-			data->frameBuffer->Bind();
+			data->FrameBuffer->Bind();
 
-			g_renderer.setViewport(data->depthTexture->Width, data->depthTexture->Height);
+			g_renderer.SetViewport(data->DepthTexture->Width, data->DepthTexture->Height);
 			
-			g_renderer.setCullMode(GL_FRONT);
+			g_renderer.SetCullMode(GL_FRONT);
 
 			g_renderer.ClearBufferBits(GL_DEPTH_BUFFER_BIT);
 
-			for (auto& model : models)
+			for (auto& ModelItem : Models)
 			{
-				if (model->getHasShadow())
+				if (ModelItem->GetHasShadow())
 				{
-					if (!model->getIsInstanced())
+					if (!ModelItem->GetIsInstanced())
 					{
-						model->Draw(m_shaderManager.getShaderById(data->shaderId));
+						ModelItem->Draw(RenderPassShaderManager.GetShaderById(data->ShaderId));
 					}
 					else
-						model->Draw(m_shaderManager.getShaderById(data->instancedShaderId));
+					{
+						ModelItem->Draw(RenderPassShaderManager.GetShaderById(data->InstancedShaderId));
+					}
 				}
 			}
 
-			data->frameBuffer->Unbind();
-			g_renderer.setCullMode(GL_BACK);
-			g_renderer.setViewport(1920, 1080);
+			data->FrameBuffer->Unbind();
+			g_renderer.SetCullMode(GL_BACK);
+			g_renderer.SetViewport(1920, 1080);
 			return data;
 		});
 }
@@ -94,43 +96,43 @@ void RenderPassCollection::RenderPassCollection::AddOpaquePass(Scene& scene)
 	{
 		OpaquePassData()
 		{
-			isValid = true;
+			bIsValid = true;
 		}
 
 		//Vector<glm::mat4> instancedModelMatrices;
-		uint shaderId;
-		uint instancedShaderId;
-		Vector<Ref<Model>> models;
+		uint ShaderId;
+		uint InstancedShaderId;
+		Vector<Ref<Model>> Models;
 	};
 
 	g_renderPassManager.AddPass("OpaquePass",
 		[&](Ref<IPassData> passData) 
 		{
-			Ref<OpaquePassData> data = std::make_shared<OpaquePassData>();
+			Ref<OpaquePassData> Data = std::make_shared<OpaquePassData>();
 
-			data->shaderId = m_shaderManager.getShaderId("BasicModel");
-			data->instancedShaderId = m_shaderManager.getShaderId("InstancedBasicModel");
+			Data->ShaderId = RenderPassShaderManager.GetShaderId("BasicModel");
+			Data->InstancedShaderId = RenderPassShaderManager.GetShaderId("InstancedBasicModel");
 
-			data->models = scene.getModels();
+			Data->Models = scene.GetModels();
 
-			return data;
+			return Data;
 		},
 		[&](Ref<IPassData> dependencyData, Ref<IPassData> setupData)
 		{
-			Ref<OpaquePassData> data = std::dynamic_pointer_cast<OpaquePassData>(setupData);
+			Ref<OpaquePassData> Data = std::dynamic_pointer_cast<OpaquePassData>(setupData);
 
 			g_renderer.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			g_renderer.ClearBoundBufferBits();
 
-			for (auto& model : data->models)
+			for (auto& ModelItem : Data->Models)
 			{
-				if (!model->getIsInstanced())
+				if (!ModelItem->GetIsInstanced())
 				{
-					model->Draw(m_shaderManager.getShaderById(data->shaderId));
+					ModelItem->Draw(RenderPassShaderManager.GetShaderById(Data->ShaderId));
 				}
 				else
 				{
-					model->Draw(m_shaderManager.getShaderById(data->instancedShaderId));
+					ModelItem->Draw(RenderPassShaderManager.GetShaderById(Data->InstancedShaderId));
 				}
 			}
 
@@ -148,45 +150,45 @@ void RenderPassCollection::AddPostProcessingPass()
 
 }
 
-void RenderPassCollection::AddGBufferPass(Scene& scene)
+void RenderPassCollection::AddGBufferPass(Scene& Scene)
 {
 
 	g_renderPassManager.AddPass("GBufferPass",
 		[&](Ref<IPassData> data) 
 		{
 			
-			Ref<GBuffer> gbuffer = std::make_shared<GBuffer>();
+			Ref<GBuffer> GBufferData = std::make_shared<GBuffer>();
 			
-			gbuffer->geometryShaderId = m_shaderManager.getShaderId("gBufferGeometry");
-			gbuffer->instancedGeometryShaderId = m_shaderManager.getShaderId("InstancedGBufferGeometry");
+			GBufferData->GeometryShaderId = RenderPassShaderManager.GetShaderId("gBufferGeometry");
+			GBufferData->InstancedGeometryShaderId = RenderPassShaderManager.GetShaderId("InstancedGBufferGeometry");
 
-			Tuple<int, int> windowSize = scene.getWindowSize();
-			int width = std::get<0>(windowSize);
-			int height = std::get<1>(windowSize);
+			Tuple<int, int> WindowSize = Scene.GetWindowSize();
+			int width = std::get<0>(WindowSize);
+			int height = std::get<1>(WindowSize);
 
 			//need a good way to get window current size instead of hard coding 
-			gbuffer->positionBuffer = std::make_shared<GLTexture>(GL_RGBA16F, GL_RGBA, GL_TEXTURE_2D, GL_FLOAT, width, height);
-			gbuffer->positionBuffer->setParameteri(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			gbuffer->positionBuffer->setParameteri(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			GBufferData->PositionBuffer = std::make_shared<GLTexture>(GL_RGBA16F, GL_RGBA, GL_TEXTURE_2D, GL_FLOAT, width, height);
+			GBufferData->PositionBuffer->SetParameteri(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			GBufferData->PositionBuffer->SetParameteri(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-			gbuffer->normalBuffer = std::make_shared<GLTexture>(GL_RGBA16F, GL_RGBA, GL_TEXTURE_2D, GL_FLOAT, width, height);
-			gbuffer->normalBuffer->setParameteri(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			gbuffer->normalBuffer->setParameteri(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			GBufferData->NormalBuffer = std::make_shared<GLTexture>(GL_RGBA16F, GL_RGBA, GL_TEXTURE_2D, GL_FLOAT, width, height);
+			GBufferData->NormalBuffer->SetParameteri(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			GBufferData->NormalBuffer->SetParameteri(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-			gbuffer->diffuseSpec = std::make_shared<GLTexture>(GL_RGBA, GL_RGBA, GL_TEXTURE_2D, GL_UNSIGNED_BYTE, width, height);
-			gbuffer->diffuseSpec->setParameteri(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			gbuffer->diffuseSpec->setParameteri(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			GBufferData->DiffuseSpec = std::make_shared<GLTexture>(GL_RGBA, GL_RGBA, GL_TEXTURE_2D, GL_UNSIGNED_BYTE, width, height);
+			GBufferData->DiffuseSpec->SetParameteri(GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			GBufferData->DiffuseSpec->SetParameteri(GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-			gbuffer->rbo = std::make_shared<GLRenderBuffer>(width, height, GL_DEPTH_COMPONENT, GL_DEPTH_ATTACHMENT);
+			GBufferData->RBO = std::make_shared<GLRenderBuffer>(width, height, GL_DEPTH_COMPONENT, GL_DEPTH_ATTACHMENT);
 
-			gbuffer->frameBuffer = std::make_shared<GLFramebuffer>();
-			gbuffer->frameBuffer->Bind();
-			gbuffer->frameBuffer->AttachTexture(AttachmentType::COLOR, gbuffer->positionBuffer);
-			gbuffer->frameBuffer->AttachTexture(AttachmentType::COLOR, gbuffer->diffuseSpec);
-			gbuffer->frameBuffer->AttachTexture(AttachmentType::COLOR, gbuffer->normalBuffer);
-			gbuffer->frameBuffer->setDrawBuffers();
-			gbuffer->frameBuffer->AttachRenderBuffer(gbuffer->rbo);
-			gbuffer->frameBuffer->Unbind();
+			GBufferData->FrameBuffer = std::make_shared<GLFramebuffer>();
+			GBufferData->FrameBuffer->Bind();
+			GBufferData->FrameBuffer->AttachTexture(AttachmentType::COLOR, GBufferData->PositionBuffer);
+			GBufferData->FrameBuffer->AttachTexture(AttachmentType::COLOR, GBufferData->DiffuseSpec);
+			GBufferData->FrameBuffer->AttachTexture(AttachmentType::COLOR, GBufferData->NormalBuffer);
+			GBufferData->FrameBuffer->SetDrawBuffers();
+			GBufferData->FrameBuffer->AttachRenderBuffer(GBufferData->RBO);
+			GBufferData->FrameBuffer->Unbind();
 			FATAL_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Frambuffer machine broke");
 			
 			//auto fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -195,33 +197,33 @@ void RenderPassCollection::AddGBufferPass(Scene& scene)
 			//	std::cout << "Framebuffer not complete " << fboStatus << std::endl;
 			//}
 
-			return gbuffer;
+			return GBufferData;
 		}, 
 		[&](Ref<IPassData> dependencyData, Ref<IPassData> setupData) 
 		{
-			Ref<GBuffer> data = std::dynamic_pointer_cast<GBuffer>(setupData);
+			Ref<GBuffer> GBufferData = std::dynamic_pointer_cast<GBuffer>(setupData);
 
-			data->frameBuffer->Bind();
+			GBufferData->FrameBuffer->Bind();
 
 			g_renderer.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			g_renderer.ClearBoundBufferBits();
 
 			
-			for (auto model : scene.getModels())
+			for (auto ModelItem : Scene.GetModels())
 			{
-				if (!model->getIsInstanced())
+				if (!ModelItem->GetIsInstanced())
 				{
-					model->Draw(m_shaderManager.getShaderById(data->geometryShaderId));
+					ModelItem->Draw(RenderPassShaderManager.GetShaderById(GBufferData->GeometryShaderId));
 				}
 				else
 				{
-					model->Draw(m_shaderManager.getShaderById(data->instancedGeometryShaderId));
+					ModelItem->Draw(RenderPassShaderManager.GetShaderById(GBufferData->InstancedGeometryShaderId));
 				}
 			}
 
-			data->frameBuffer->Unbind();
+			GBufferData->FrameBuffer->Unbind();
 
-			return data;
+			return GBufferData;
 		});
 }
 
@@ -231,7 +233,7 @@ void RenderPassCollection::AddGBufferLightingPass(Scene& scene)
 	{
 		GBufferLightingData()
 		{
-			isValid = true;
+			bIsValid = true;
 		}
 		
 		uint gBufferLightingShaderId;
@@ -241,10 +243,10 @@ void RenderPassCollection::AddGBufferLightingPass(Scene& scene)
 	g_renderPassManager.AddPass("GBufferLightingPass", "GBufferPass", 
 		[&](Ref<IPassData> passData) 
 		{
-			Ref<GBufferLightingData> lightData = std::make_shared<GBufferLightingData>();
+			Ref<GBufferLightingData> LightData = std::make_shared<GBufferLightingData>();
 
-			lightData->gBufferLightingShaderId = m_shaderManager.getShaderId("gBufferLighting");
-			lightData->gBufferQuadLightingShaderId = m_shaderManager.getShaderId("QuadGBufferLighting");
+			LightData->gBufferLightingShaderId = RenderPassShaderManager.GetShaderId("gBufferLighting");
+			LightData->gBufferQuadLightingShaderId = RenderPassShaderManager.GetShaderId("QuadGBufferLighting");
 
 			/*lightData->rbo = std::make_shared<GLRenderBuffer>(1920, 1080, GL_DEPTH_COMPONENT, GL_DEPTH_ATTACHMENT);
 			lightData->buffer = std::make_shared<GLTexture>(GL_RGBA16F, GL_RGBA, GL_TEXTURE_2D, GL_FLOAT, 1920, 1080);
@@ -258,131 +260,131 @@ void RenderPassCollection::AddGBufferLightingPass(Scene& scene)
 			lightData->frameBuffer->AttachRenderBuffer(lightData->rbo);
 			lightData->frameBuffer->Unbind();*/
 
-			return lightData;
+			return LightData;
 		}, 
 		[&](Ref<IPassData> dependencyData, Ref<IPassData> setupData)
 		{
-			Ref<GBuffer> gbuffer = std::dynamic_pointer_cast<GBuffer>(dependencyData);
+			Ref<GBuffer> gBuffer = std::dynamic_pointer_cast<GBuffer>(dependencyData);
 			Ref<GBufferLightingData> lightingData = std::dynamic_pointer_cast<GBufferLightingData>(setupData);
 
-			auto& lightVolumeShader = m_shaderManager.getShaderById(lightingData->gBufferLightingShaderId);
-			auto& quadShader = m_shaderManager.getShaderById(lightingData->gBufferQuadLightingShaderId);
+			auto& LightVolumeShader = RenderPassShaderManager.GetShaderById(lightingData->gBufferLightingShaderId);
+			auto& QuadShader = RenderPassShaderManager.GetShaderById(lightingData->gBufferQuadLightingShaderId);
 			g_renderer.ClearBoundBufferBits();
 			g_renderer.Enable(GL_BLEND);
-			g_renderer.setBlendFunc(GL_ONE, GL_ONE);
-			g_renderer.setBlendEquation(GL_FUNC_ADD);
+			g_renderer.SetBlendFunc(GL_ONE, GL_ONE);
+			g_renderer.SetBlendEquation(GL_FUNC_ADD);
 
 			g_renderer.Disable(GL_DEPTH_TEST);
 			
-			g_renderer.setCullMode(GL_FRONT);
-			lightVolumeShader.Bind();
+			g_renderer.SetCullMode(GL_FRONT);
+			LightVolumeShader.Bind();
 
-			lightVolumeShader.setUniform("gPos", 0);
-			gbuffer->positionBuffer->Bind(0);
-			lightVolumeShader.setUniform("gDiffuseSpec", 1);
-			gbuffer->diffuseSpec->Bind(1);
-			lightVolumeShader.setUniform("gNormal", 2);
-			gbuffer->normalBuffer->Bind(2);
+			LightVolumeShader.SetUniform("gPos", 0);
+			gBuffer->PositionBuffer->Bind(0);
+			LightVolumeShader.SetUniform("gDiffuseSpec", 1);
+			gBuffer->DiffuseSpec->Bind(1);
+			LightVolumeShader.SetUniform("gNormal", 2);
+			gBuffer->NormalBuffer->Bind(2);
 
 
-			for (const auto& light : scene.getPointlights())
+			for (const auto& PointLight : scene.GetPointlights())
 			{
-				auto shaderParams = light.getShaderParams();
+				auto ShaderParams = PointLight.getShaderParams();
 
 
-				lightVolumeShader.setUniform("viewPos", scene.getActiveCamera().getPosition());
+				LightVolumeShader.SetUniform("viewPos", scene.GetActiveCamera().GetPosition());
 
-				lightVolumeShader.setUniform("light.position", shaderParams.position);
-				lightVolumeShader.setUniform("light.direction", shaderParams.direction);
-				lightVolumeShader.setUniform("light.color", shaderParams.color);
-				lightVolumeShader.setUniform("light.spotlightAngle", shaderParams.spotlightAngle);
-				lightVolumeShader.setUniform("light.radius", shaderParams.radius);
-				lightVolumeShader.setUniform("light.intensity", shaderParams.intensity);
-				lightVolumeShader.setUniform("light.enable", shaderParams.enable);
-				lightVolumeShader.setUniform("light.type", (uint)shaderParams.type);
-				lightVolumeShader.setUniform("light.linear", (float)0.7);
-				lightVolumeShader.setUniform("light.quadratic", (float)1.8);
+				LightVolumeShader.SetUniform("light.position", ShaderParams.position);
+				LightVolumeShader.SetUniform("light.direction", ShaderParams.direction);
+				LightVolumeShader.SetUniform("light.color", ShaderParams.color);
+				LightVolumeShader.SetUniform("light.spotlightAngle", ShaderParams.spotlightAngle);
+				LightVolumeShader.SetUniform("light.radius", ShaderParams.radius);
+				LightVolumeShader.SetUniform("light.intensity", ShaderParams.intensity);
+				LightVolumeShader.SetUniform("light.enable", ShaderParams.enable);
+				LightVolumeShader.SetUniform("light.type", (uint)ShaderParams.type);
+				LightVolumeShader.SetUniform("light.linear", (float)0.7);
+				LightVolumeShader.SetUniform("light.quadratic", (float)1.8);
 
-				light.getLightVolume().Draw(lightVolumeShader);
+				PointLight.getLightVolume().Draw(LightVolumeShader);
 			}
-			g_renderer.setCullMode(GL_BACK);
+			g_renderer.SetCullMode(GL_BACK);
 
-			quadShader.Bind();
-			quadShader.setUniform("gPos", 0);
-			quadShader.setUniform("gDiffuseSpec", 1);
-			quadShader.setUniform("gNormal", 2);
+			QuadShader.Bind();
+			QuadShader.SetUniform("gPos", 0);
+			QuadShader.SetUniform("gDiffuseSpec", 1);
+			QuadShader.SetUniform("gNormal", 2);
 
-			gbuffer->positionBuffer->Bind(0);
-			gbuffer->diffuseSpec->Bind(1);
-			gbuffer->normalBuffer->Bind(2);
+			gBuffer->PositionBuffer->Bind(0);
+			gBuffer->DiffuseSpec->Bind(1);
+			gBuffer->NormalBuffer->Bind(2);
 
 
 
-			for (const auto& light : scene.getDirectionalLights())
+			for (const auto& DirectionalLight : scene.GetDirectionalLights())
 			{
-				auto shaderParams = light.getShaderParams();
+				auto ShaderParams = DirectionalLight.getShaderParams();
 
 
-				lightVolumeShader.setUniform("viewPos", scene.getActiveCamera().getPosition());
+				LightVolumeShader.SetUniform("viewPos", scene.GetActiveCamera().GetPosition());
 
-				lightVolumeShader.setUniform("light.position", shaderParams.position);
-				lightVolumeShader.setUniform("light.direction", shaderParams.direction);
-				lightVolumeShader.setUniform("light.color", shaderParams.color);
-				lightVolumeShader.setUniform("light.spotlightAngle", shaderParams.spotlightAngle);
-				lightVolumeShader.setUniform("light.radius", shaderParams.radius);
-				lightVolumeShader.setUniform("light.intensity", shaderParams.intensity);
-				lightVolumeShader.setUniform("light.enable", shaderParams.enable);
-				lightVolumeShader.setUniform("light.type", (uint)shaderParams.type);
-				lightVolumeShader.setUniform("light.linear", (float)0.7);
-				lightVolumeShader.setUniform("light.quadratic", (float)1.8);
+				LightVolumeShader.SetUniform("light.position", ShaderParams.position);
+				LightVolumeShader.SetUniform("light.direction", ShaderParams.direction);
+				LightVolumeShader.SetUniform("light.color", ShaderParams.color);
+				LightVolumeShader.SetUniform("light.spotlightAngle", ShaderParams.spotlightAngle);
+				LightVolumeShader.SetUniform("light.radius", ShaderParams.radius);
+				LightVolumeShader.SetUniform("light.intensity", ShaderParams.intensity);
+				LightVolumeShader.SetUniform("light.enable", ShaderParams.enable);
+				LightVolumeShader.SetUniform("light.type", (uint)ShaderParams.type);
+				LightVolumeShader.SetUniform("light.linear", (float)0.7);
+				LightVolumeShader.SetUniform("light.quadratic", (float)1.8);
 
-				light.getLightVolume().Draw(quadShader);
+				DirectionalLight.getLightVolume().Draw(QuadShader);
 			}
 
 			g_renderer.Disable(GL_BLEND);
 			g_renderer.Enable(GL_DEPTH_TEST);
 
-			return gbuffer;
+			return gBuffer;
 		});
 }
 
-void RenderPassCollection::AddDebugQuadDraw(Vector<Ref<GLTexture>>& textures)
+void RenderPassCollection::AddDebugQuadDraw(Vector<Ref<GLTexture>>& Textures)
 {
 	struct QuadDrawData : IPassData
 	{
 		QuadDrawData()
 		{
-			isValid = true;
+			bIsValid = true;
 		}
 
-		uint shaderId;
-		Ref<Mesh> mesh;
+		uint ShaderId;
+		Ref<WarpMesh> Mesh;
 	};
 
 	g_renderPassManager.AddPass("QuadPass",
 		[&](Ref<IPassData> passData) 
 		{
-			Ref<QuadDrawData> data = std::make_shared<QuadDrawData>();
-			data->mesh = GeoGen::CreateDefaultQuad();
-			data->shaderId = m_shaderManager.getShaderId("QuadDraw");
+			Ref<QuadDrawData> QuadData = std::make_shared<QuadDrawData>();
+			QuadData->Mesh = GeoGen::CreateDefaultQuad();
+			QuadData->ShaderId = RenderPassShaderManager.GetShaderId("QuadDraw");
 
-			return data;
+			return QuadData;
 		}, 
 		[&](Ref<IPassData> dependencyData, Ref<IPassData> setupData)
 		{
-			Ref<QuadDrawData> data = std::dynamic_pointer_cast<QuadDrawData>(setupData);
+			Ref<QuadDrawData> QuadData = std::dynamic_pointer_cast<QuadDrawData>(setupData);
 
-			auto& shader = m_shaderManager.getShaderById(data->shaderId);
-			shader.Bind();
+			auto& Shader = RenderPassShaderManager.GetShaderById(QuadData->ShaderId);
+			Shader.Bind();
 			
 			int i = 0;
-			for (auto& texture : textures)
+			for (auto& textureItem : Textures)
 			{
-				shader.setUniform("tex" + std::to_string(i), i);
-				texture->Bind(++i);
+				Shader.SetUniform("tex" + std::to_string(i), i);
+				textureItem->Bind(++i);
 			}
 
-			data->mesh->Draw(shader);
-			return data;
+			QuadData->Mesh->Draw(Shader);
+			return QuadData;
 		});
 }

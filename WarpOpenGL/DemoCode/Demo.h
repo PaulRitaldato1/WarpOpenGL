@@ -11,5 +11,5 @@ public:
 	virtual Ref<Scene> MakeScene(GLFWwindow* window) = 0;
 	virtual void Update(float DeltaTime) = 0;
 
-	Ref<Scene> m_scene;
+	Ref<Scene> DemoScene;
 };

@@ -1,273 +1,274 @@
 #include <Mesh/ModelLoader.h>
 #include <Mesh/GeoGen.h>
 
-Ref<Model> ModelLoader::generateQuad()
+Ref<Model> ModelLoader::GenerateQuad()
 {
-	Vector<Ref<Mesh>> meshes;
-	meshes.push_back(GeoGen::CreateDefaultQuad());
+	Vector<Ref<WarpMesh>> Meshes;
+	Meshes.push_back(GeoGen::CreateDefaultQuad());
 
-	ModelDesc desc;
-	desc.isInstanced = false;
-	desc.gamma = false;
-	desc.hasShadow = false;
-	desc.transform = glm::mat4(1.0f);
+	ModelDesc Desc;
+	Desc.bIsInstanced = false;
+	Desc.bGamma = false;
+	Desc.bHasShadow = false;
+	Desc.Transform = glm::mat4(1.0f);
 
-	return std::make_shared<Model>(meshes, desc);
+	return std::make_shared<Model>(Meshes, Desc);
 }
 
-Ref<Model> ModelLoader::generateGrid(int width, int depth, int m, int n, glm::vec3 pos)
+Ref<Model> ModelLoader::GenerateGrid(int Width, int Depth, int M, int N, glm::vec3 Pos)
 {
-	Vector<Ref<Mesh>> meshes;
-	meshes.push_back(std::make_shared<Mesh>(GeoGen::CreateGrid(width, depth, m, n)));
+	Vector<Ref<WarpMesh>> Meshes;
+	Meshes.push_back(std::make_shared<WarpMesh>(GeoGen::CreateGrid(Width, Depth, M, N)));
 
-	ModelDesc desc;
-	desc.isInstanced = false;
-	desc.gamma = false;
-	desc.hasShadow = false;
+	ModelDesc Desc;
+	Desc.bIsInstanced = false;
+	Desc.bGamma = false;
+	Desc.bHasShadow = false;
 
-	glm::mat4 modelMatrix(1.0f);
-	desc.transform = glm::translate(modelMatrix, pos);
+	glm::mat4 ModelMatrix(1.0f);
+	Desc.Transform = glm::translate(ModelMatrix, Pos);
 
-	return std::make_shared<Model>(meshes, desc);
+	return std::make_shared<Model>(Meshes, Desc);
 }
 
-Ref<Model> ModelLoader::generateSphereInstanced(Vector<float>& radii, Vector<glm::mat4>& transforms, uint sliceCount, uint stackCount, Ref<GLTexParams> tex /*= nullptr*/)
+Ref<Model> ModelLoader::GenerateSphereInstanced(Vector<float>& Radii, Vector<glm::mat4>& Transforms, uint SliceCount, uint StackCount, Ref<GLTexParams> TexParams /*= nullptr*/)
 {
 
-	DYNAMIC_ASSERT(radii.size() == transforms.size(), "These need to be the same size");
+	DYNAMIC_ASSERT(Radii.size() == Transforms.size(), "These need to be the same size");
 
-	Vector<Ref<Mesh>> meshes;
-	meshes.push_back(GeoGen::CreateSphere(1.0f, sliceCount, stackCount));
+	Vector<Ref<WarpMesh>> Meshes;
+	Meshes.push_back(GeoGen::CreateSphere(1.0f, SliceCount, StackCount));
 
-	for (uint i = 0; i < radii.size(); i++)
+	for (uint i = 0; i < Radii.size(); i++)
 	{
-		float radius = radii[i];
-		transforms[i] = glm::scale(transforms[i], glm::vec3(radius, radius, radius));
+		float Radius = Radii[i];
+		Transforms[i] = glm::scale(Transforms[i], glm::vec3(Radius, Radius, Radius));
 	}
 	
 
-	ModelDesc desc;
-	desc.isInstanced = true;
-	desc.gamma = false;
-	desc.hasShadow = false;
-	desc.instances = transforms;
+	ModelDesc Desc;
+	Desc.bIsInstanced = true;
+	Desc.bGamma = false;
+	Desc.bHasShadow = false;
+	Desc.Instances = Transforms;
 
-	if (tex != nullptr)
-		meshes.back()->setTexture(tex);
+	if (TexParams != nullptr)
+		Meshes.back()->SetTexture(TexParams);
 
-	return std::make_shared<Model>(meshes, desc);
+	return std::make_shared<Model>(Meshes, Desc);
 }
 
-Ref<Model> ModelLoader::generateSphere(float radius, uint sliceCount, uint stackCount, glm::vec3 pos, Ref<GLTexParams> tex)
+Ref<Model> ModelLoader::GenerateSphere(float Radius, uint SliceCount, uint StackCount, glm::vec3 Pos, Ref<GLTexParams> TexParams)
 {
-	Vector<Ref<Mesh>> meshes;
-	meshes.push_back(GeoGen::CreateSphere(radius, sliceCount, stackCount));
+	Vector<Ref<WarpMesh>> Meshes;
+	Meshes.push_back(GeoGen::CreateSphere(Radius, SliceCount, StackCount));
 
-	ModelDesc desc;
-	desc.isInstanced = false;
-	desc.gamma = false;
-	desc.hasShadow = false;
+	ModelDesc Desc;
+	Desc.bIsInstanced = false;
+	Desc.bGamma = false;
+	Desc.bHasShadow = false;
 
-	glm::mat4 modelMatrix(1.0f);
-	desc.transform = glm::translate(modelMatrix, pos);
+	glm::mat4 ModelMatrix(1.0f);
+	ModelMatrix[3] = glm::vec4(Pos, 1.0f);
+	Desc.Transform = ModelMatrix;
 
-	if(tex != nullptr)
-		meshes.back()->setTexture(tex);
+	if(TexParams != nullptr)
+		Meshes.back()->SetTexture(TexParams);
 
-	return std::make_shared<Model>(meshes, desc);
+	return std::make_shared<Model>(Meshes, Desc);
 }
 
-Vector<Ref<Model>> ModelLoader::loadModelsAsync(Vector<ModelDesc>& modelArgs, uint numThreads)
+Vector<Ref<Model>> ModelLoader::LoadModelsAsync(Vector<ModelDesc>& modelArgs, uint numThreads)
 {
 	PROFILE_SCOPE("ModelLoader::LoadModelAsync");
 	
-	ThreadPool m_pool(numThreads);
+	ThreadPool Pool(numThreads);
 
 	stbi_set_flip_vertically_on_load(true);
 
-	Vector<std::future<Ref<Model>>> futures;
-	auto loadFunc = [this](ModelDesc& args) { return loadModel(args); };
+	Vector<std::future<Ref<Model>>> Futures;
+	auto LoadFunc = [this](ModelDesc& args) { return LoadModel(args); };
 	for (auto& args : modelArgs)
 	{
-		futures.push_back(m_pool.enqueue(loadFunc, args));
+		Futures.push_back(Pool.enqueue(LoadFunc, args));
 	}
 
-	Vector<Ref<Model>> models;
-	for (auto& fut : futures)
+	Vector<Ref<Model>> Models;
+	for (auto& FutureItem : Futures)
 	{
-		models.push_back(fut.get());
+		Models.push_back(FutureItem.get());
 	}
 
 	//gl calls need to be in the same thread
-	for (auto& [path, params] : m_loadedTextures)
+	for (auto& [path, params] : LoadedTextures)
 	{
-		m_textures[path] = std::make_shared<GLTexture>(params);
+		Textures[path] = std::make_shared<GLTexture>(params);
 	}
 
-	for (auto& model : models)
+	for (auto& ModelItem : Models)
 	{
-		model->genBuffers();
-		for (const auto& mesh : model->getMeshes())
+		ModelItem->GenBuffers();
+		for (const auto& MeshItem : ModelItem->GetMeshes())
 		{
 			//gl calls to create buffers. Needs to be in main thread
-			mesh->setupMesh();
-			Vector<Ref<GLTexture>> texturesToGive;
-			const auto& texRequests = mesh->getTextureRequests();
-			for (const auto& tex : texRequests)
+			MeshItem->SetupMesh();
+			Vector<Ref<GLTexture>> TexturesToGive;
+			const auto& TexRequests = MeshItem->GetTextureRequests();
+			for (const auto& Tex : TexRequests)
 			{
-				texturesToGive.push_back(m_textures[tex->Path]);
+				TexturesToGive.push_back(Textures[Tex->Path]);
 			}
-			mesh->setTextures(texturesToGive);
-			mesh->clearInitTextures();
+			MeshItem->SetTextures(TexturesToGive);
+			MeshItem->ClearInitTextures();
 		}
 	}
-	return models;
+	return Models;
 }
 
-Ref<Model> ModelLoader::loadModel(ModelDesc& desc)
+Ref<Model> ModelLoader::LoadModel(ModelDesc& Desc)
 {
 	PROFILE_FUNCTION();
-	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(desc.path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+	Assimp::Importer Importer;
+	const aiScene* Scene = Importer.ReadFile(Desc.Path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
-	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+	if (!Scene || Scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !Scene->mRootNode)
 	{
-		FATAL_ASSERT(false, "ERROR::ASSIMP:: " << importer.GetErrorString() << std::endl);
+		FATAL_ASSERT(false, "ERROR::ASSIMP:: " << Importer.GetErrorString() << std::endl);
 		return nullptr;
 	}
 	
-	Vector<Ref<Mesh>> meshList;
-	string directory = desc.path.substr(0, desc.path.find_last_of('/'));
-	traverseSceneGraph(scene->mRootNode, directory, meshList, scene);
-	return std::make_shared<Model>(meshList, desc);
+	Vector<Ref<WarpMesh>> meshList;
+	string directory = Desc.Path.substr(0, Desc.Path.find_last_of('/'));
+	TraverseSceneGraph(Scene->mRootNode, directory, meshList, Scene);
+	return std::make_shared<Model>(meshList, Desc);
 }
 
-void ModelLoader::traverseSceneGraph(aiNode* node, string& directory, Vector<Ref<Mesh>>& meshList, const aiScene* scene)
+void ModelLoader::TraverseSceneGraph(aiNode* Node, string& Directory, Vector<Ref<WarpMesh>>& MeshList, const aiScene* Scene)
 {
 	PROFILE_FUNCTION();
 
-	for (uint i = 0; i < node->mNumMeshes; ++i)
+	for (uint i = 0; i < Node->mNumMeshes; ++i)
 	{
-		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-		meshList.push_back(loadMesh(mesh, directory, scene));
+		aiMesh* mesh = Scene->mMeshes[Node->mMeshes[i]];
+		MeshList.push_back(LoadMesh(mesh, Directory, Scene));
 	}
 
-	for (uint i = 0; i < node->mNumChildren; ++i)
+	for (uint i = 0; i < Node->mNumChildren; ++i)
 	{
-		traverseSceneGraph(node->mChildren[i], directory, meshList, scene);
+		TraverseSceneGraph(Node->mChildren[i], Directory, MeshList, Scene);
 	}
 }
 
-Ref<Mesh> ModelLoader::loadMesh(aiMesh* mesh, string& directory, const aiScene* scene)
+Ref<WarpMesh> ModelLoader::LoadMesh(aiMesh* Mesh, string& Directory, const aiScene* Scene)
 {
 	PROFILE_FUNCTION();
 
-	Vector<Vertex> vertices;
-	Vector<uint> indices;
-	Vector<Ref<GLTexParams>> textures;
+	Vector<Vertex> Vertices;
+	Vector<uint> Indices;
+	Vector<Ref<GLTexParams>> Textures;
 
-	for (uint i = 0; i < mesh->mNumVertices; ++i)
+	for (uint i = 0; i < Mesh->mNumVertices; ++i)
 	{
-		Vertex vertex;
-		glm::vec3 vector;
+		Vertex CurrentVertex;
+		glm::vec3 ReusableVector;
 
 		//positions
-		vector.x = mesh->mVertices[i].x;
-		vector.y = mesh->mVertices[i].y;
-		vector.z = mesh->mVertices[i].z;
-		vertex.Position = vector;
+		ReusableVector.x = Mesh->mVertices[i].x;
+		ReusableVector.y = Mesh->mVertices[i].y;
+		ReusableVector.z = Mesh->mVertices[i].z;
+		CurrentVertex.Position = ReusableVector;
 
 		//normals
-		if (mesh->HasNormals())
+		if (Mesh->HasNormals())
 		{
-			vector.x = mesh->mNormals[i].x;
-			vector.y = mesh->mNormals[i].y;
-			vector.z = mesh->mNormals[i].z;
-			vertex.Normal = vector;
+			ReusableVector.x = Mesh->mNormals[i].x;
+			ReusableVector.y = Mesh->mNormals[i].y;
+			ReusableVector.z = Mesh->mNormals[i].z;
+			CurrentVertex.Normal = ReusableVector;
 		}
 
 		//tex coords
-		if (mesh->mTextureCoords[0])
+		if (Mesh->mTextureCoords[0])
 		{
-			glm::vec2 vec;
+			glm::vec2 Vec;
 
-			vec.x = mesh->mTextureCoords[0][i].x;
-			vec.y = mesh->mTextureCoords[0][i].y;
-			vertex.TexCoords = vec;
+			Vec.x = Mesh->mTextureCoords[0][i].x;
+			Vec.y = Mesh->mTextureCoords[0][i].y;
+			CurrentVertex.TexCoords = Vec;
 
 			//tangent
-			vector.x = mesh->mTangents[i].x;
-			vector.y = mesh->mTangents[i].y;
-			vector.z = mesh->mTangents[i].z;
-			vertex.Tangent = vector;
+			ReusableVector.x = Mesh->mTangents[i].x;
+			ReusableVector.y = Mesh->mTangents[i].y;
+			ReusableVector.z = Mesh->mTangents[i].z;
+			CurrentVertex.Tangent = ReusableVector;
 
 			//bitangent
-			vector.x = mesh->mBitangents[i].x;
-			vector.y = mesh->mBitangents[i].y;
-			vector.z = mesh->mBitangents[i].z;
-			vertex.Bitangent = vector;
+			ReusableVector.x = Mesh->mBitangents[i].x;
+			ReusableVector.y = Mesh->mBitangents[i].y;
+			ReusableVector.z = Mesh->mBitangents[i].z;
+			CurrentVertex.Bitangent = ReusableVector;
 		}
 		else
 		{
-			vertex.TexCoords = glm::vec2(0.0f, 0.0f);
+			CurrentVertex.TexCoords = glm::vec2(0.0f, 0.0f);
 		}
 
-		vertices.push_back(vertex);
+		Vertices.push_back(CurrentVertex);
 
 	}
 
-	for (uint i = 0; i < mesh->mNumFaces; ++i)
+	for (uint i = 0; i < Mesh->mNumFaces; ++i)
 	{
-		aiFace face = mesh->mFaces[i];
+		aiFace face = Mesh->mFaces[i];
 		for (uint j = 0; j < face.mNumIndices; ++j)
 		{
-			indices.push_back(face.mIndices[j]);
+			Indices.push_back(face.mIndices[j]);
 		}
 	}
 
-	aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+	aiMaterial* Material = Scene->mMaterials[Mesh->mMaterialIndex];
 
 	//1 diffuse maps
-	Vector<Ref<GLTexParams>> diffuseMaps = loadTextures(material, aiTextureType_DIFFUSE, "texture_diffuse", directory);
-	textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+	Vector<Ref<GLTexParams>> DiffuseMaps = LoadTextures(Material, aiTextureType_DIFFUSE, "texture_diffuse", Directory);
+	Textures.insert(Textures.end(), DiffuseMaps.begin(), DiffuseMaps.end());
 	//2 spec maps
-	Vector<Ref<GLTexParams>> specularMaps = loadTextures(material, aiTextureType_SPECULAR, "texture_specular", directory);
-	textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+	Vector<Ref<GLTexParams>> SpecularMaps = LoadTextures(Material, aiTextureType_SPECULAR, "texture_specular", Directory);
+	Textures.insert(Textures.end(), SpecularMaps.begin(), SpecularMaps.end());
 	//3 normal maps
-	Vector<Ref<GLTexParams>> normalMaps = loadTextures(material, aiTextureType_HEIGHT, "texture_normal", directory);
-	textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
+	Vector<Ref<GLTexParams>> NormalMaps = LoadTextures(Material, aiTextureType_HEIGHT, "texture_normal", Directory);
+	Textures.insert(Textures.end(), NormalMaps.begin(), NormalMaps.end());
 	//4 height maps
-	Vector<Ref<GLTexParams>> heightMaps = loadTextures(material, aiTextureType_AMBIENT, "texture_height", directory);
-	textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
+	Vector<Ref<GLTexParams>> HeightMaps = LoadTextures(Material, aiTextureType_AMBIENT, "texture_height", Directory);
+	Textures.insert(Textures.end(), HeightMaps.begin(), HeightMaps.end());
 
-	return std::make_shared<Mesh>(vertices, indices, textures);
+	return std::make_shared<WarpMesh>(Vertices, Indices, Textures);
 }
 
-Vector<Ref<GLTexParams>> ModelLoader::loadTextures(aiMaterial* mat, aiTextureType type, string typeName, string& directory)
+Vector<Ref<GLTexParams>> ModelLoader::LoadTextures(aiMaterial* Mat, aiTextureType Type, string TypeName, string& Directory)
 {
 	PROFILE_FUNCTION();
 
-	Vector<Ref<GLTexParams>> textures;
-	for (uint i = 0; i < mat->GetTextureCount(type); ++i)
+	Vector<Ref<GLTexParams>> Textures;
+	for (uint i = 0; i < Mat->GetTextureCount(Type); ++i)
 	{
-		aiString str;
-		mat->GetTexture(type, i, &str);
+		aiString Str;
+		Mat->GetTexture(Type, i, &Str);
 
-		string fullPath = directory + "/" + string(str.C_Str());
-		if (m_loadedTextures.find(fullPath) == m_loadedTextures.end())
+		string fullPath = Directory + "/" + string(Str.C_Str());
+		if (LoadedTextures.find(fullPath) == LoadedTextures.end())
 		{
-			Ref<GLTexParams> params = loadGLTexture(str.C_Str(), directory.c_str(), typeName);
+			Ref<GLTexParams> params = LoadGLTexture(Str.C_Str(), Directory.c_str(), TypeName);
 
 			//GLTexture texture(params);
 			//Ref<GLTexture> texture = makeRef<GLTexture>(params); //this limits to 1 thread. GLcalls need to be in 1 thrad
-			m_loadedTextures[fullPath] = params;
-			textures.push_back(params);
+			LoadedTextures[fullPath] = params;
+			Textures.push_back(params);
 		}
 		else
 		{
-			textures.push_back(m_loadedTextures[fullPath]);
+			Textures.push_back(LoadedTextures[fullPath]);
 		}
 	}
-	return textures;
+	return Textures;
 }
 

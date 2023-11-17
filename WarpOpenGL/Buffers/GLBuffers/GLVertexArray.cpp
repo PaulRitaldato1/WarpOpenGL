@@ -6,14 +6,14 @@ GLVertexArray::GLVertexArray()
 {
 	PROFILE_FUNCTION();
 
-	glGenVertexArrays(1, &m_id);
+	glGenVertexArrays(1, &Id);
 }
 
 GLVertexArray::~GLVertexArray()
 {
 	PROFILE_FUNCTION();
 
-	glDeleteVertexArrays(1, &m_id);
+	glDeleteVertexArrays(1, &Id);
 }
 
 void GLVertexArray::AddBuffer(const GLVertexBuffer& vb, const GLVertexBufferLayout& layout)
@@ -21,12 +21,12 @@ void GLVertexArray::AddBuffer(const GLVertexBuffer& vb, const GLVertexBufferLayo
 	PROFILE_FUNCTION();
 
 	vb.Bind();
-	const auto& elements = layout.getElements();
-	for (uint i = 0; i < elements.size(); i++)
+	const auto& Elements = layout.GetElements();
+	for (uint i = 0; i < Elements.size(); i++)
 	{
-		const auto& element = elements[i];
+		const auto& Element = Elements[i];
 		glEnableVertexAttribArray(i);
-		glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.getStride(), (const void*)element.offset);
+		glVertexAttribPointer(i, Element.Count, Element.Type, Element.Normalized, layout.GetStride(), (const void*)Element.Offset);
 	}
 }
 
@@ -34,7 +34,7 @@ void GLVertexArray::Bind() const
 {
 	PROFILE_FUNCTION();
 
-	glBindVertexArray(m_id);
+	glBindVertexArray(Id);
 }
 
 void GLVertexArray::Unbind() const

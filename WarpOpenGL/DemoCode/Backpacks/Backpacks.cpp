@@ -8,59 +8,59 @@
 
 Ref<Scene> BackPacksDemo::MakeScene(GLFWwindow* window)
 {
-	ModelLoader loader("Resources/");
-	FPCamera camera(glm::vec3(0.0f, 0.0f, 50.0f), glm::vec3(0.0, 1.0, 0.0), -90.0, 0);
+	ModelLoader Loader("Resources/");
+	FPCamera Camera(glm::vec3(0.0f, 0.0f, 50.0f), glm::vec3(0.0, 1.0, 0.0), -90.0, 0);
 
-	std::vector<glm::vec3> objectPositions;
-	objectPositions.push_back(glm::vec3(-3.0, -0.5, -3.0));
-	objectPositions.push_back(glm::vec3(0.0, -0.5, -3.0));
-	objectPositions.push_back(glm::vec3(3.0, -0.5, -3.0));
-	objectPositions.push_back(glm::vec3(-3.0, -0.5, 0.0));
-	objectPositions.push_back(glm::vec3(0.0, -0.5, 0.0));
-	objectPositions.push_back(glm::vec3(3.0, -0.5, 0.0));
-	objectPositions.push_back(glm::vec3(-3.0, -0.5, 3.0));
-	objectPositions.push_back(glm::vec3(0.0, -0.5, 3.0));
-	objectPositions.push_back(glm::vec3(3.0, -0.5, 3.0));
+	std::vector<glm::vec3> ObjectPositions;
+	ObjectPositions.push_back(glm::vec3(-3.0, -0.5, -3.0));
+	ObjectPositions.push_back(glm::vec3(0.0, -0.5, -3.0));
+	ObjectPositions.push_back(glm::vec3(3.0, -0.5, -3.0));
+	ObjectPositions.push_back(glm::vec3(-3.0, -0.5, 0.0));
+	ObjectPositions.push_back(glm::vec3(0.0, -0.5, 0.0));
+	ObjectPositions.push_back(glm::vec3(3.0, -0.5, 0.0));
+	ObjectPositions.push_back(glm::vec3(-3.0, -0.5, 3.0));
+	ObjectPositions.push_back(glm::vec3(0.0, -0.5, 3.0));
+	ObjectPositions.push_back(glm::vec3(3.0, -0.5, 3.0));
 
-	Vector<glm::mat4> modelMatrices;
-	glm::mat4 base = glm::mat4(1.0f);
-	base = glm::scale(base, glm::vec3(1.0f, 1.0f, 1.0f));
+	Vector<glm::mat4> ModelMatrices;
+	glm::mat4 Base = glm::mat4(1.0f);
+	Base = glm::scale(Base, glm::vec3(1.0f, 1.0f, 1.0f));
 
-	for (auto& pos : objectPositions)
-		modelMatrices.push_back(glm::translate(base, pos));
+	for (auto& Pos : ObjectPositions)
+		ModelMatrices.push_back(glm::translate(Base, Pos));
 	
-	Vector<ModelDesc> modelDescs;
-	modelDescs.emplace_back("Resources/Backpack/backpack.obj", false, true, modelMatrices);
+	Vector<ModelDesc> ModelDescs;
+	ModelDescs.emplace_back("Resources/Backpack/backpack.obj", false, true, ModelMatrices);
 
-	Vector<Ref<Model>> models = loader.loadModelsAsync(modelDescs, 1);
+	Vector<Ref<Model>> Models = Loader.LoadModelsAsync(ModelDescs, 1);
 
-	models[0]->setInstances(modelMatrices);
+	Models[0]->SetInstances(ModelMatrices);
 
-	Vector<Pointlight> pointLights;
-	Vector<Spotlight> spotlights;
-	Vector<DirectionalLight> directionalLights;
-	directionalLights.emplace_back(glm::vec3(1.0, 1.0, 1.0), glm::vec3(-0.5, -1.0, 0.0), .75, false);
+	Vector<Pointlight> PointLights;
+	Vector<Spotlight> Spotlights;
+	Vector<DirectionalLight> DirectionalLights;
+	DirectionalLights.emplace_back(glm::vec3(1.0, 1.0, 1.0), glm::vec3(-0.5, -1.0, 0.0), .75, false);
 
-	Vector<FPCamera> cameras;
-	cameras.push_back(camera);
+	Vector<FPCamera> Cameras;
+	Cameras.push_back(Camera);
 
-	m_scene = std::make_shared<Scene>(window, "Backpacks Test", spotlights, pointLights, directionalLights, models, cameras);
-	return m_scene;
+	DemoScene = std::make_shared<Scene>(window, "Backpacks Test", Spotlights, PointLights, DirectionalLights, Models, Cameras);
+	return DemoScene;
 }
 
 void BackPacksDemo::Update(float DeltaTime)
 {
-	float baseRotAngle = 0.5f;
-	float adjustedRotAngle = baseRotAngle / (DeltaTime * 10000);
+	float BaseRotAngle = 0.5f;
+	float AdjustedRotAngle = BaseRotAngle / (DeltaTime * 10000);
 
-	for (auto& model : m_scene->getModels())
+	for (auto& ModelItem : DemoScene->GetModels())
 	{
-		auto instances = model->getInstances();
+		auto Instances = ModelItem->GetInstances();
 
-		for (auto& instance : instances)
+		for (auto& InstanceItem : Instances)
 		{
-			instance = glm::rotate(instance, adjustedRotAngle, glm::vec3(0.0f, 1.0f, 0.0f));
+			InstanceItem = glm::rotate(InstanceItem, AdjustedRotAngle, glm::vec3(0.0f, 1.0f, 0.0f));
 		}
-		model->setInstances(instances);
+		ModelItem->SetInstances(Instances);
 	}
 }

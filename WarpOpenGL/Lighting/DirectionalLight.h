@@ -8,13 +8,13 @@ class DirectionalLight : public ILight
 public:
 
 	DirectionalLight(glm::vec3 color, glm::vec3 direction, float intensity, bool castsShadows)
-		: m_color(color)
-		, m_direction(direction)
-		, m_intensity(intensity)
-		, m_isShadowCaster(castsShadows)
+		: Color(color)
+		, Direction(direction)
+		, Intensity(intensity)
+		, bIsShadowCaster(castsShadows)
 	{
-		ModelLoader loader("/");
-		m_lightVolume = loader.generateQuad();
+		ModelLoader Loader("/");
+		LightVolume = Loader.GenerateQuad();
 	}
 
 	LightType getType() const override
@@ -23,41 +23,41 @@ public:
 	}
 
 
-	bool getIsShadowCaster() const override
+	bool GetIsShadowCaster() const override
 	{
-		return m_isShadowCaster;
+		return bIsShadowCaster;
 	}
 
-	void setIsShadowCaster(bool toggle) { m_isShadowCaster = toggle; }
+	void SetIsShadowCaster(bool toggle) { bIsShadowCaster = toggle; }
 
-	glm::vec3 getColor() const override
+	glm::vec3 GetColor() const override
 	{
-		return m_color;
+		return Color;
 	}
 
 
-	LightShaderParams getShaderParams() const override
+	LightShaderParams GetShaderParams() const override
 	{
-		LightShaderParams params;
-		params.color = m_color;
-		params.direction = m_direction;
-		params.intensity = m_intensity;
-		params.type = LightType::DIRECTIONAL;
-		return params;
+		LightShaderParams Params;
+		Params.Color = Color;
+		Params.Direction = Direction;
+		Params.Intensity = Intensity;
+		Params.Type = LightType::DIRECTIONAL;
+		return Params;
 	}
 
-	Model& getLightVolume() const override
+	Model& GetLightVolume() const override
 	{
-		return *m_lightVolume;
+		return *LightVolume;
 	}
 
 private:
-	bool m_isShadowCaster;
+	bool bIsShadowCaster;
 
-	glm::vec3 m_color;
-	glm::vec3 m_direction;
-	float m_intensity;
+	glm::vec3 Color;
+	glm::vec3 Direction;
+	float Intensity;
 
-	Ref<Model> m_lightVolume;
+	Ref<Model> LightVolume;
 
 };

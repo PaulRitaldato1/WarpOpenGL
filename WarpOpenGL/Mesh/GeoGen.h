@@ -5,16 +5,16 @@
 class GeoGen
 {
 public:
-	static Mesh CreateBox(float width, float height, float depth, uint numSubdivisions);
-	static Ref<Mesh> CreateSphere(float radius, uint sliceCount, uint stackCount);
-	static Mesh CreateGeoSphere(float radius, uint numSubdivisions);
-	static Mesh CreateCylinder(float bottomRadius, float topRadius, float height, uint sliceCount, uint stackCount);
-	static Mesh CreateGrid(float width, float depth, uint m, uint n);
-	static Ref<Mesh> CreateQuad(float x, float y, float w, float h, float depth);
-	static Ref<Mesh> CreateDefaultQuad();
+	static WarpMesh CreateBox(float Width, float Height, float Depth, uint NumSubdivisions);
+	static Ref<WarpMesh> CreateSphere(float Radius, uint SliceCount, uint StackCount);
+	static WarpMesh CreateGeoSphere(float Radius, uint NumSubdivisions);
+	static WarpMesh CreateCylinder(float BottomRadius, float TopRadius, float Height, uint SliceCount, uint StackCount);
+	static WarpMesh CreateGrid(float Width, float Depth, uint M, uint N);
+	static Ref<WarpMesh> CreateQuad(float X, float Y, float W, float H, float Depth);
+	static Ref<WarpMesh> CreateDefaultQuad();
 private:
-	static void Subdivide(Mesh& mesh);
-	static Vertex MidPoint(const Vertex& v0, const Vertex& v1);
-	static void BuildCylinderTop(float bottomRadius, float topRadius, float height, uint sliceCount, uint stackCount, Mesh& mesh);
-	static void BuildCylinderBottomCap(float bottomRadius, float topRadius, float height, uint sliceCount, uint stackCount, Mesh& mesh);
+	static void Subdivide(WarpMesh& Mesh);
+	static Vertex MidPoint(const Vertex& V0, const Vertex& V1);
+	static void BuildCylinderTop(float BottomRadius, float TopRadius, float Height, uint SliceCount, uint StackCount, WarpMesh& Mesh);
+	static void BuildCylinderBottomCap(float BottomRadius, float TopRadius, float Height, uint SliceCount, uint StackCount, WarpMesh& Mesh);
 };

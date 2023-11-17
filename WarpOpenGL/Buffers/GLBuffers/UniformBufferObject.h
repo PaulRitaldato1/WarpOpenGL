@@ -20,8 +20,8 @@ public:
 	void BindSubdata(const T& data)
 	{
 		Bind();
-		glBufferSubData(GL_UNIFORM_BUFFER, m_currentOffset, sizeof(T), &data);
-		updateOffset<T>();
+		glBufferSubData(GL_UNIFORM_BUFFER, CurrentOffset, sizeof(T), &data);
+		UpdateOffset<T>();
 		Unbind();
 	}
 	
@@ -29,8 +29,8 @@ public:
 	void BindSubdata<glm::mat4>(const glm::mat4& data)
 	{
 		Bind();
-		glBufferSubData(GL_UNIFORM_BUFFER, m_currentOffset, sizeof(glm::mat4), glm::value_ptr(data));
-		updateOffset<glm::mat4>();
+		glBufferSubData(GL_UNIFORM_BUFFER, CurrentOffset, sizeof(glm::mat4), glm::value_ptr(data));
+		UpdateOffset<glm::mat4>();
 		Unbind();
 	}
 
@@ -38,21 +38,21 @@ public:
 private:
 
 	template <typename T>
-	void updateOffset()
+	void UpdateOffset()
 	{
 		uint size = sizeof(T);
 
-		FATAL_ASSERT(m_currentOffset + size <= m_size, "Attemping to bind more memory than buffer contains!");
+		FATAL_ASSERT(CurrentOffset + size <= Size, "Attemping to bind more memory than buffer contains!");
 
-		if (m_currentOffset + size == m_size)
-			m_currentOffset = 0;
+		if (CurrentOffset + size == Size)
+			CurrentOffset = 0;
 		else
-			m_currentOffset += size;
+			CurrentOffset += size;
 	}
 
 	void BindRange(uint begin, uint end);
 
-	uint m_size = 0;
-	uint m_bindingPoint;
-	uint m_currentOffset = 0;
+	uint Size = 0;
+	uint BindingPoint;
+	uint CurrentOffset = 0;
 };

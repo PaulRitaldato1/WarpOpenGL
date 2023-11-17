@@ -14,24 +14,24 @@ struct GBuffer : public IPassData
 
 	GBuffer()
 	{
-		isValid = true;
+		bIsValid = true;
 	}
 
-	Ref<GLTexture> positionBuffer; //color buffer
-	Ref<GLTexture> normalBuffer; //color buffer
-	Ref<GLTexture> diffuseSpec; //color buffer
-	Ref<GLRenderBuffer> rbo; //for depth
+	Ref<GLTexture> PositionBuffer; //color buffer
+	Ref<GLTexture> NormalBuffer; //color buffer
+	Ref<GLTexture> DiffuseSpec; //color buffer
+	Ref<GLRenderBuffer> RBO; //for depth
 
-	Ref<GLFramebuffer> frameBuffer;
+	Ref<GLFramebuffer> FrameBuffer;
 
-	uint instancedGeometryShaderId;
-	uint geometryShaderId;
+	uint InstancedGeometryShaderId;
+	uint GeometryShaderId;
 };
 
 class RenderPassCollection
 {
 public:
-	RenderPassCollection() : m_shaderManager("Resources/Shaders/ShaderDefs/ShaderDefs.json")
+	RenderPassCollection() : RenderPassShaderManager("Resources/Shaders/ShaderDefs/ShaderDefs.json")
 	{
 	}
 
@@ -51,7 +51,7 @@ public:
 
 	void AddDebugQuadDraw(Vector<Ref<GLTexture>>& textures);
 
-	ShaderManager& getShaderManager() { return m_shaderManager; }
+	ShaderManager& GetShaderManager() { return RenderPassShaderManager; }
 private:
-	ShaderManager m_shaderManager;
+	ShaderManager RenderPassShaderManager;
 };

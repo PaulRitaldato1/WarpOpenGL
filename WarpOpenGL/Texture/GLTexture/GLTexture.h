@@ -36,7 +36,7 @@ struct GLTexParams
 	unsigned char* Data;
 };
 
-inline Ref<GLTexParams> loadGLTexture(const char* path, const char* directory, string type)
+inline Ref<GLTexParams> LoadGLTexture(const char* path, const char* directory, string type)
 {
 	PROFILE_FUNCTION();
 
@@ -117,12 +117,12 @@ struct GLTexture : ITexture
 		glDeleteTextures(1, &Id);
 	}
 
-	void setParameteri(GLenum paramName, int param)
+	void SetParameteri(GLenum paramName, int param)
 	{
 		glTexParameteri(TexType, paramName, param);
 	}
 
-	void setParameterfv(GLenum paramName, const float* data)
+	void SetParameterfv(GLenum paramName, const float* data)
 	{
 		glTexParameterfv(TexType, paramName, data);
 	}

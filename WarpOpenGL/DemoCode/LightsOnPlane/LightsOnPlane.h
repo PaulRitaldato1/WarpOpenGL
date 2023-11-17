@@ -19,12 +19,12 @@ public:
 
 private:
 	
-	Vector<Pointlight> generatePointLightGrid(int width, int height);
+	Vector<Pointlight> GeneratePointLightGrid(int width, int height);
 
 	// Inherited via Demo
 	virtual void Update(float DeltaTime) override;
 
-	Ref<Model> generateSphereGrid(int width, int height);
+	Ref<Model> GenerateSphereGrid(int width, int height);
 };
 
 

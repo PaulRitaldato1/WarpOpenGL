@@ -24,19 +24,19 @@ public:
 
 	//expensive constructor, but this should only be run during setup, or loading, not per frame
 	Scene(GLFWwindow* window, string name, Vector<Spotlight> spotlights, Vector<Pointlight> pointlights, Vector<DirectionalLight> directionalLights, Vector<Ref<Model>> models, Vector<FPCamera> cameras)
-		: m_window(window)
-		, m_name(name)
-		, m_spotlights(spotlights)
-		, m_pointlights(pointlights)
-		, m_directionalLights(directionalLights)
-		, m_models(models)
-		, m_cameras(cameras)
-		, m_activeCameraIndex(0)
-		, m_windowChanged(false)
+		: Window(window)
+		, Name(name)
+		, Spotlights(spotlights)
+		, Pointlights(pointlights)
+		, DirectionalLights(directionalLights)
+		, Models(models)
+		, Cameras(cameras)
+		, ActiveCameraIndex(0)
+		, bWindowChanged(false)
 	{
-		DYNAMIC_ASSERT(m_cameras.size() > 0, "No Camera(s) provided to scene, creating a default one");
-		DYNAMIC_ASSERT(m_spotlights.size() > 0 || m_pointlights.size() > 0 || m_directionalLights.size() > 0, "No lights provided to the scene. Render may be dark.");
-		DYNAMIC_ASSERT(m_models.size() > 0, "No models in the current scene");
+		DYNAMIC_ASSERT(Cameras.size() > 0, "No Camera(s) provided to scene, creating a default one");
+		DYNAMIC_ASSERT(Spotlights.size() > 0 || Pointlights.size() > 0 || DirectionalLights.size() > 0, "No lights provided to the scene. Render may be dark.");
+		DYNAMIC_ASSERT(Models.size() > 0, "No models in the current scene");
 
 		if (cameras.size() == 0)
 		{
@@ -44,7 +44,7 @@ public:
 		}
 	}
 
-	void update(float delta)
+	void Update(float delta)
 	{	
 
 		//float baseRotAngle = 1.0f;
@@ -78,52 +78,54 @@ public:
 		//}
 	}
 
-	void addPointlight(Pointlight light) { m_pointlights.push_back(light); }
-	void addSpotlight(Spotlight light) { m_spotlights.push_back(light); }
-	void addModel(Ref<Model> model) { m_models.push_back(model); }
-	void addCamera(FPCamera camera) { m_cameras.push_back(camera); }
+	void AddPointlight(Pointlight light) { Pointlights.push_back(light); }
+	void AddSpotlight(Spotlight light) { Spotlights.push_back(light); }
+	void AddModel(Ref<Model> model) { Models.push_back(model); }
+	void AddCamera(FPCamera camera) { Cameras.push_back(camera); }
 
-	const Vector<Pointlight>& getPointlights() { return m_pointlights; }
-	const Vector<Spotlight>& getSpotlights() { return m_spotlights; }
-	const Vector<DirectionalLight>& getDirectionalLights() { return m_directionalLights; }
-	const Vector<Ref<Model>>& getModels() { return m_models; }
+	const Vector<Pointlight>& GetPointlights() { return Pointlights; }
+	const Vector<Spotlight>& GetSpotlights() { return Spotlights; }
+	const Vector<DirectionalLight>& GetDirectionalLights() { return DirectionalLights; }
+	const Vector<Ref<Model>>& GetModels() { return Models; }
 
-	const Vector<FPCamera>& getCameras() { return m_cameras; }
+	const Vector<FPCamera>& GetCameras() { return Cameras; }
 
-	FPCamera& getActiveCamera() { return m_cameras[m_activeCameraIndex]; }
+	FPCamera& GetActiveCamera() { return Cameras[ActiveCameraIndex]; }
 	
-	uint getSpotlightCount() { m_spotlights.size(); }
-	uint getPointlightCount() { m_pointlights.size(); }
-	uint getModelCount() { m_models.size(); }
-	uint getCameraCount() { m_cameras.size(); }
+	uint GetSpotlightCount() { return Spotlights.size(); }
+	uint GetPointlightCount() { return Pointlights.size(); }
+	uint GetModelCount() { return Models.size(); }
+	uint GetCameraCount() { return Cameras.size(); }
 
-	Tuple<int, int> getWindowSize()
+	Tuple<int, int> GetWindowSize()
 	{
 		int width = 0;
 		int height = 0;
-		glfwGetFramebufferSize(m_window, &width, &height);
+		glfwGetFramebufferSize(Window, &width, &height);
 		return Tuple<int, int>(width, height);
 	}
 
-	bool hasWindowChanged() 
+	bool HasWindowChanged() 
 	{ 
-		if (m_windowChanged)
+		if (bWindowChanged)
 		{
-			m_windowChanged = false;
+			bWindowChanged = false;
 			return true;
 		}
 		else
 			return false;
 	}
-	void setWindowChanged(bool toggle) { m_windowChanged = toggle; }
+
+	void SetWindowChanged(bool bToggle) { bWindowChanged = bToggle; }
+
 private:
-	GLFWwindow* m_window;
-	string m_name;
-	uint m_activeCameraIndex;
-	Vector<Spotlight> m_spotlights;
-	Vector<Pointlight> m_pointlights;
-	Vector<DirectionalLight> m_directionalLights;
-	Vector<Ref<Model>> m_models;
-	Vector<FPCamera> m_cameras;
-	bool m_windowChanged;
+	GLFWwindow* Window;
+	string Name;
+	uint ActiveCameraIndex;
+	Vector<Spotlight> Spotlights;
+	Vector<Pointlight> Pointlights;
+	Vector<DirectionalLight> DirectionalLights;
+	Vector<Ref<Model>> Models;
+	Vector<FPCamera> Cameras;
+	bool bWindowChanged;
 };

@@ -14,8 +14,8 @@ public:
 
 	void Unbind() const override;
 
-	GLenum getFormat() { return m_format; }
+	GLenum getFormat() { return Format; }
 
 private:
-	GLenum m_format;
+	GLenum Format;
 };
