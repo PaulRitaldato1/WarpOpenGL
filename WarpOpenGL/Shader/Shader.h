@@ -208,7 +208,7 @@ public:
 	template<>
 	void SetUniform<int>(const std::string& name, const int& value)
 	{
-		glUniform1i(getUniformLocation(name), value);
+		glUniform1i(GetUniformLocation(name), value);
 	}
 	template<>
 	void SetUniform<uint>(const std::string& name, const uint& value)

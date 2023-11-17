@@ -9,9 +9,9 @@
 class ILight
 {
 public:
-	virtual LightType getType() const = 0;
-	virtual bool getIsShadowCaster() const = 0;
-	virtual glm::vec3 getColor() const = 0;
-	virtual LightShaderParams getShaderParams() const = 0;
-	virtual Model& getLightVolume() const = 0;
+	virtual LightType GetType() const = 0;
+	virtual bool GetIsShadowCaster() const = 0;
+	virtual glm::vec3 GetColor() const = 0;
+	virtual LightShaderParams GetShaderParams() const = 0;
+	virtual Model& GetLightVolume() const = 0;
 };

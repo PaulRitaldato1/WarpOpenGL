@@ -17,7 +17,7 @@ public:
 		LightVolume = Loader.GenerateQuad();
 	}
 
-	LightType getType() const override
+	LightType GetType() const override
 	{
 		return LightType::DIRECTIONAL;
 	}
