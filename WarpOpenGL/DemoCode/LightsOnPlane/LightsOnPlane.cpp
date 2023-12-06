@@ -6,8 +6,8 @@ Ref<Scene> LightOnPlaneDemo::MakeScene(GLFWwindow* window)
 	ModelLoader Loader("Resources/");
 	Vector<Ref<Model>> Models;
 
-	Models.push_back(GenerateSphereGrid(1000, 1000));
-	Models.push_back(Loader.GenerateGrid(1000, 1000, 100, 100, glm::vec3(0.0f, -4.0f, 0.0f)));
+	Models.push_back(GenerateSphereGrid(2000, 2000));
+	Models.push_back(Loader.GenerateGrid(2000, 2000, 100, 100, glm::vec3(0.0f, -4.0f, 0.0f)));
 	Models.back()->GetMeshes()[0]->SetTexture(LoadGLTexture("RandomTextures/wood.png", "Resources", "Diffuse"));
 
 	Vector<Pointlight> PointLights = GeneratePointLightGrid(1000, 1000);

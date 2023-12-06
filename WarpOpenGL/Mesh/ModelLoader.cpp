@@ -55,7 +55,9 @@ Ref<Model> ModelLoader::GenerateSphereInstanced(Vector<float>& Radii, Vector<glm
 	if (TexParams != nullptr)
 		Meshes.back()->SetTexture(TexParams);
 
-	return std::make_shared<Model>(Meshes, Desc);
+	Ref<Model> RetModel = std::make_shared<Model>(Meshes, Desc);
+	//RetModel->GenBuffers();
+	return RetModel;
 }
 
 Ref<Model> ModelLoader::GenerateSphere(float Radius, uint SliceCount, uint StackCount, glm::vec3 Pos, Ref<GLTexParams> TexParams)

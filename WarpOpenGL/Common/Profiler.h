@@ -7,8 +7,9 @@
 
 #include <mutex>
 #include <thread>
+#include <Parallelization/Futex.h>
 
-//#define PROFILING_ENABLE
+#define PROFILING_ENABLE
 #ifdef PROFILING_ENABLE
 
 struct ProfileResult
@@ -26,65 +27,65 @@ struct InstrumentationSession
 class Instrumentor
 {
 private:
-	InstrumentationSession* m_CurrentSession;
-	std::ofstream m_OutputStream;
-	int m_ProfileCount;
-	std::mutex m_lock;
+	InstrumentationSession* CurrentSession;
+	std::ofstream OutputStream;
+	int ProfileCount;
+	Futex WriteLock;
 public:
 	Instrumentor()
-		: m_CurrentSession(nullptr), m_ProfileCount(0)
+		: CurrentSession(nullptr), ProfileCount(0)
 	{
 	}
 
 	void BeginSession(const std::string& name, const std::string& filepath = "results.json")
 	{
-		m_OutputStream.open(filepath);
+		OutputStream.open(filepath);
 		WriteHeader();
-		m_CurrentSession = new InstrumentationSession{ name };
+		CurrentSession = new InstrumentationSession{ name };
 	}
 
 	void EndSession()
 	{
 		WriteFooter();
-		m_OutputStream.close();
-		delete m_CurrentSession;
-		m_CurrentSession = nullptr;
-		m_ProfileCount = 0;
+		OutputStream.close();
+		delete CurrentSession;
+		CurrentSession = nullptr;
+		ProfileCount = 0;
 	}
 
 	void WriteProfile(const ProfileResult& result)
 	{
-		std::lock_guard<std::mutex> lock(m_lock);
+		std::lock_guard<Futex> lock(WriteLock);
 
-		if (m_ProfileCount++ > 0)
-			m_OutputStream << ",";
+		if (ProfileCount++ > 0)
+			OutputStream << ",";
 
 		std::string name = result.Name;
 		std::replace(name.begin(), name.end(), '"', '\'');
 
-		m_OutputStream << "{";
-		m_OutputStream << "\"cat\":\"function\",";
-		m_OutputStream << "\"dur\":" << (result.End - result.Start) << ',';
-		m_OutputStream << "\"name\":\"" << name << "\",";
-		m_OutputStream << "\"ph\":\"X\",";
-		m_OutputStream << "\"pid\":0,";
-		m_OutputStream << "\"tid\":" << result.ThreadID << ",";
-		m_OutputStream << "\"ts\":" << result.Start;
-		m_OutputStream << "}";
+		OutputStream << "{";
+		OutputStream << "\"cat\":\"function\",";
+		OutputStream << "\"dur\":" << (result.End - result.Start) << ',';
+		OutputStream << "\"name\":\"" << name << "\",";
+		OutputStream << "\"ph\":\"X\",";
+		OutputStream << "\"pid\":0,";
+		OutputStream << "\"tid\":" << result.ThreadID << ",";
+		OutputStream << "\"ts\":" << result.Start;
+		OutputStream << "}";
 
-		m_OutputStream.flush();
+		OutputStream.flush();
 	}
 
 	void WriteHeader()
 	{
-		m_OutputStream << "{\"otherData\": {},\"traceEvents\":[";
-		m_OutputStream.flush();
+		OutputStream << "{\"otherData\": {},\"traceEvents\":[";
+		OutputStream.flush();
 	}
 
 	void WriteFooter()
 	{
-		m_OutputStream << "]}";
-		m_OutputStream.flush();
+		OutputStream << "]}";
+		OutputStream.flush();
 	}
 
 	static Instrumentor& Get()

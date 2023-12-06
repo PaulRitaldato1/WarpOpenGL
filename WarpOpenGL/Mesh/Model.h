@@ -79,6 +79,7 @@ public:
 			// constructor is called in another thread, these glcalls will "fail"
 		//	m_ssbo = std::make_unique<GLSSBO>(desc.instances.size() * sizeof(glm::mat4), 1);
 			Instances.insert(Instances.end(), std::make_move_iterator(Desc.Instances.begin()), std::make_move_iterator(Desc.Instances.end()));
+			GenBuffers();
 		}
 		else
 			SetTransform(Desc.Transform);

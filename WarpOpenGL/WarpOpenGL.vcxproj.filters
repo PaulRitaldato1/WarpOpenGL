@@ -168,6 +168,8 @@
     <ClInclude Include="DemoCode\Demo.h" />
     <ClInclude Include="DemoCode\Asteroids\Asteroids.h" />
     <ClInclude Include="DemoCode\Backpacks\Backpacks.h" />
+    <ClInclude Include="Parallelization\Futex.h" />
+    <ClInclude Include="Parallelization\BufferedContainer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\model.vert" />

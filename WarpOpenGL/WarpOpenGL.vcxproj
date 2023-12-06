@@ -290,6 +290,8 @@
     <ClInclude Include="Mesh\ModelLoader.h" />
     <ClInclude Include="Mesh\Model.h" />
     <ClInclude Include="Mesh\Vertex.h" />
+    <ClInclude Include="Parallelization\BufferedContainer.h" />
+    <ClInclude Include="Parallelization\Futex.h" />
     <ClInclude Include="Parallelization\Threading\ThreadPool.h" />
     <ClInclude Include="Renderer\GLRenderer\GLRenderer.h" />
     <ClInclude Include="Renderer\IRenderer.h" />
